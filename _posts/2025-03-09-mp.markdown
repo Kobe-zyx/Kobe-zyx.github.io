@@ -1,0 +1,13 @@
+---
+layout:       post
+title:        "我的个人博客搭建中..."
+author:       "Kobe_zyx"
+header-style: text
+catalog:      true
+tags:
+     - Web
+     - Blog
+---
+
+# 原因 #
+有了这个个人博客纯粹是因为花70块钱买了个域名没地方用。。。
