@@ -1,7 +1,7 @@
 # Site settings
 title: Kobe_zyx Blog
 SEOTitle: 宇轩的博客 | Kobe_zyx Blog
-header-img:  img/home-bg.jpg
+header-img: https://telegraph-image-92x.pages.dev/file/cd9b794cbd811f0aafb03-4d12807485ff67af0a.jpg
 email: kobezyuxuan@gmail.com
 description: "这里是 @Kobe_zyx宇轩 的个人博客，与你一起发现更大的世界 "
 keyword: "Kobe_zyx，宇轩，Kobe_zyx宇轩"
@@ -14,7 +14,7 @@ future: true
 # SNS settings
 RSS: false
 gmail_username: kobezyuxuan@gmial.com
-bilibili_username: huxpro
+bilibili_username: kobe_zyx824
 github_username: Kobe-zyx
 twitter_username: kobe_zyx24
 #facebook_username:  huxpro
