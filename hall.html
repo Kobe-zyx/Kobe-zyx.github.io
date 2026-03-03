@@ -3,34 +3,29 @@ layout: default
 title: Kobe Zhang | Hall
 ---
 
-<section class="timeline-section">
+<section class="timeline-section" style="margin-top: 100px;">
     <div class="container">
-        <h1>Music Hall</h1>
-        <h3>音乐馆</h3>
+        <h1 style="margin-bottom: 10px;">Music Hall</h1>
         <p class="blog-intro-text">Discover and enjoy music from around the world.</p>
-        <p class="blog-intro-text">发现并享受来自世界各地的音乐。</p> 
+        <p class="blog-intro-text" style="margin-bottom: 40px;">音乐馆：发现并享受来自世界各地的节奏。</p>
         
         <div class="music-search-container">
             <div class="search-box">
-                <input type="text" id="searchInput" placeholder="搜索音乐、艺术家或专辑..." class="search-input">
+                <input type="text" id="searchInput" placeholder="搜索歌曲、艺术家或专辑..." class="search-input">
                 <button id="searchBtn" class="search-button">
                     <i data-feather="search"></i>
-                </button> 
+                </button>
             </div>
         </div>
         
         <div class="music-section" id="searchResults" style="display: none;">
-             <h2>Search Results</h2>
-            <h3>搜索结果</h3>
-        <div id="searchResultsGrid" class="music-grid">
-         </div>
-    </div>
+            <h2 style="font-size: 1.5em; margin-top: 40px;">Search Results</h2>
+            <div id="searchResultsGrid" class="music-grid"></div>
+        </div>
         
-    <div class="music-section">
-            <h2>Featured Music</h2>
-            <h3>精选音乐</h3>
-            <div id="featuredMusic" class="music-grid">
-                </div>
+        <div class="music-section">
+            <h2 style="font-size: 1.5em; margin-top: 40px;">Geek's Favorites</h2>
+            <div id="featuredMusic" class="music-grid"></div>
         </div>
 
         <div class="music-player-container" id="musicPlayer" style="display: none;">
@@ -43,7 +38,7 @@ title: Kobe Zhang | Hall
                     </div>
                 </div>
                 <div class="player-controls">
-                    <button id="playPauseBtn" class="control-btn">
+                    <button id="playPauseBtn" class="control-btn play-btn">
                         <i data-feather="play"></i>
                     </button>
                     <div class="progress-container">
@@ -52,9 +47,12 @@ title: Kobe Zhang | Hall
                         </div>
                         <div class="time-display">
                             <span id="currentTime">0:00</span>
-                            <span id="totalTime">0:00</span>
+                            <span id="totalTime">0:30</span>
                         </div>
                     </div>
+                    <button id="closePlayerBtn" class="control-btn close-btn" title="关闭播放器">
+                        <i data-feather="x"></i>
+                    </button>
                 </div>
             </div>
         </div>

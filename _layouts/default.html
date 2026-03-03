@@ -3,10 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ page.title | default: site.title }}</title>
+    
     <link rel="stylesheet" href="/style.css">
-    <link rel="icon" href="/img/favicon.png">
-    <script src="https://unpkg.com/feather-icons"></script> 
+    
+    <link rel="icon" type="image/png" href="/img/favicon.png">
+    
+    <script src="https://unpkg.com/feather-icons"></script>
+
+    {% seo %}
 </head>
 
 <body class="fade-in">
@@ -24,6 +28,7 @@
                         <li><a href="/timeline.html" {% if page.url contains '/timeline' %}class="active"{% endif %}>Timeline</a></li>
                         <li><a href="/stack.html" {% if page.url contains '/stack' %}class="active"{% endif %}>Stack</a></li>
                         <li><a href="/hall.html" {% if page.url contains '/hall' %}class="active"{% endif %}>Hall</a></li>
+                        <li><a href="/archive.html" {% if page.url contains '/archive' %}class="active"{% endif %}>Archive</a></li>
                     </ul>
                 </nav>
             </div>

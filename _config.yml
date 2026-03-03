@@ -3,7 +3,7 @@ author: "Kobe_zyx"
 email: "kobezyuxuan@gmail.com"
 description: "IT Enthusiast & Student"
 baseurl: ""
-url: "https://kobezyx.xx.kg"
+url: ""
 
 # Markdown 解析设置 
 markdown: kramdown
@@ -12,3 +12,8 @@ kramdown:
   hard_wrap: false    # 像 Obsidian 一样，单次回车不换行，双次回车才换段落
   math_engine: mathjax # 开启 LaTeX 数学公式支持
   syntax_highlighter: rouge # 代码高亮引擎
+
+plugins:
+  - jekyll-seo-tag
+  - jekyll-feed          # <--- 加上这个
+  - jekyll-admin

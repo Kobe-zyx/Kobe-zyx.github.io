@@ -1,0 +1,36 @@
+---
+layout: default
+title: Kobe Zhang | Archive
+---
+
+<section class="timeline-section" style="margin-top: 100px;">
+    <div class="container">
+        <h1 style="margin-bottom: 10px;">Archive</h1>
+        <p class="blog-intro-text">Time machine: Browse all my posts by year.</p>
+        <p class="blog-intro-text" style="margin-bottom: 40px;">时光机：在这里按年份浏览我所有的博文。</p>
+
+        <div class="archive-container">
+            {% for post in site.posts %}
+                {% capture current_year %}{{ post.date | date: "%Y" }}{% endcapture %}
+                
+                {% if current_year != year %}
+                    {% unless forloop.first %}
+                        </ul>
+                    {% endunless %}
+                    <h2 class="archive-year">{{ current_year }}</h2>
+                    <ul class="archive-list">
+                    {% capture year %}{{ current_year }}{% endcapture %}
+                {% endif %}
+                
+                <li class="archive-item">
+                    <span class="archive-date">{{ post.date | date: "%m-%d" }}</span>
+                    <a href="{{ post.url | relative_url }}" class="archive-title">{{ post.title }}</a>
+                </li>
+                
+                {% if forloop.last %}
+                    </ul>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</section>

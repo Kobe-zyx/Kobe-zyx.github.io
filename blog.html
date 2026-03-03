@@ -11,12 +11,17 @@ title: Kobe Zhang | Geek
         
         <div class="tags-cloud">
             <span class="tag-pill active" data-tag="all">全部 All</span>
+            
             {% for tag in site.tags %}
             <span class="tag-pill" data-tag="{{ tag[0] }}">
                 {{ tag[0] }} <sup>{{ tag[1].size }}</sup>
             </span>
             {% endfor %}
-        </div> 
+
+            <a href="{{ '/archive.html' | relative_url }}" class="tag-pill" style="margin-left: auto; color: var(--primary-color); border-color: var(--primary-color); text-decoration: none; display: inline-flex; align-items: center;">
+                <i data-feather="archive" style="width: 14px; height: 14px; margin-right: 4px;"></i>归档时光机
+            </a>
+        </div>
         
         <div class="post-list-hux" id="post-list">                
             {% for post in site.posts %}
@@ -25,14 +30,17 @@ title: Kobe Zhang | Geek
                     <h2 class="post-title-hux">
                         {{ post.title }}
                     </h2>
+                    
                     {% if post.subtitle %}
                     <h3 class="post-subtitle-hux">
                         {{ post.subtitle }}
                     </h3>
                     {% endif %}
                 </a>
+                
                 <p class="post-meta-hux">
                     Posted by {{ site.author | default: "Kobe_zyx" }} on {{ post.date | date: "%Y年%m月%d日" }}
+                    
                     {% if post.tags.size > 0 %}
                         &nbsp;·&nbsp; 
                         {% for tag in post.tags %}
@@ -48,7 +56,12 @@ title: Kobe Zhang | Geek
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const tagPills = document.querySelectorAll('.tag-pill');
+        // 确保新加的归档小图标能够正常渲染
+        if(typeof feather !== 'undefined') {
+            feather.replace();
+        }
+
+        const tagPills = document.querySelectorAll('.tag-pill[data-tag]');
         const posts = document.querySelectorAll('.post-item-hux');
 
         tagPills.forEach(pill => {
