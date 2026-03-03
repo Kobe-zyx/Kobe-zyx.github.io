@@ -1,0 +1,64 @@
+---
+layout: default
+title: Kobe Zhang | Hall
+---
+
+<section class="timeline-section">
+    <div class="container">
+        <h1>Music Hall</h1>
+        <h3>音乐馆</h3>
+        <p class="blog-intro-text">Discover and enjoy music from around the world.</p>
+        <p class="blog-intro-text">发现并享受来自世界各地的音乐。</p> 
+        
+        <div class="music-search-container">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="搜索音乐、艺术家或专辑..." class="search-input">
+                <button id="searchBtn" class="search-button">
+                    <i data-feather="search"></i>
+                </button> 
+            </div>
+        </div>
+        
+        <div class="music-section" id="searchResults" style="display: none;">
+             <h2>Search Results</h2>
+            <h3>搜索结果</h3>
+        <div id="searchResultsGrid" class="music-grid">
+         </div>
+    </div>
+        
+    <div class="music-section">
+            <h2>Featured Music</h2>
+            <h3>精选音乐</h3>
+            <div id="featuredMusic" class="music-grid">
+                </div>
+        </div>
+
+        <div class="music-player-container" id="musicPlayer" style="display: none;">
+            <div class="music-player">
+                <div class="player-info">
+                    <img id="playerAlbumArt" src="" alt="专辑封面" class="player-album-art">
+                    <div class="player-details">
+                        <h3 id="playerTitle">歌曲标题</h3>
+                        <p id="playerArtist">艺术家</p>
+                    </div>
+                </div>
+                <div class="player-controls">
+                    <button id="playPauseBtn" class="control-btn">
+                        <i data-feather="play"></i>
+                    </button>
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="time-display">
+                            <span id="currentTime">0:00</span>
+                            <span id="totalTime">0:00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="/hall.js"></script>

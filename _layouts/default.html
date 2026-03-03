@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page.title | default: site.title }}</title>
+    <link rel="stylesheet" href="/style.css">
+    <link rel="icon" href="/img/favicon.png">
+    <script src="https://unpkg.com/feather-icons"></script> 
+</head>
+
+<body class="fade-in">
+    <header class="navbar">
+        <div class="container">
+            <a href="/index.html" class="logo">
+                <img src="https://cdn.jsdelivr.net/gh/Kobe-zyx/PicGo@main/light.svg" alt="切换到浅色模式" class="light-icon">
+                <img src="https://cdn.jsdelivr.net/gh/Kobe-zyx/PicGo@main/dark.svg" alt="切换到深色模式" class="dark-icon">
+            </a>
+            <div class="nav-links-container">
+                <nav>
+                    <ul>
+                        <li><a href="/index.html" {% if page.url == '/index.html' or page.url == '/' %}class="active"{% endif %}>Readme</a></li>
+                        <li><a href="/blog.html" {% if page.url contains '/blog' %}class="active"{% endif %}>Geek</a></li>
+                        <li><a href="/timeline.html" {% if page.url contains '/timeline' %}class="active"{% endif %}>Timeline</a></li>
+                        <li><a href="/stack.html" {% if page.url contains '/stack' %}class="active"{% endif %}>Stack</a></li>
+                        <li><a href="/hall.html" {% if page.url contains '/hall' %}class="active"{% endif %}>Hall</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    {{ content }}
+
+    <nav class="bottom-nav">
+        <div class="container">
+            <ul>
+                <li><a href="/index.html">Readme</a></li>
+                <li><a href="/blog.html">Geek</a></li>
+                <li><a href="/timeline.html">Timeline</a></li>
+                <li><a href="/stack.html">Stack</a></li>
+                <li><a href="/hall.html">Hall</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 Kobe_zyx. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <button id="back-to-top" class="back-to-top" aria-label="回到顶部">
+        <i data-feather="arrow-up"></i>
+    </button>
+
+    <script>
+        feather.replace();
+    </script>
+    <script src="/script.js"></script>
+    
+    <button class="theme-toggle" aria-label="切换深浅模式">
+        <img src="/svg/ld/light.svg" alt="切换到浅色模式" class="light-icon">
+        <img src="/svg/ld/dark.svg" alt="切换到深色模式" class="dark-icon">
+    </button>
+</body>
+</html>

@@ -1,0 +1,85 @@
+---
+layout: default
+title: Kobe Zhang | Geek
+---
+
+<section class="timeline-section" style="margin-top: 100px;">
+    <div class="container">
+        <h1 style="margin-bottom: 10px;">Geek</h1>
+        <p class="blog-intro-text">Here, you can see my all blog list.</p>
+        <p class="blog-intro-text" style="margin-bottom: 30px;">以下是我的所有博文列表：</p>
+        
+        <div class="tags-cloud">
+            <span class="tag-pill active" data-tag="all">全部 All</span>
+            {% for tag in site.tags %}
+            <span class="tag-pill" data-tag="{{ tag[0] }}">
+                {{ tag[0] }} <sup>{{ tag[1].size }}</sup>
+            </span>
+            {% endfor %}
+        </div> 
+        
+        <div class="post-list-hux" id="post-list">                
+            {% for post in site.posts %}
+            <div class="post-item-hux" data-tags="{{ post.tags | join: ',' }}">
+                <a href="{{ post.url | relative_url }}">
+                    <h2 class="post-title-hux">
+                        {{ post.title }}
+                    </h2>
+                    {% if post.subtitle %}
+                    <h3 class="post-subtitle-hux">
+                        {{ post.subtitle }}
+                    </h3>
+                    {% endif %}
+                </a>
+                <p class="post-meta-hux">
+                    Posted by {{ site.author | default: "Kobe_zyx" }} on {{ post.date | date: "%Y年%m月%d日" }}
+                    {% if post.tags.size > 0 %}
+                        &nbsp;·&nbsp; 
+                        {% for tag in post.tags %}
+                            <span class="post-inline-tag">#{{ tag }}</span>
+                        {% endfor %}
+                    {% endif %}
+                </p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const tagPills = document.querySelectorAll('.tag-pill');
+        const posts = document.querySelectorAll('.post-item-hux');
+
+        tagPills.forEach(pill => {
+            pill.addEventListener('click', function() {
+                // 1. 切换按钮的 active 状态
+                tagPills.forEach(p => p.classList.remove('active'));
+                this.classList.add('active');
+
+                // 2. 获取被点击的标签名
+                const selectedTag = this.getAttribute('data-tag');
+
+                // 3. 过滤文章（加入极简的淡入淡出效果）
+                posts.forEach(post => {
+                    post.style.opacity = '0'; // 先变透明
+                    
+                    setTimeout(() => {
+                        if (selectedTag === 'all') {
+                            post.style.display = 'block';
+                            setTimeout(() => post.style.opacity = '1', 50);
+                        } else {
+                            const postTags = post.getAttribute('data-tags').split(',');
+                            if (postTags.includes(selectedTag)) {
+                                post.style.display = 'block';
+                                setTimeout(() => post.style.opacity = '1', 50);
+                            } else {
+                                post.style.display = 'none';
+                            }
+                        }
+                    }, 300); // 等待透明度过渡完成
+                });
+            });
+        });
+    });
+</script>

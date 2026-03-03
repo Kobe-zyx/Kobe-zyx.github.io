@@ -1,0 +1,839 @@
+---
+layout: default
+title: Kobe Zhang | TimeLine
+---
+
+<style>
+    /* 通用时间轴样式 */
+    .timeline-section {
+        margin-top: 100px;
+        transition: margin-top 0.3s ease;
+    }
+
+    .navbar.hidden~.timeline-section {
+        margin-top: 0;
+    }
+
+    .container {
+        padding-top: calc(var(--spacing-unit) * 4);
+        padding-bottom: calc(var(--spacing-unit) * 4);
+    }
+ 
+    .timeline {
+        position: relative;
+        padding-left: 60px;
+        gap: 0;
+        margin-top: 30px;
+    }
+
+    .timeline::before,
+    .timeline-item::before {
+        content: none;
+    }
+
+    .timeline-point-text {
+        position: absolute;
+        left: -39px;
+        top: 20px;
+        width: 14px;
+        height: 14px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1em;
+        color: var(--text-color);
+        border-radius: 50%;
+        z-index: 1;
+        box-sizing: border-box;
+        padding: 2px;
+        border: none !important;
+        background: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+    }
+
+    .timeline-point-text::before,
+    .timeline-point-text::after {
+        content: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        border: none !important;
+        background: none !important;
+    }
+
+    .timeline-item:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        left: -33.5px;
+        top: 27px;
+        height: calc(100% - 27px);
+        width: 2px;
+        background-color: #D2D2D7;
+        border-left: none;
+        z-index: 0;
+    }
+
+    .timeline-item {
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 15px 0;
+        margin-left: 0;
+        border-bottom: 1px solid var(--border-color);
+        gap: 20px;
+        background: transparent !important;
+        box-shadow: none !important;
+        transition: none !important;
+    }
+
+    .timeline-item:hover {
+        transform: none !important;
+        box-shadow: none !important;
+    }
+
+    .timeline-item:last-child {
+        border-bottom: none;
+    }
+
+    .timeline-main-content {
+        flex-grow: 1;
+        min-width: 0;
+        border: none !important;
+        background: none !important;
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+    }
+
+    .timeline-point-text+.timeline-main-content {
+        border-left: none !important;
+        background: none !important;
+        margin-left: 0 !important;
+        padding-left: 0 !important;
+        box-shadow: none !important;
+        outline: none !important;
+    }
+
+    .timeline-main-content h3 {
+        margin: 0 0 5px 0;
+        font-size: 1.1em;
+        font-weight: 600;
+        color: var(--text-color);
+    }
+
+    .timeline-main-content>p {
+        font-size: 0.9em;
+        color: var(--secondary-text-color);
+        margin: 0 0 10px 0;
+        line-height: 1.5;
+    }
+
+    .timeline-date,
+    .timeline-date-right {
+        min-width: 120px;
+        text-align: right;
+        color: var(--secondary-text-color);
+        font-size: 0.85em;
+        padding-top: 2px;
+        font-weight: normal;
+    }
+
+    /* ====== 核心画廊样式 ====== */
+    .timeline-image-row,
+    .timeline-photos {
+        display: flex;
+        align-items: center;
+        flex-wrap: nowrap;
+        margin-top: 15px;
+        margin-bottom: 10px;
+        min-height: 140px;
+    }
+
+    .timeline-image-row img,
+    .timeline-photos img {
+        object-fit: cover;
+        border: 4px solid white;
+        border-radius: 2px;
+        box-shadow: 1px 1px 5px rgba(0, 0, 0, 0.2);
+        margin-left: -25px;
+        position: relative;
+        cursor: pointer;
+        opacity: 0; /* 默认透明 */
+        transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    .timeline-image-row img.animate-in,
+    .timeline-photos img.animate-in {
+        opacity: 1;
+    }
+
+    .timeline-image-row img:only-child,
+    .timeline-photos img:only-child {
+        opacity: 0;
+        transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    .timeline-image-row img:only-child.animate-in,
+    .timeline-photos img:only-child.animate-in {
+        opacity: 1;
+    }
+
+    .timeline-image-row img.img-square,
+    .timeline-photos img.img-square { width: 100px; height: 100px; }
+    .timeline-image-row img.img-landscape,
+    .timeline-photos img.img-landscape { width: 140px; height: 84px; }
+    .timeline-image-row img.img-portrait,
+    .timeline-photos img.img-portrait { width: 84px; height: 140px; }
+
+    .timeline-image-row img:first-child,
+    .timeline-photos img:first-child { margin-left: 0; }
+
+    .timeline-image-row img.image-hovered,
+    .timeline-photos img.image-hovered {
+        box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    /* 延迟动画遍历，实现扇形展开 */
+    .timeline-photos img:nth-child(1) { transition-delay: 0.1s; }
+    .timeline-photos img:nth-child(2) { transition-delay: 0.2s; }
+    .timeline-photos img:nth-child(3) { transition-delay: 0.3s; }
+    .timeline-photos img:nth-child(4) { transition-delay: 0.4s; }
+    .timeline-photos img:nth-child(5) { transition-delay: 0.5s; }
+    .timeline-photos img:nth-child(6) { transition-delay: 0.6s; }
+    .timeline-photos img:nth-child(7) { transition-delay: 0.7s; }
+    .timeline-photos img:nth-child(8) { transition-delay: 0.8s; }
+    .timeline-photos img:nth-child(9) { transition-delay: 0.9s; }
+    .timeline-photos img:nth-child(10) { transition-delay: 1.0s; }
+
+    /* 模态框样式 */
+    .image-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+    }
+
+    .modal-content-wrapper {
+        position: relative;
+        width: 800px;
+        height: 600px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        transform: scale(0.8);
+        opacity: 0;
+        transition: transform 0.3s ease, opacity 0.3s ease;
+        background-color: var(--card-background);
+        border-radius: 0;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .modal-content-wrapper.active {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    .modal-image-container {
+        position: relative;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 90%;
+        overflow: hidden;
+        background-color: var(--card-background);
+    }
+
+    .modal-image {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+    .modal-image.portrait {
+        max-height: 100%;
+        width: auto;
+    }
+
+    .modal-caption {
+        color: var(--text-color);
+        text-align: center;
+        padding: 10px 0;
+        font-size: 16px;
+        width: 100%;
+        background-color: var(--card-background);
+    }
+
+    .modal-close, .modal-nav {
+        position: absolute;
+        color: var(--text-color);
+        font-size: 30px;
+        font-weight: bold;
+        cursor: pointer;
+        background: none;
+        border: none;
+        outline: none;
+        z-index: 1002;
+    }
+
+    .modal-close { top: 10px; right: 10px; }
+    
+    .modal-nav {
+        top: 50%;
+        transform: translateY(-50%);
+        width: 50px;
+        height: 50px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: var(--card-background);
+        opacity: 0.7;
+        transition: background-color 0.3s ease, opacity 0.3s ease;
+    }
+
+    .modal-nav:hover { opacity: 0.9; }
+    .modal-prev { left: 10px; }
+    .modal-next { right: 10px; }
+    .modal-nav.disabled { opacity: 0.3; cursor: not-allowed; }
+    body.modal-open { overflow: hidden; }
+
+    @media (max-width: 768px) {
+        .timeline-item { flex-direction: column; align-items: flex-start; gap: 5px; }
+        .timeline-date-right { text-align: left; padding-top: 0; margin-top: 5px; }
+        .timeline-image-row, .timeline-photos { justify-content: flex-start; margin-left: 0; padding-left: 0; }
+        .timeline-image-row img, .timeline-photos img { margin-left: 0; margin-right: 10px; }
+    }
+</style>
+
+<section class="timeline-section">
+    <div class="container">
+        <h1>TimeLine</h1>
+        <p class="timeline-intro-text">Here, you can see the main updates and changes in my life.</p>
+        <p class="timeline-intro-text">在这里，你可以看到我生活中的主要更新和变化。</p>
+        
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-point-text">🧨</div>
+                <div class="timeline-media-container">
+                    <div class="timeline-main-content">
+                        <h3>2025 Spotlight</h3>
+                        <p>2025 GoodBye ! 2026 Hello !</p>
+                    </div>
+                    <div class="timeline-photos">
+                        <img src="/timeline-img/2025 Spotlight/1.jpg" alt="2025 Spotlight -1" class="img-portrait">
+                        <img src="/timeline-img/2025 Spotlight/2.jpg" alt="2025 Spotlight -2" class="img-portrait">
+                        <img src="/timeline-img/2025 Spotlight/3.jpg" alt="2025 Spotlight -3" class="img-portrait">
+                        <img src="/timeline-img/2025 Spotlight/4.jpg" alt="2025 Spotlight -4" class="img-portrait">
+                        <img src="/timeline-img/2025 Spotlight/5.jpg" alt="2025 Spotlight -5" class="img-portrait">
+                        <img src="/timeline-img/2025 Spotlight/6.jpg" alt="2025 Spotlight -6" class="img-portrait">
+                        <img src="/timeline-img/2025 Spotlight/7.jpg" alt="2025 Spotlight -7" class="img-portrait">
+                        <img src="/timeline-img/2025 Spotlight/8.jpg" alt="2025 Spotlight -8" class="img-portrait">
+                        <img src="/timeline-img/2025 Spotlight/9.jpg" alt="2025 Spotlight -9" class="img-portrait">
+                    </div>
+                </div>
+                <div class="timeline-date-right">2025年11月23日</div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-point-text">🍁</div>
+                <div class="timeline-media-container">
+                    <div class="timeline-main-content">
+                        <h3>眼睛是风景最好的相机</h3>
+                        <p>Day in the Life</p>
+                    </div>
+                    <div class="timeline-photos">
+                        <img src="/timeline-img/eye-camera/1.jpg" alt="eyes -1" class="img-portrait">
+                        <img src="/timeline-img/eye-camera/2.jpg" alt="eyes -2" class="img-portrait">
+                        <img src="/timeline-img/eye-camera/3.jpg" alt="eyes -3" class="img-portrait">
+                        <img src="/timeline-img/eye-camera/4.jpg" alt="eyes -4" class="img-portrait">
+                        <img src="/timeline-img/eye-camera/5.jpg" alt="eyes -5" class="img-portrait">
+                        <img src="/timeline-img/eye-camera/6.jpg" alt="eyes -6" class="img-portrait">
+                        <img src="/timeline-img/eye-camera/7.jpg" alt="eyes -7" class="img-portrait">
+                        <img src="/timeline-img/eye-camera/8.jpg" alt="eyes -8" class="img-portrait">
+                        <img src="/timeline-img/eye-camera/9.jpg" alt="eyes -9" class="img-portrait">
+                    </div>
+                </div>
+                <div class="timeline-date-right">2025年11月9日</div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-point-text">🧨</div>
+                <div class="timeline-media-container">
+                    <div class="timeline-main-content">
+                        <h3>3/4 of 2025 -- 国庆快乐</h3>
+                        <p>是一种能量磁场，希望你也拥有 </p>
+                    </div>
+                    <div class="timeline-photos">
+                        <img src="/timeline-img/2025.10.1/微信图片_2025-10-04_194334_400.jpg" alt="3/4 of 2025 -1" class="img-portrait">
+                        <img src="/timeline-img/2025.10.1/微信图片_2025-10-04_194345_881.jpg" alt="3/4 of 2025 -2" class="img-portrait">
+                        <img src="/timeline-img/2025.10.1/微信图片_2025-10-04_194355_564.jpg" alt="3/4 of 2025 -3" class="img-portrait">
+                        <img src="/timeline-img/2025.10.1/微信图片_2025-10-04_194403_978.jpg" alt="3/4 of 2025 -4" class="img-portrait">
+                        <img src="/timeline-img/2025.10.1/微信图片_2025-10-04_194411_262.jpg" alt="3/4 of 2025 -5" class="img-portrait">
+                        <img src="/timeline-img/2025.10.1/微信图片_2025-10-04_194416_994.jpg" alt="3/4 of 2025 -6" class="img-portrait">
+                        <img src="/timeline-img/2025.10.1/微信图片_2025-10-04_194422_294.jpg" alt="3/4 of 2025 -7" class="img-portrait">
+                        <img src="/timeline-img/2025.10.1/微信图片_2025-10-04_194427_560.jpg" alt="3/4 of 2025 -8" class="img-portrait">
+                        <img src="/timeline-img/2025.10.1/微信图片_2025-10-04_194436_242.jpg" alt="3/4 of 2025 -9" class="img-portrait">
+                    </div>
+                </div>
+                <div class="timeline-date-right">2025年10月1日</div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-point-text">苏</div>
+                <div class="timeline-media-container">
+                    <div class="timeline-main-content">
+                        <h3>苏州之行 -- Visit to Suzhou Zhejiang</h3>
+                    </div>
+                    <div class="timeline-photos">
+                        <img src="/timeline-img/苏州之行/1.jpg" alt="苏州之行-1" class="img-portrait">
+                        <img src="/timeline-img/苏州之行/2.jpg" alt="苏州之行-2" class="img-portrait">
+                        <img src="/timeline-img/苏州之行/3.jpg" alt="苏州之行-3" class="img-portrait">
+                        <img src="/timeline-img/苏州之行/4.jpg" alt="苏州之行-4" class="img-portrait">
+                        <img src="/timeline-img/苏州之行/5.jpg" alt="苏州之行-5" class="img-portrait">
+                    </div>
+                </div>
+                <div class="timeline-date-right">2025年7月</div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-point-text">😏</div>
+                <div class="timeline-media-container">
+                    <div class="timeline-main-content">
+                        <h3>采购 -- 购买零食</h3>
+                        <p>记录生活之取快递加买零食 </p>
+                    </div>
+                    <div class="timeline-photos">
+                        <img src="/timeline-img/猎奇-采购/微信图片_20250607221649_153.jpg" alt="life 1" class="img-portrait">
+                        <img src="/timeline-img/猎奇-采购/微信图片_20250607221649_155.jpg" alt="life 2" class="img-portrait">
+                        <img src="/timeline-img/猎奇-采购/微信图片_20250607221649_151.jpg" alt="life 3" class="img-portrait">
+                        <img src="/timeline-img/猎奇-采购/微信图片_20250607221649_150.jpg" alt="life 4" class="img-portrait">
+                    </div>
+                </div>
+                <div class="timeline-date-right">2025年6月</div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-point-text">😦</div>
+                <div class="timeline-main-content">
+                    <h3>AI科技 -- is going CRAZY !!!</h3>
+                    <p>现在的Text to Image对于AI甚至Text to Video已经是小儿科了 </p>
+                    <p>效果太真实了，简直无法分辨</p>
+                    <p>Jason Tatum和Lebron James那张太搞笑了（没有故意引战哈~）</p>
+                    <p>Kobe R.I.P.🏛</p>
+                    <div class="timeline-photos">
+                        <img src="/timeline-img/AI technology/assets_task_01jtv53gb8er9aj31wbzhw8tv0_1746815619_img_1.webp" alt="AI 1" class="img-portrait">
+                        <img src="/timeline-img/AI technology/assets_task_01jtvr071mfxn856tcnac6cta8_1746835453_img_1.webp" alt="AI 2" class="img-portrait">
+                        <img src="/timeline-img/AI technology/assets_task_01jtvvekhtff5ahgtspyzf0n6q_1746839043_img_0.webp" alt="AI 3" class="img-portrait">
+                        <img src="/timeline-img/AI technology/assets_task_01jtt0e92yftjbq1jep02dfr9y_1746777203_img_2.webp" alt="AI 4" class="img-portrait">
+                        <img src="/timeline-img/AI technology/微信图片_20250605202036_147.jpg" alt="AI 5" class="img-portrait">
+                        <img src="/timeline-img/AI technology/assets_task_01jttb1f9ee3t8f8q6x96ja7nq_1746788283_img_1.webp" alt="AI 6" class="img-portrait">
+                        <img src="/timeline-img/AI technology/assets_task_01jtsypfxye7ab0ycnncaddj7e_1746775343_img_0.webp" alt="AI 7" class="img-portrait">
+                    </div>
+                </div>
+                <div class="timeline-date-right">2025年6月</div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-point-text">🚀</div>
+                <div class="timeline-main-content">
+                    <h3>生活常态 -- Keep Going</h3>
+                    <p>生物模考结束-预估57分😁 </p>
+                    <p>果茶+作业</p>
+                    <div class="timeline-photos">
+                        <img src="/timeline-img/Keep going/微信图片_20250605202036_145.jpg" alt="KG 1" class="img-portrait">
+                        <img src="/timeline-img/Keep going/微信图片_20250605202036_146.jpg" alt="KG 2" class="img-portrait">
+                    </div>
+                </div>
+                <div class="timeline-date-right">2025年6月5日</div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-point-text">🎁</div>
+                <div class="timeline-main-content">
+                    <h3>Technoblade 26岁生日 -- Happy Birthday !</h3>
+                    <p>愿天堂有吃不完的马铃薯，安息。</p>
+                    <div class="timeline-photos">
+                        <img src="/timeline-img/Technoblade-Happy Birthday!!!/technoblade.png" alt="Technoblade-Happy 1" class="img-portrait">
+                    </div>
+                </div>
+                <div class="timeline-date-right">2025年6月2日</div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-point-text">✅</div>
+                <div class="timeline-main-content">
+                    <h3>新网站 -- kobezyx.xx.kg</h3>
+                    <p>终于，我发布了自己的个人网站</p>
+                </div>
+                <div class="timeline-date-right">2025年5月27日</div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-point-text">🌐</div>
+                <div class="timeline-main-content">
+                    <h3>域名迁移 -- Cloudflare</h3>
+                    <p>最终还是把域名转移到了Cloudflare上 😊</p>
+                    <div class="timeline-image-row">
+                        <img src="/timeline-img/域名迁移到Cloudflare/PixPin_2025-05-31_20-58-13.png" alt="Cloudflare">
+                    </div>
+                </div>
+                <div class="timeline-date-right">2025年5月20日</div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-point-text">🚀</div>
+                <div class="timeline-main-content">
+                    <h3> 新域名 -- kobezyx.xx.kg</h3>
+                    <p>我注册到了专属博客的域名</p>
+                </div>
+                <div class="timeline-date-right">2025年4月23日</div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-point-text">🎉</div>
+                <div class="timeline-main-content">
+                    <h3>我的首个域名 -- 网络构建的开始</h3>
+                    <p>终于，我拥有了自己的域名</p>
+                    <div class="timeline-photos">
+                        <img src="/timeline-img/我的第一个域名-前端开发的开始/PixPin_2025-06-01_21-48-00.png" alt="domin 1">
+                        <img src="/timeline-img/我的第一个域名-前端开发的开始/PixPin_2025-06-01_21-39-50.png" alt="domin 2">
+                    </div>
+                </div>
+                <div class="timeline-date-right">2025年3月8日</div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-point-text">💻</div>
+                <div class="timeline-main-content">
+                    <h3>梦开始的地方 -- 我的计算机</h3>
+                    <p>我的个人计算机 -- HP ZHAN 66</p>
+                </div>
+                <div class="timeline-date-right">2021年6月5日</div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-point-text">🕯️</div>
+                <div class="timeline-main-content">
+                    <h3>失去了偶像 -- 这对我来说是一段艰难的时光</h3>
+                    <p>科比和他 13 岁的女儿吉安娜等 9 人在加利福尼亚州卡拉巴萨斯的一次直升机坠毁事故中丧生</p>
+                    <p>随后，人们纷纷表达了对科比的敬意和追悼，全明星 MVP 奖也以科比的名字重新命名</p>
+                    <p>那年的冬天格外的冷...</p>
+                    <div class="timeline-photos">
+                        <img src="/timeline-img/失去了偶像 -- 这对我来说是一段艰难的时光/500px-Kobe_Bryant_death.jpg" alt="R.I.P. KOBE 1" class="img-portrait">
+                        <img src="/timeline-img/失去了偶像 -- 这对我来说是一段艰难的时光/Kobe_Bryant_retired_HS2.jpg" alt="R.I.P. KOBE 2" class="img-portrait">
+                        <img src="/timeline-img/失去了偶像 -- 这对我来说是一段艰难的时光/Kobe_Bryant_dunking_2013.jpg" alt="R.I.P. KOBE 3" class="img-portrait">
+                        <img src="/timeline-img/失去了偶像 -- 这对我来说是一段艰难的时光/Kobe_Bryant_left_floater.jpg" alt="R.I.P. KOBE 4" class="img-portrait">
+                        <img src="/timeline-img/失去了偶像 -- 这对我来说是一段艰难的时光/Kobe_Bryant_Shane_Battier.jpg" alt="R.I.P. KOBE 5" class="img-portrait">
+                        <img src="/timeline-img/失去了偶像 -- 这对我来说是一段艰难的时光/Kobe_Bryant_vs_Marcin_Gortat.jpg" alt="R.I.P. KOBE 6" class="img-portrait">
+                        <img src="/timeline-img/失去了偶像 -- 这对我来说是一段艰难的时光/Lakers_Finals_08.jpg" alt="R.I.P. KOBE 7" class="img-portrait">
+                        <img src="/timeline-img/失去了偶像 -- 这对我来说是一段艰难的时光/LeBron_James_vs._Kobe_Bryant_(24848589252).jpg" alt="R.I.P. KOBE 8" class="img-portrait">
+                    </div>
+                </div>
+                <div class="timeline-date-right">2020年1月26日</div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-point-text">PL</div>
+                <div class="timeline-media-container">
+                    <div class="timeline-main-content">
+                        <h3>波特兰 -- Visit to Portland Oregon</h3>
+                        <p>这是我父亲早年前往波特兰工作所拍，仅作分享。</p>
+                        <p>This photo was taken by my father when he worked in Portland in his early years. I'm just sharing it here.</p>
+                    </div>
+                    <div class="timeline-photos">
+                        <img src="/timeline-img/波特兰/1.jpg" alt="波特兰-1" class="img-portrait">
+                        <img src="/timeline-img/波特兰/2.jpg" alt="波特兰-2" class="img-portrait">
+                        <img src="/timeline-img/波特兰/3.jpg" alt="波特兰-3" class="img-portrait">
+                    </div>
+                </div>
+                <div class="timeline-date-right">2018年</div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-point-text">🏫</div>
+                <div class="timeline-main-content">
+                    <h3>教育 -- 我在西安市铁五小学开始了我的义务教育</h3>
+                    <p>在那里度过了快乐的时光😎</p>
+                </div>
+                <div class="timeline-date-right">2017年</div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-point-text">👶</div>
+                <div class="timeline-main-content">
+                    <h3>出生 -- 我出生于 CN 中国的西安</h3>
+                    <p>家中的独生子女，我有两个表姐</p>
+                </div>
+                <div class="timeline-date-right">2011年8月9日</div>
+            </div>
+            
+        </div>
+    </div>
+</section>
+
+<div id="image-modal" class="image-modal">
+    <div id="modal-content-wrapper" class="modal-content-wrapper">
+        <button id="modal-close" class="modal-close">&times;</button>
+        <div class="modal-image-container">
+            <img id="modal-image" class="modal-image" src="" alt="">
+            <button id="modal-prev" class="modal-nav modal-prev">&lt;</button>
+            <button id="modal-next" class="modal-nav modal-next">&gt;</button>
+        </div>
+        <div id="image-modal-caption" class="modal-caption"></div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // [1] 初始化点数字
+        const timelineItems = document.querySelectorAll('.timeline-item');
+        timelineItems.forEach((item, index) => {
+            const numberLabel = document.createElement('div');
+            numberLabel.className = 'timeline-number';
+            numberLabel.textContent = (index + 1).toString();
+            item.appendChild(numberLabel);
+        });
+
+        // [2] 模态框所需变量
+        const imageModal = document.getElementById('image-modal');
+        const modalContentWrapper = document.getElementById('modal-content-wrapper');
+        let modalImage = document.getElementById('modal-image');
+        const modalCloseButton = document.getElementById('modal-close');
+        const modalPrev = document.getElementById('modal-prev');
+        const modalNext = document.getElementById('modal-next');
+        const imageModalCaption = document.getElementById('image-modal-caption');
+
+        let currentImageGroup = [];
+        let currentImageIndex = 0;
+        const clickableImages = document.querySelectorAll('.timeline-image-row img, .timeline-photos img');
+
+        let hoveredImage = null;
+        let originalZIndexMap = new Map();
+        let originalTransformMap = new Map();
+
+        // [3] 判断横竖排版
+        function setImageOrientationClass(img) {
+            if (img.complete) {
+                applyClass();
+            } else {
+                img.onload = applyClass;
+                img.onerror = () => img.classList.add('img-square');
+            }
+            function applyClass() {
+                const width = img.naturalWidth;
+                const height = img.naturalHeight;
+                if (width === height) img.classList.add('img-square');
+                else if (width > height) img.classList.add('img-landscape');
+                else img.classList.add('img-portrait');
+                img.onload = null;
+            }
+        }
+
+        // ====== 核心修复区：完美避开首屏加载的竞态条件 ====== //
+        const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
+        const imageObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    // 取消监听，确保动画只运行一次
+                    observer.unobserve(img);
+
+                    // 1. 恢复 CSS 的过渡动画（覆盖刚才初始化的 none）
+                    img.style.transition = '';
+
+                    // 2. 延迟应用最终状态，避开浏览器初始渲染，并让路给页面的 fade-in
+                    setTimeout(() => {
+                        img.classList.add('animate-in'); // 控制 opacity: 1
+                        img.style.transform = originalTransformMap.get(img); // 触发 transform 动画
+                    }, 150); 
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.timeline-image-row, .timeline-photos').forEach(container => {
+            const imagesInContainer = container.querySelectorAll('img');
+            const totalImages = imagesInContainer.length;
+            const isSingleImage = totalImages === 1;
+
+            imagesInContainer.forEach((img, index) => {
+                setImageOrientationClass(img);
+                
+                // 设置层级关系
+                const initialZIndex = (totalImages - 1) - index;
+                img.style.zIndex = initialZIndex.toString();
+                originalZIndexMap.set(img, initialZIndex.toString());
+
+                // 计算随机角度和最终状态
+                const randomRotate = Math.random() * 20 - 10;
+                const finalTransform = `scale(1) rotate(${randomRotate}deg) translateX(0px)`;
+                originalTransformMap.set(img, finalTransform);
+
+                // 核心修复步骤1：强制关闭过渡，防止浏览器脑补一段 "原点 -> 初始点" 的反向动画
+                img.style.transition = 'none';
+
+                // 核心修复步骤2：直接定位到初始点（向左缩进状态）
+                if (isSingleImage) {
+                    img.style.transform = `translateY(30px) scale(0.7) rotate(${randomRotate + 15}deg)`;
+                } else {
+                    img.style.transform = `translateX(-50px) scale(0.8) rotate(${randomRotate}deg)`;
+                }
+                
+                // 核心修复步骤3：强制浏览器立刻进行渲染计算 (Reflow)，这样之后才能从这里开始做动画
+                void img.offsetWidth;
+
+                // 放入监听器，等待进入视口
+                imageObserver.observe(img);
+            });
+        });
+
+        // [4] 悬停交互逻辑 (复原你原版的完美悬停效果)
+        clickableImages.forEach((img) => {
+            img.addEventListener('mouseenter', function () {
+                if (!this.classList.contains('animate-in')) return;
+                
+                if (hoveredImage && hoveredImage !== this) {
+                    const prevHovered = hoveredImage;
+                    prevHovered.classList.remove('image-hovered');
+                    prevHovered.style.transition = 'transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+                    prevHovered.style.transform = originalTransformMap.get(prevHovered); 
+                    prevHovered.style.zIndex = originalZIndexMap.get(prevHovered);
+                }
+                
+                this.style.transition = 'transform 0.15s ease-out';
+                this.classList.add('image-hovered');
+                const currentRotation = originalTransformMap.get(this).match(/rotate\(([^)]+)\)/)?.[1] || '0deg';
+                this.style.transform = `scale(1.2) rotate(${currentRotation}) translateX(30px)`;
+                hoveredImage = this;
+            });
+
+            img.addEventListener('mouseleave', function () {
+                const currentLeavingImage = this;
+                if (hoveredImage === currentLeavingImage) {
+                    currentLeavingImage.style.transition = 'transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+                    currentLeavingImage.classList.remove('image-hovered');
+                    currentLeavingImage.style.transform = originalTransformMap.get(currentLeavingImage);
+                    currentLeavingImage.style.zIndex = originalZIndexMap.get(currentLeavingImage);
+                    
+                    currentLeavingImage.addEventListener('transitionend', function handler(event) {
+                        if (event.propertyName === 'transform') {
+                            currentLeavingImage.removeEventListener('transitionend', handler);
+                        }
+                    }, { once: true });
+                    
+                    hoveredImage = null;
+                }
+            });
+
+            // 点击放大模态框
+            img.addEventListener('click', function () {
+                const parentDiv = this.closest('.timeline-image-row') || this.closest('.timeline-photos');
+                currentImageGroup = Array.from(parentDiv.querySelectorAll('img'));
+                currentImageIndex = currentImageGroup.indexOf(this);
+                const isPortrait = this.naturalHeight > this.naturalWidth;
+                openModal(this, isPortrait);
+            });
+        });
+
+        // [5] 模态框功能支持
+        function openModal(imgElement, isPortrait) {
+            imageModal.style.display = 'flex';
+            modalImage.src = imgElement.src;
+            modalImage.alt = imgElement.alt;
+            if (isPortrait) modalImage.classList.add('portrait');
+            else modalImage.classList.remove('portrait');
+            imageModalCaption.innerHTML = imgElement.alt;
+            updateModalNavButtons();
+            document.body.classList.add('modal-open');
+            requestAnimationFrame(() => { modalContentWrapper.classList.add('active'); });
+        }
+
+        modalCloseButton.onclick = function () {
+            modalContentWrapper.classList.remove('active');
+            modalContentWrapper.addEventListener('transitionend', function handler() {
+                imageModal.style.display = 'none';
+                document.body.classList.remove('modal-open');
+                modalContentWrapper.removeEventListener('transitionend', handler);
+            }, { once: true });
+        }
+
+        imageModal.addEventListener('click', function (event) {
+            if (event.target === imageModal) {
+                modalContentWrapper.classList.remove('active');
+                modalContentWrapper.addEventListener('transitionend', function handler() {
+                    imageModal.style.display = 'none';
+                    document.body.classList.remove('modal-open');
+                    modalContentWrapper.removeEventListener('transitionend', handler);
+                }, { once: true });
+            }
+        });
+
+        modalPrev.onclick = function (event) {
+            event.stopPropagation();
+            if (currentImageIndex > 0) {
+                currentImageIndex--;
+                updateModalImage();
+            }
+        };
+
+        modalNext.onclick = function (event) {
+            event.stopPropagation();
+            if (currentImageIndex < currentImageGroup.length - 1) {
+                currentImageIndex++;
+                updateModalImage();
+            }
+        };
+
+        function updateModalImage() {
+            if (currentImageGroup.length === 0 || currentImageIndex < 0 || currentImageIndex >= currentImageGroup.length) return;
+            const img = currentImageGroup[currentImageIndex];
+            modalImage.src = img.src;
+            modalImage.alt = img.alt;
+            const isPortrait = img.naturalHeight > img.naturalWidth;
+            if (isPortrait) modalImage.classList.add('portrait');
+            else modalImage.classList.remove('portrait');
+            imageModalCaption.innerHTML = img.alt;
+            updateModalNavButtons();
+        }
+
+        function updateModalNavButtons() {
+            if (currentImageGroup.length <= 1) {
+                modalPrev.classList.add('disabled');
+                modalNext.classList.add('disabled');
+            } else {
+                modalPrev.classList.toggle('disabled', currentImageIndex === 0);
+                modalNext.classList.toggle('disabled', currentImageIndex === currentImageGroup.length - 1);
+            }
+        }
+
+        document.addEventListener('keydown', function (e) {
+            if (imageModal.style.display === 'flex') {
+                if (e.key === 'ArrowRight' && currentImageIndex < currentImageGroup.length - 1) {
+                    currentImageIndex++; updateModalImage();
+                } else if (e.key === 'ArrowLeft' && currentImageIndex > 0) {
+                    currentImageIndex--; updateModalImage();
+                } else if (e.key === 'Escape') {
+                    modalCloseButton.click();
+                }
+            }
+        });
+
+        document.addEventListener('wheel', function (e) {
+            if (imageModal.style.display === 'flex') {
+                e.preventDefault();
+                if (e.deltaY > 0 && currentImageIndex < currentImageGroup.length - 1) {
+                    currentImageIndex++; updateModalImage();
+                } else if (e.deltaY <= 0 && currentImageIndex > 0) {
+                    currentImageIndex--; updateModalImage();
+                }
+            }
+        }, { passive: false });
+    });
+</script>

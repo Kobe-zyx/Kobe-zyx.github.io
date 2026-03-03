@@ -1,0 +1,160 @@
+---
+layout: default
+---
+
+<div class="blog-full-post fade-in">
+    <div class="container">
+        <a href="{{ '/blog.html' | relative_url }}" class="back-to-blog-list" style="display: inline-flex; align-items: center; gap: 5px; margin-bottom: 30px; color: var(--text-color); text-decoration: none; opacity: 0.8; transition: opacity 0.2s;">
+            <i data-feather="arrow-left"></i> 返回 Geek
+        </a>
+        
+        <div class="post-layout-wrapper">
+            <div class="blog-main-content">
+                <h1 style="margin-top: 0; font-size: 2.5em; line-height: 1.2; letter-spacing: -0.02em;">{{ page.title }}</h1>
+                <div class="post-meta" style="color: var(--secondary-text-color); font-size: 0.9em; margin-bottom: 40px;">
+                    {{ page.date | date: "%Y年%m月%d日" }} 
+                    {% if page.tag %} · <span style="background: var(--border-color); padding: 2px 8px; border-radius: 4px; font-size: 0.85em;">{{ page.tag }}</span>{% endif %}
+                </div>
+                
+                <div class="markdown-content" id="markdown-content">
+                    {{ content }}
+                </div>
+            </div>
+            
+            <aside class="post-toc-sidebar">
+                <div class="toc-wrapper">
+                    <div class="toc-title">目录</div>
+                    <nav id="toc-nav"></nav>
+                </div>
+            </aside>
+        </div>
+    </div>
+</div>
+
+<style>
+    .post-layout-wrapper { display: flex; gap: 60px; align-items: flex-start; position: relative; }
+    .blog-main-content { flex: 1; min-width: 0; }
+    .post-toc-sidebar { width: 240px; flex-shrink: 0; position: sticky; top: 100px; display: none; }
+    .toc-wrapper { border-left: 2px solid var(--border-color); padding-left: 15px; max-height: calc(100vh - 150px); overflow-y: auto; }
+    .toc-wrapper::-webkit-scrollbar { width: 0px; }
+    .toc-title { font-size: 12px; font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-color); opacity: 0.8; }
+    .toc-list { list-style: none; padding: 0; margin: 0; }
+    .toc-item { margin-bottom: 8px; }
+    .toc-item a { color: var(--secondary-text-color); text-decoration: none; font-size: 14px; display: block; transition: color 0.2s ease, transform 0.2s ease; line-height: 1.5; }
+    .toc-item a:hover { color: var(--text-color); transform: translateX(2px); }
+    
+    /* 目录层级缩进与字体加粗样式 */
+    .toc-level-1 > a { font-weight: 600; color: var(--text-color); margin-top: 12px; }
+    .toc-level-2 > a { padding-left: 12px; }
+    .toc-level-3 > a { padding-left: 24px; font-size: 13px; opacity: 0.9; }
+
+    @media (max-width: 1024px) {
+        .post-toc-sidebar { display: none !important; }
+        .post-layout-wrapper { display: block; }
+    }
+</style>
+
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if(typeof feather !== 'undefined') { feather.replace(); }
+        
+        const content = document.getElementById('markdown-content');
+        if (!content) return;
+
+        // ==========================================
+        // 1. 解析 Obsidian 的 ==高亮文字== 语法
+        // ==========================================
+        let html = content.innerHTML;
+        // 使用正则将 ==xx== 替换为 <mark>xx</mark>
+        html = html.replace(/==([^=]+)==/g, '<mark>$1</mark>');
+        content.innerHTML = html;
+
+        // ==========================================
+        // 2. 解析 Obsidian Callout 块
+        // ==========================================
+        const blockquotes = content.querySelectorAll('blockquote');
+        const calloutIcons = {
+            'note': '<i data-feather="edit-2"></i>',
+            'info': '<i data-feather="info"></i>',
+            'warning': '<i data-feather="alert-triangle"></i>',
+            'error': '<i data-feather="x-circle"></i>',
+            'success': '<i data-feather="check-circle"></i>'
+        };
+
+        blockquotes.forEach(quote => {
+            const firstP = quote.querySelector('p');
+            if (!firstP) return;
+            
+            const match = firstP.innerHTML.match(/^\[!(\w+)\]\s*(.*)?<br>/i) || 
+                          firstP.textContent.match(/^\[!(\w+)\]\s*(.*)?/i);
+            
+            if (match) {
+                const type = match[1].toLowerCase();
+                let title = match[2] ? match[2].trim() : type.charAt(0).toUpperCase() + type.slice(1);
+                const calloutClass = calloutIcons[type] ? type : 'note';
+                const iconHtml = calloutIcons[calloutClass] || calloutIcons['note'];
+
+                let contentHtml = quote.innerHTML;
+                if (firstP.innerHTML.includes('<br>')) {
+                    contentHtml = contentHtml.replace(/^<p>\[!\w+\][^\n<]*<br>/i, '<p>');
+                } else {
+                    firstP.remove();
+                    contentHtml = quote.innerHTML;
+                }
+
+                const calloutWrapper = document.createElement('div');
+                calloutWrapper.className = `obsidian-callout callout-${calloutClass}`;
+                calloutWrapper.innerHTML = `
+                    <div class="obsidian-callout-title">${iconHtml} ${title}</div>
+                    <div class="obsidian-callout-content">${contentHtml}</div>
+                `;
+                quote.parentNode.replaceChild(calloutWrapper, quote);
+            }
+        });
+        if(typeof feather !== 'undefined') { feather.replace(); }
+
+        // ==========================================
+        // 3. 生成支持 H1, H2, H3 的右侧目录
+        // ==========================================
+        const tocNav = document.getElementById('toc-nav');
+        const sidebar = document.querySelector('.post-toc-sidebar');
+        // 现在抓取 h1, h2, h3
+        const headings = content.querySelectorAll('h1, h2, h3');
+        
+        if (headings.length > 0 && tocNav) {
+            sidebar.style.display = 'block'; 
+            const ul = document.createElement('ul');
+            ul.className = 'toc-list';
+            
+            headings.forEach((heading, index) => {
+                if (!heading.id) { heading.id = 'heading-' + index; }
+                
+                const li = document.createElement('li');
+                // 判断层级并赋予对应的 class
+                let levelClass = 'toc-level-1';
+                if (heading.tagName.toLowerCase() === 'h2') levelClass = 'toc-level-2';
+                if (heading.tagName.toLowerCase() === 'h3') levelClass = 'toc-level-3';
+                
+                li.className = 'toc-item ' + levelClass;
+                
+                const a = document.createElement('a');
+                a.href = '#' + heading.id;
+                a.textContent = heading.textContent;
+                
+                a.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = document.getElementById(heading.id);
+                    const offsetPosition = target.getBoundingClientRect().top + window.pageYOffset - 70;
+                    window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+                });
+                
+                li.appendChild(a);
+                ul.appendChild(li);
+            });
+            tocNav.appendChild(ul);
+        }
+    });
+</script>
