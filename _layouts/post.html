@@ -19,6 +19,25 @@ layout: default
                 <div class="markdown-content" id="markdown-content">
                     {{ content }}
                 </div>
+                
+                <div style="margin-top: 60px; margin-bottom: 60px;">
+                    <hr style="border: none; border-top: 1px solid var(--border-color); margin-bottom: 40px;">
+                    <script src="https://giscus.app/client.js"
+                        data-repo="Kobe-zyx/Kobe-zyx.github.io"
+                        data-repo-id="R_kgDORdNjTQ"
+                        data-category="General"
+                        data-category-id="DIC_kwDORdNjTc4C3l42"
+                        data-mapping="pathname"
+                        data-strict="0"
+                        data-reactions-enabled="1"
+                        data-emit-metadata="0"
+                        data-input-position="bottom"
+                        data-theme="light"
+                        data-lang="zh-CN"
+                        crossorigin="anonymous"
+                        async>
+                    </script>
+                </div>
             </div>
             
             <aside class="post-toc-sidebar">
@@ -43,7 +62,6 @@ layout: default
     .toc-item a { color: var(--secondary-text-color); text-decoration: none; font-size: 14px; display: block; transition: color 0.2s ease, transform 0.2s ease; line-height: 1.5; }
     .toc-item a:hover { color: var(--text-color); transform: translateX(2px); }
     
-    /* 目录层级缩进与字体加粗样式 */
     .toc-level-1 > a { font-weight: 600; color: var(--text-color); margin-top: 12px; }
     .toc-level-2 > a { padding-left: 12px; }
     .toc-level-3 > a { padding-left: 24px; font-size: 13px; opacity: 0.9; }
@@ -64,17 +82,12 @@ layout: default
         const content = document.getElementById('markdown-content');
         if (!content) return;
 
-        // ==========================================
         // 1. 解析 Obsidian 的 ==高亮文字== 语法
-        // ==========================================
         let html = content.innerHTML;
-        // 使用正则将 ==xx== 替换为 <mark>xx</mark>
         html = html.replace(/==([^=]+)==/g, '<mark>$1</mark>');
         content.innerHTML = html;
 
-        // ==========================================
         // 2. 解析 Obsidian Callout 块
-        // ==========================================
         const blockquotes = content.querySelectorAll('blockquote');
         const calloutIcons = {
             'note': '<i data-feather="edit-2"></i>',
@@ -116,12 +129,9 @@ layout: default
         });
         if(typeof feather !== 'undefined') { feather.replace(); }
 
-        // ==========================================
         // 3. 生成支持 H1, H2, H3 的右侧目录
-        // ==========================================
         const tocNav = document.getElementById('toc-nav');
         const sidebar = document.querySelector('.post-toc-sidebar');
-        // 现在抓取 h1, h2, h3
         const headings = content.querySelectorAll('h1, h2, h3');
         
         if (headings.length > 0 && tocNav) {
@@ -133,7 +143,6 @@ layout: default
                 if (!heading.id) { heading.id = 'heading-' + index; }
                 
                 const li = document.createElement('li');
-                // 判断层级并赋予对应的 class
                 let levelClass = 'toc-level-1';
                 if (heading.tagName.toLowerCase() === 'h2') levelClass = 'toc-level-2';
                 if (heading.tagName.toLowerCase() === 'h3') levelClass = 'toc-level-3';
@@ -157,4 +166,4 @@ layout: default
             tocNav.appendChild(ul);
         }
     });
-</script>
+</script>  

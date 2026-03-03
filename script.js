@@ -151,48 +151,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Markdown 解析和目录生成
-    // 检查是否在博客文章页面
-    const markdownContent = document.querySelector('.markdown-content');
-    if (!markdownContent) return;
-
-    // 获取原始内容
-    const content = markdownContent.innerHTML;
-
-    // 配置 marked 选项
-    marked.setOptions({
-        breaks: true,  // 支持 GitHub 风格的换行
-        gfm: true,     // 启用 GitHub 风格的 Markdown
-        headerIds: true, // 为标题添加 id
-        mangle: false,  // 不转义标题中的特殊字符
-        sanitize: false // 允许 HTML 标签
-    });
-
-    // 解析 Markdown
-    const parsedContent = marked.parse(content);
-
-    // 更新内容
-    markdownContent.innerHTML = parsedContent;
-
-    // 生成目录
-    const headings = markdownContent.querySelectorAll('h1, h2, h3, h4, h5, h6');
-    const toc = document.querySelector('.blog-toc ul');
-    if (toc && headings.length > 0) {
-        toc.innerHTML = '';
-        headings.forEach((heading, index) => {
-            // 为每个标题添加 id
-            const id = heading.id || `heading-${index}`;
-            heading.id = id;
-
-            // 创建目录项
-            const li = document.createElement('li');
-            const a = document.createElement('a');
-            a.href = `#${id}`;
-            a.textContent = heading.textContent;
-            li.appendChild(a);
-            toc.appendChild(li);
-        });
-    }
+    
 
     // 导航栏滚动高亮逻辑
     const sections = document.querySelectorAll('section');
@@ -203,7 +162,7 @@ document.addEventListener('DOMContentLoaded', function() {
         let currentSectionId = '';
         // 获取当前滚动位置
         const scrollPosition = window.pageYOffset;
-
+ 
         sections.forEach(section => {
             // 计算 section 的顶部和底部相对于视口的位置
             const sectionTop = section.offsetTop - navbarHeight - 10; // 考虑导航栏高度和一些偏移
@@ -244,25 +203,46 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // 深浅模式切换逻辑
 document.addEventListener('DOMContentLoaded', function() {
-    // 深浅模式切换
     const themeToggle = document.querySelector('.theme-toggle');
 
-    // 检查本地存储中的主题设置
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-        document.documentElement.setAttribute('data-theme', savedTheme);
+    // 获取当前主题
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    if (savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
     }
 
-    // 切换主题
+    // 🌟 核心魔法：向 Giscus 的 iframe 发送跨域换色指令
+    function syncGiscusTheme(theme) {
+        const iframe = document.querySelector('iframe.giscus-frame');
+        if (!iframe) return;
+        // 向评论区内部传递当前主题状态
+        iframe.contentWindow.postMessage(
+            { giscus: { setConfig: { theme: theme } } },
+            'https://giscus.app'
+        );
+    }
+
+    // 监听右上角按钮的点击切换
     themeToggle.addEventListener('click', () => {
         const currentTheme = document.documentElement.getAttribute('data-theme');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
         
-        // 直接切换主题，无动画
+        // 切换网页本地主题
         document.documentElement.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
+
+        // ⚡️ 同时让评论区瞬间变色
+        syncGiscusTheme(newTheme);
+    });
+
+    // 🌟 核心防御：当 Giscus 刚刚加载完毕时，自动校准一次颜色
+    window.addEventListener('message', (event) => {
+        if (event.origin === 'https://giscus.app') {
+            syncGiscusTheme(document.documentElement.getAttribute('data-theme') || 'light');
+        }
     });
 });
+
 
 document.addEventListener('DOMContentLoaded', function() {
     // 图片查看器逻辑
