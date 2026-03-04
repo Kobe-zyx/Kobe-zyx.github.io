@@ -96,7 +96,9 @@ title: Kobe Zhang | TimeLine
         border-bottom: none;
     }
 
-    .timeline-main-content {
+    /* 核心修复：让带有图片容器的区块也能自动撑满空间，把时间和序号挤到最右侧 */
+    .timeline-main-content,
+    .timeline-media-container {
         flex-grow: 1;
         min-width: 0;
         border: none !important;
@@ -205,35 +207,53 @@ title: Kobe Zhang | TimeLine
     .timeline-photos img:nth-child(9) { transition-delay: 0.9s; }
     .timeline-photos img:nth-child(10) { transition-delay: 1.0s; }
 
-    /* 模态框样式 */
+    /* ==========================================================
+       现代极简全屏模态框 (Modern Minimalist Modal)
+       ========================================================== */
+/* ==========================================================
+       现代极简全屏模态框 (Modern Minimalist Modal)
+       ========================================================== */
     .image-modal {
         display: none;
         position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0, 0, 0, 0.8);
-        z-index: 1000;
+        inset: 0;
+        background-color: rgba(0, 0, 0, 0.85);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        z-index: 2000;
         justify-content: center;
         align-items: center;
         overflow: hidden;
+        /* 🌟 核心修改 1：让黑色毛玻璃背景也拥有平滑的淡入淡出动画 */
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    /* 🌟 新增：控制背景显示的专属 class */
+    .image-modal.show-modal {
+        opacity: 1;
     }
 
     .modal-content-wrapper {
         position: relative;
-        width: 800px;
-        height: 600px;
+        width: 100%;
+        height: 100%;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        transform: scale(0.8);
+        transform: scale(0.95);
         opacity: 0;
-        transition: transform 0.3s ease, opacity 0.3s ease;
-        background-color: var(--card-background);
-        border-radius: 0;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        /* 🌟 核心修改 2：将图片的动画时间统一缩短到 0.3s，配合背景同步消失，更干脆不拖泥带水 */
+        transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.3s ease;
+        padding: 40px 20px;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .modal-content-wrapper.active {
+        transform: scale(1);
+        opacity: 1;
     }
 
     .modal-content-wrapper.active {
@@ -247,69 +267,145 @@ title: Kobe Zhang | TimeLine
         justify-content: center;
         align-items: center;
         width: 100%;
-        height: 90%;
-        overflow: hidden;
-        background-color: var(--card-background);
+        height: 85%;
+        background: transparent;
     }
 
     .modal-image {
-        max-width: 100%;
+        max-width: 90vw;
         max-height: 100%;
         object-fit: contain;
-    }
-
-    .modal-image.portrait {
-        max-height: 100%;
-        width: auto;
+        border-radius: 12px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
     }
 
     .modal-caption {
-        color: var(--text-color);
+        color: rgba(255, 255, 255, 0.9);
         text-align: center;
-        padding: 10px 0;
-        font-size: 16px;
-        width: 100%;
-        background-color: var(--card-background);
+        padding-top: 20px;
+        font-size: 15px;
+        font-weight: 300;
+        letter-spacing: 1px;
+        background: transparent;
     }
 
-    .modal-close, .modal-nav {
+    /* =========================================
+       左上角标题区
+       ========================================= */
+    .modal-top-left {
         position: absolute;
-        color: var(--text-color);
-        font-size: 30px;
-        font-weight: bold;
-        cursor: pointer;
-        background: none;
-        border: none;
-        outline: none;
+        top: 40px;
+        left: 50px;
         z-index: 1002;
+        color: rgba(255, 255, 255, 0.95);
+        font-family: var(--font-main);
+        pointer-events: none;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.3);
     }
 
-    .modal-close { top: 10px; right: 10px; }
-    
-    .modal-nav {
-        top: 50%;
-        transform: translateY(-50%);
-        width: 50px;
-        height: 50px;
+    .modal-main-title {
+        font-size: 22px;
+        font-weight: 600;
+        margin-bottom: 6px;
+        letter-spacing: 0.5px;
+    }
+
+    .modal-sub-title {
+        font-size: 15px;
+        color: rgba(255, 255, 255, 0.7);
+        font-weight: 400;
+    }
+
+    /* =========================================
+       右上角计数器与关闭区
+       ========================================= */
+    .modal-top-right {
+        position: absolute;
+        top: 40px;
+        right: 50px;
+        z-index: 1002;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .modal-counter {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 15px;
+        font-family: var(--font-code);
+        letter-spacing: 2px;
+        user-select: none;
+    }
+
+    /* 控制按钮统一风格 */
+    .modal-close, .modal-nav {
+        color: rgba(255, 255, 255, 0.9);
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
         display: flex;
         justify-content: center;
         align-items: center;
-        background-color: var(--card-background);
-        opacity: 0.7;
-        transition: background-color 0.3s ease, opacity 0.3s ease;
+        cursor: pointer;
+        border-radius: 50%;
+        z-index: 1002;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        outline: none;
     }
 
-    .modal-nav:hover { opacity: 0.9; }
-    .modal-prev { left: 10px; }
-    .modal-next { right: 10px; }
-    .modal-nav.disabled { opacity: 0.3; cursor: not-allowed; }
+    .modal-close { 
+        position: relative; 
+        width: 44px; 
+        height: 44px;
+        font-size: 28px;
+        line-height: 1;
+    }
+    
+    .modal-close:hover {
+        background: rgba(255, 255, 255, 0.2);
+        transform: scale(1.1) rotate(90deg);
+        color: #fff;
+    }
+
+    .modal-nav {
+        position: absolute;
+        top: 50%;
+        width: 52px;
+        height: 52px;
+        font-size: 24px;
+        font-weight: 300;
+    }
+
+    .modal-prev { left: 40px; transform: translateY(-50%); }
+    .modal-next { right: 40px; transform: translateY(-50%); }
+
+    .modal-prev:hover, .modal-next:hover { 
+        transform: translateY(-50%) scale(1.15); 
+        background: rgba(255, 255, 255, 0.2); 
+        color: #fff; 
+    }
+
+    .modal-nav.disabled { 
+        opacity: 0; 
+        pointer-events: none; 
+        transform: translateY(-50%) scale(0.8);
+    }
+    
     body.modal-open { overflow: hidden; }
 
+    /* 手机端按钮微调 */
     @media (max-width: 768px) {
-        .timeline-item { flex-direction: column; align-items: flex-start; gap: 5px; }
-        .timeline-date-right { text-align: left; padding-top: 0; margin-top: 5px; }
-        .timeline-image-row, .timeline-photos { justify-content: flex-start; margin-left: 0; padding-left: 0; }
-        .timeline-image-row img, .timeline-photos img { margin-left: 0; margin-right: 10px; }
+        .modal-top-left { top: 20px; left: 20px; }
+        .modal-top-right { top: 20px; right: 20px; gap: 15px; }
+        .modal-main-title { font-size: 18px; }
+        .modal-sub-title { font-size: 13px; }
+        .modal-counter { font-size: 13px; }
+        .modal-close { width: 36px; height: 36px; font-size: 24px; }
+        
+        .modal-prev { left: 15px; }
+        .modal-next { right: 15px; }
+        .modal-nav { width: 44px; height: 44px; font-size: 20px; }
     }
 </style>
 
@@ -324,19 +420,14 @@ title: Kobe Zhang | TimeLine
                 <div class="timeline-point-text">🧨</div>
                 <div class="timeline-media-container">
                     <div class="timeline-main-content">
-                        <h3>2025 Spotlight</h3>
+                        <h3>Recent Records -- 近期记录</h3>
                         <p>2025 GoodBye ! 2026 Hello !</p>
                     </div>
                     <div class="timeline-photos">
-                        <img src="/timeline-img/2025 Spotlight/1.jpg" alt="2025 Spotlight -1" class="img-portrait">
-                        <img src="/timeline-img/2025 Spotlight/2.jpg" alt="2025 Spotlight -2" class="img-portrait">
-                        <img src="/timeline-img/2025 Spotlight/3.jpg" alt="2025 Spotlight -3" class="img-portrait">
-                        <img src="/timeline-img/2025 Spotlight/4.jpg" alt="2025 Spotlight -4" class="img-portrait">
-                        <img src="/timeline-img/2025 Spotlight/5.jpg" alt="2025 Spotlight -5" class="img-portrait">
-                        <img src="/timeline-img/2025 Spotlight/6.jpg" alt="2025 Spotlight -6" class="img-portrait">
-                        <img src="/timeline-img/2025 Spotlight/7.jpg" alt="2025 Spotlight -7" class="img-portrait">
-                        <img src="/timeline-img/2025 Spotlight/8.jpg" alt="2025 Spotlight -8" class="img-portrait">
-                        <img src="/timeline-img/2025 Spotlight/9.jpg" alt="2025 Spotlight -9" class="img-portrait">
+                        <img src="/timeline-img/2025 Spotlight/3.jpg" alt="2025 Spotlight -1" class="img-portrait">
+                        <img src="/timeline-img/2025 Spotlight/4.jpg" alt="2025 Spotlight -2" class="img-portrait">
+                        <img src="/timeline-img/2025 Spotlight/6.jpg" alt="2025 Spotlight -3" class="img-portrait">
+                        <img src="/timeline-img/2025 Spotlight/8.jpg" alt="2025 Spotlight -4" class="img-portrait">
                     </div>
                 </div>
                 <div class="timeline-date-right">2025年11月23日</div>
@@ -394,10 +485,9 @@ title: Kobe Zhang | TimeLine
                     </div>
                     <div class="timeline-photos">
                         <img src="/timeline-img/苏州之行/1.jpg" alt="苏州之行-1" class="img-portrait">
-                        <img src="/timeline-img/苏州之行/2.jpg" alt="苏州之行-2" class="img-portrait">
-                        <img src="/timeline-img/苏州之行/3.jpg" alt="苏州之行-3" class="img-portrait">
-                        <img src="/timeline-img/苏州之行/4.jpg" alt="苏州之行-4" class="img-portrait">
-                        <img src="/timeline-img/苏州之行/5.jpg" alt="苏州之行-5" class="img-portrait">
+                        <img src="/timeline-img/苏州之行/3.jpg" alt="苏州之行-2" class="img-portrait">
+                        <img src="/timeline-img/苏州之行/4.jpg" alt="苏州之行-3" class="img-portrait">
+                        <img src="/timeline-img/苏州之行/5.jpg" alt="苏州之行-4" class="img-portrait">
                     </div>
                 </div>
                 <div class="timeline-date-right">2025年7月</div>
@@ -411,10 +501,7 @@ title: Kobe Zhang | TimeLine
                         <p>记录生活之取快递加买零食 </p>
                     </div>
                     <div class="timeline-photos">
-                        <img src="/timeline-img/猎奇-采购/微信图片_20250607221649_153.jpg" alt="life 1" class="img-portrait">
-                        <img src="/timeline-img/猎奇-采购/微信图片_20250607221649_155.jpg" alt="life 2" class="img-portrait">
-                        <img src="/timeline-img/猎奇-采购/微信图片_20250607221649_151.jpg" alt="life 3" class="img-portrait">
-                        <img src="/timeline-img/猎奇-采购/微信图片_20250607221649_150.jpg" alt="life 4" class="img-portrait">
+                        <img src="/timeline-img/猎奇-采购/微信图片_20250607221649_155.jpg" alt="life 1" class="img-portrait">
                     </div>
                 </div>
                 <div class="timeline-date-right">2025年6月</div>
@@ -442,20 +529,6 @@ title: Kobe Zhang | TimeLine
             </div>
 
             <div class="timeline-item">
-                <div class="timeline-point-text">🚀</div>
-                <div class="timeline-main-content">
-                    <h3>生活常态 -- Keep Going</h3>
-                    <p>生物模考结束-预估57分😁 </p>
-                    <p>果茶+作业</p>
-                    <div class="timeline-photos">
-                        <img src="/timeline-img/Keep going/微信图片_20250605202036_145.jpg" alt="KG 1" class="img-portrait">
-                        <img src="/timeline-img/Keep going/微信图片_20250605202036_146.jpg" alt="KG 2" class="img-portrait">
-                    </div>
-                </div>
-                <div class="timeline-date-right">2025年6月5日</div>
-            </div>
-
-            <div class="timeline-item">
                 <div class="timeline-point-text">🎁</div>
                 <div class="timeline-main-content">
                     <h3>Technoblade 26岁生日 -- Happy Birthday !</h3>
@@ -470,29 +543,17 @@ title: Kobe Zhang | TimeLine
             <div class="timeline-item">
                 <div class="timeline-point-text">✅</div>
                 <div class="timeline-main-content">
-                    <h3>新网站 -- kobezyx.xx.kg</h3>
+                    <h3>新网站 -- kobezyx.com</h3>
                     <p>终于，我发布了自己的个人网站</p>
                 </div>
                 <div class="timeline-date-right">2025年5月27日</div>
             </div>
 
             <div class="timeline-item">
-                <div class="timeline-point-text">🌐</div>
-                <div class="timeline-main-content">
-                    <h3>域名迁移 -- Cloudflare</h3>
-                    <p>最终还是把域名转移到了Cloudflare上 😊</p>
-                    <div class="timeline-image-row">
-                        <img src="/timeline-img/域名迁移到Cloudflare/PixPin_2025-05-31_20-58-13.png" alt="Cloudflare">
-                    </div>
-                </div>
-                <div class="timeline-date-right">2025年5月20日</div>
-            </div>
-
-            <div class="timeline-item">
                 <div class="timeline-point-text">🚀</div>
                 <div class="timeline-main-content">
                     <h3> 新域名 -- kobezyx.xx.kg</h3>
-                    <p>我注册到了专属博客的域名</p>
+                    <p>我注册到了极客的域名</p>
                 </div>
                 <div class="timeline-date-right">2025年4月23日</div>
             </div>
@@ -503,8 +564,7 @@ title: Kobe Zhang | TimeLine
                     <h3>我的首个域名 -- 网络构建的开始</h3>
                     <p>终于，我拥有了自己的域名</p>
                     <div class="timeline-photos">
-                        <img src="/timeline-img/我的第一个域名-前端开发的开始/PixPin_2025-06-01_21-48-00.png" alt="domin 1">
-                        <img src="/timeline-img/我的第一个域名-前端开发的开始/PixPin_2025-06-01_21-39-50.png" alt="domin 2">
+                        <img src="/timeline-img/我的第一个域名-前端开发的开始/PixPin_2025-06-01_21-39-50.png" alt="domin 1">
                     </div>
                 </div>
                 <div class="timeline-date-right">2025年3月8日</div>
@@ -580,8 +640,17 @@ title: Kobe Zhang | TimeLine
 </section>
 
 <div id="image-modal" class="image-modal">
-    <div id="modal-content-wrapper" class="modal-content-wrapper">
+    <div class="modal-top-left">
+        <div id="modal-main-title" class="modal-main-title"></div>
+        <div id="modal-sub-title" class="modal-sub-title"></div>
+    </div>
+    
+    <div class="modal-top-right">
+        <span id="modal-counter" class="modal-counter"></span>
         <button id="modal-close" class="modal-close">&times;</button>
+    </div>
+
+    <div id="modal-content-wrapper" class="modal-content-wrapper">
         <div class="modal-image-container">
             <img id="modal-image" class="modal-image" src="" alt="">
             <button id="modal-prev" class="modal-nav modal-prev">&lt;</button>
@@ -694,7 +763,7 @@ title: Kobe Zhang | TimeLine
             });
         });
 
-        // [4] 悬停交互逻辑 (复原你原版的完美悬停效果)
+        // [4] 悬停交互逻辑
         clickableImages.forEach((img) => {
             img.addEventListener('mouseenter', function () {
                 if (!this.classList.contains('animate-in')) return;
@@ -732,17 +801,29 @@ title: Kobe Zhang | TimeLine
                 }
             });
 
-            // 点击放大模态框
+            // 🌟 核心：点击图片，打开现代画廊模态框，并提取标题
             img.addEventListener('click', function () {
                 const parentDiv = this.closest('.timeline-image-row') || this.closest('.timeline-photos');
                 currentImageGroup = Array.from(parentDiv.querySelectorAll('img'));
                 currentImageIndex = currentImageGroup.indexOf(this);
+                
+                // 自动向上寻找最近的标题并切割 "--"
+                const timelineItem = this.closest('.timeline-item');
+                if (timelineItem) {
+                    const h3 = timelineItem.querySelector('h3');
+                    if (h3) {
+                        const titleText = h3.textContent || '';
+                        const parts = titleText.split('--');
+                        document.getElementById('modal-main-title').textContent = parts[0] ? parts[0].trim() : '';
+                        document.getElementById('modal-sub-title').textContent = parts[1] ? parts[1].trim() : '';
+                    }
+                }
+
                 const isPortrait = this.naturalHeight > this.naturalWidth;
                 openModal(this, isPortrait);
             });
         });
-
-        // [5] 模态框功能支持
+// [5] 模态框功能支持
         function openModal(imgElement, isPortrait) {
             imageModal.style.display = 'flex';
             modalImage.src = imgElement.src;
@@ -750,28 +831,37 @@ title: Kobe Zhang | TimeLine
             if (isPortrait) modalImage.classList.add('portrait');
             else modalImage.classList.remove('portrait');
             imageModalCaption.innerHTML = imgElement.alt;
+            
+            // 更新图片计数器
+            document.getElementById('modal-counter').textContent = (currentImageIndex + 1) + ' / ' + currentImageGroup.length;
+            
             updateModalNavButtons();
             document.body.classList.add('modal-open');
-            requestAnimationFrame(() => { modalContentWrapper.classList.add('active'); });
+            
+            // 🌟 核心修改 3：同时给背景和图片添加激活动画的 class
+            requestAnimationFrame(() => { 
+                imageModal.classList.add('show-modal');
+                modalContentWrapper.classList.add('active'); 
+            });
         }
 
         modalCloseButton.onclick = function () {
+            // 🌟 核心修改 4：点击关闭时，同步剥夺背景和图片的激活状态，让它们一起开始淡出
+            imageModal.classList.remove('show-modal');
             modalContentWrapper.classList.remove('active');
-            modalContentWrapper.addEventListener('transitionend', function handler() {
+            
+            // 使用 setTimeout 等待 300 毫秒（刚好是我们在 CSS 里设置的 transition 时间）
+            // 等它们彻底透明后，再隐藏元素，完美解决生硬感！
+            setTimeout(() => {
                 imageModal.style.display = 'none';
                 document.body.classList.remove('modal-open');
-                modalContentWrapper.removeEventListener('transitionend', handler);
-            }, { once: true });
+            }, 300);
         }
 
         imageModal.addEventListener('click', function (event) {
-            if (event.target === imageModal) {
-                modalContentWrapper.classList.remove('active');
-                modalContentWrapper.addEventListener('transitionend', function handler() {
-                    imageModal.style.display = 'none';
-                    document.body.classList.remove('modal-open');
-                    modalContentWrapper.removeEventListener('transitionend', handler);
-                }, { once: true });
+            // 点击背景时触发关闭
+            if (event.target === imageModal || event.target === modalContentWrapper) {
+                modalCloseButton.click();
             }
         });
 
@@ -800,6 +890,10 @@ title: Kobe Zhang | TimeLine
             if (isPortrait) modalImage.classList.add('portrait');
             else modalImage.classList.remove('portrait');
             imageModalCaption.innerHTML = img.alt;
+            
+            // 🌟 核心：更新图片计数器
+            document.getElementById('modal-counter').textContent = (currentImageIndex + 1) + ' / ' + currentImageGroup.length;
+            
             updateModalNavButtons();
         }
 
@@ -808,11 +902,14 @@ title: Kobe Zhang | TimeLine
                 modalPrev.classList.add('disabled');
                 modalNext.classList.add('disabled');
             } else {
-                modalPrev.classList.toggle('disabled', currentImageIndex === 0);
-                modalNext.classList.toggle('disabled', currentImageIndex === currentImageGroup.length - 1);
+                modalPrev.classList.remove('disabled');
+                modalNext.classList.remove('disabled');
+                if (currentImageIndex === 0) modalPrev.classList.add('disabled');
+                if (currentImageIndex === currentImageGroup.length - 1) modalNext.classList.add('disabled');
             }
         }
 
+        // 键盘左右键切换与 ESC 关闭
         document.addEventListener('keydown', function (e) {
             if (imageModal.style.display === 'flex') {
                 if (e.key === 'ArrowRight' && currentImageIndex < currentImageGroup.length - 1) {
@@ -825,6 +922,7 @@ title: Kobe Zhang | TimeLine
             }
         });
 
+        // 鼠标滚轮切换
         document.addEventListener('wheel', function (e) {
             if (imageModal.style.display === 'flex') {
                 e.preventDefault();

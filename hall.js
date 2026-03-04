@@ -1,4 +1,4 @@
-// 音乐馆功能实现
+// 音乐馆功能实现 (iTunes API 稳定试听版)
 class MusicHall {
     constructor() {
         this.currentAudio = null;
@@ -9,8 +9,8 @@ class MusicHall {
 
     async init() {
         this.bindEvents();
-        // 极客品味：默认搜索林肯公园或者电子乐来作为默认展示，比搜 featured 出来的结果酷多了
-        await this.loadFeaturedMusic("OneDirection"); 
+        // 极客品味：默认搜索 Coldplay 或 Linkin Park 作为精选展示，比官方推荐靠谱
+        await this.loadFeaturedMusic("One Direction"); 
         this.setupAudioPlayer();
     }
 
@@ -76,21 +76,27 @@ class MusicHall {
         }
 
         results.forEach(track => {
-            // 只展示有预览音频的歌曲
+            // iTunes 专属：只展示有 30 秒预览音频的歌曲
             if(track.previewUrl) {
                 const trackElement = this.createTrackElement(track);
                 targetContainer.appendChild(trackElement);
             }
         });
+        
+        // 渲染 Feather 图标
         if(typeof feather !== 'undefined') feather.replace();
     }
 
     createTrackElement(track) {
         const trackDiv = document.createElement('div');
         trackDiv.className = 'music-track';
+        
+        // 获取更高清的 300x300 封面图
+        const highResArtwork = track.artworkUrl100 ? track.artworkUrl100.replace('100x100', '300x300') : '';
+
         trackDiv.innerHTML = `
             <div class="track-image">
-                <img src="${track.artworkUrl100.replace('100x100', '300x300')}" alt="${track.trackName}" loading="lazy">
+                <img src="${highResArtwork}" alt="${track.trackName}" loading="lazy" onerror="this.src='/img/jesus.png'">
                 <div class="play-overlay">
                     <i data-feather="play-circle"></i>
                 </div>
@@ -113,6 +119,7 @@ class MusicHall {
         }
         
         this.currentTrack = track;
+        // 使用 iTunes 的 30 秒预览链接
         this.currentAudio = new Audio(track.previewUrl);
         this.setupAudioEvents();
         this.currentAudio.play();
@@ -172,10 +179,15 @@ class MusicHall {
 
     updatePlayerInfo() {
         if (!this.currentTrack) return;
-        // 把 iTunes 默认的很糊的小图换成 600x600 的高清封面
-        document.getElementById('playerAlbumArt').src = this.currentTrack.artworkUrl100.replace('100x100', '600x600');
+        // 播放器左下角使用 600x600 的超高清封面
+        const ultraResArtwork = this.currentTrack.artworkUrl100 ? this.currentTrack.artworkUrl100.replace('100x100', '600x600') : '/img/jesus.png';
+        
+        document.getElementById('playerAlbumArt').src = ultraResArtwork;
         document.getElementById('playerTitle').textContent = this.currentTrack.trackName;
         document.getElementById('playerArtist').textContent = this.currentTrack.artistName;
+        
+        // 强制把总时间显示为 30 秒 (因为 iTunes 接口返回的 trackTimeMillis 是整首歌的时间，但音频只有 30 秒)
+        document.getElementById('totalTime').textContent = '0:30';
     }
 
     showPlayer() {
