@@ -244,43 +244,74 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
+
+// 图片查看器逻辑
 document.addEventListener('DOMContentLoaded', function() {
-    // 图片查看器逻辑
     const images = document.querySelectorAll('.markdown-content img');
     if (images.length > 0) {
+        // 创建模态框背景层
         const imageViewer = document.createElement('div');
         imageViewer.className = 'image-viewer';
         document.body.appendChild(imageViewer);
 
-        const viewerImg = document.createElement('img');
-        imageViewer.appendChild(viewerImg);
+        // 创建右上角计数器
+        const counter = document.createElement('span');
+        counter.className = 'viewer-counter';
+        imageViewer.appendChild(counter);
 
+        // 创建关闭按钮
         const closeBtn = document.createElement('button');
         closeBtn.className = 'close-btn';
         closeBtn.innerHTML = '&times;';
         imageViewer.appendChild(closeBtn);
 
+        // 创建左右翻页按钮
         const prevBtn = document.createElement('button');
         prevBtn.className = 'prev-btn';
-        prevBtn.innerHTML = '&lsaquo;';
+        prevBtn.innerHTML = '&lt;';
         imageViewer.appendChild(prevBtn);
 
         const nextBtn = document.createElement('button');
         nextBtn.className = 'next-btn';
-        nextBtn.innerHTML = '&rsaquo;';
+        nextBtn.innerHTML = '&gt;';
         imageViewer.appendChild(nextBtn);
+
+        // 🌟 核心修改：创建内部内容包裹层，用于实现缩放动效
+        const contentWrapper = document.createElement('div');
+        contentWrapper.className = 'image-viewer-content';
+        imageViewer.appendChild(contentWrapper);
+
+        const viewerImg = document.createElement('img');
+        contentWrapper.appendChild(viewerImg);
 
         let currentIndex = 0;
 
+        // 更新按钮禁用状态
+        const updateNavButtons = () => {
+            if (images.length <= 1) {
+                prevBtn.classList.add('disabled');
+                nextBtn.classList.add('disabled');
+            } else {
+                prevBtn.classList.remove('disabled');
+                nextBtn.classList.remove('disabled');
+                if (currentIndex === 0) prevBtn.classList.add('disabled');
+                if (currentIndex === images.length - 1) nextBtn.classList.add('disabled');
+            }
+        };
+
+        // 打开/切换图片
         const showImage = (index) => {
             if (index >= 0 && index < images.length) {
                 currentIndex = index;
                 viewerImg.src = images[currentIndex].src;
+                counter.textContent = `${currentIndex + 1} / ${images.length}`;
+                updateNavButtons();
                 imageViewer.classList.add('show');
                 document.body.classList.add('body-no-scroll');
             }
         };
 
+        // 🌟 关闭图片（CSS中的 visibility 会自动处理 0.3s 的延时淡出，无需 setTimeout）
         const hideImage = () => {
             imageViewer.classList.remove('show');
             document.body.classList.remove('body-no-scroll');
@@ -294,33 +325,50 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 
         closeBtn.addEventListener('click', hideImage);
+        
+        // 点击背景区域关闭
         imageViewer.addEventListener('click', (e) => {
-            if (e.target === imageViewer) {
+            if (e.target === imageViewer || e.target === contentWrapper) {
                 hideImage();
             }
         });
 
-        prevBtn.addEventListener('click', () => {
+        prevBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
             showImage(currentIndex - 1);
         });
 
-        nextBtn.addEventListener('click', () => {
+        nextBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
             showImage(currentIndex + 1);
         });
 
+        // 键盘操作：左右切换与 Esc 关闭
         document.addEventListener('keydown', (e) => {
             if (imageViewer.classList.contains('show')) {
                 if (e.key === 'Escape') {
                     hideImage();
                 }
-                if (e.key === 'ArrowLeft') {
+                if (e.key === 'ArrowLeft' && currentIndex > 0) {
                     showImage(currentIndex - 1);
                 }
-                if (e.key === 'ArrowRight') {
+                if (e.key === 'ArrowRight' && currentIndex < images.length - 1) {
                     showImage(currentIndex + 1);
                 }
             }
         });
+
+        // 🌟 新增：鼠标滚轮切换图片功能
+        imageViewer.addEventListener('wheel', function (e) {
+            if (imageViewer.classList.contains('show')) {
+                e.preventDefault();
+                if (e.deltaY > 0 && currentIndex < images.length - 1) {
+                    showImage(currentIndex + 1);
+                } else if (e.deltaY <= 0 && currentIndex > 0) {
+                    showImage(currentIndex - 1);
+                }
+            }
+        }, { passive: false });
     }
 });
 

@@ -1,7 +1,5 @@
 ---
 layout: default
-title: Kobe Zhang | Geek
-permalink: /blog/        
 pagination: 
   enabled: true
 ---
@@ -13,7 +11,7 @@ pagination:
         <p class="blog-intro-text" style="margin-bottom: 30px;">以下是我的所有博文列表：</p>
         
         <div class="tags-cloud">
-            <a href="{{ '/blog.html' | relative_url }}" class="tag-pill {% unless page.autopages %}active{% endunless %}">全部 All</a>
+            <a href="{{ '/blog' | relative_url }}" class="tag-pill {% unless page.autopages %}active{% endunless %}">全部 All</a>
             
             {% for tag in site.tags %}
             <a href="{{ '/tag/' | append: tag[0] | append: '/' | relative_url }}" class="tag-pill {% if page.autopages.display_name == tag[0] %}active{% endif %}">

@@ -4,7 +4,7 @@ layout: default
 
 <div class="blog-full-post fade-in">
     <div class="container">
-        <a href="{{ '/blog.html' | relative_url }}" class="back-to-blog-list" style="display: inline-flex; align-items: center; gap: 5px; margin-bottom: 30px; color: var(--text-color); text-decoration: none; opacity: 0.8; transition: opacity 0.2s;">
+        <a href="{{ '/blog' | relative_url }}" class="back-to-blog-list" style="display: inline-flex; align-items: center; gap: 5px; margin-bottom: 30px; color: var(--text-color); text-decoration: none; opacity: 0.8; transition: opacity 0.2s;">
             <i data-feather="arrow-left"></i> 返回 Geek
         </a>
         
@@ -12,9 +12,10 @@ layout: default
             <div class="blog-main-content">
                 <h1 style="margin-top: 0; font-size: 2.5em; line-height: 1.2; letter-spacing: -0.02em;">{{ page.title }}</h1>
                 <div class="post-meta" style="color: var(--secondary-text-color); font-size: 0.9em; margin-bottom: 40px;">
+                    {{ page.author | default: site.author | default: "Kobe_zyx" }} · 
                     {{ page.date | date: "%Y年%m月%d日" }} 
                     {% if page.tag %} · <span style="background: var(--border-color); padding: 2px 8px; border-radius: 4px; font-size: 0.85em;">{{ page.tag }}</span>{% endif %}
-                </div>
+            </div>
                 
                 <div class="markdown-content" id="markdown-content">
                     {{ content }}
