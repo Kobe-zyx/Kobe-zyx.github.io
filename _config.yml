@@ -3,7 +3,7 @@ author: "Kobe_zyx"
 email: "kobezyuxuan@gmail.com"
 description: "IT Enthusiast & Student"
 baseurl: ""
-url: ""
+url: "https://www.kobezyx.com"
 
 # Markdown 解析设置 
 markdown: kramdown
