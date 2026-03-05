@@ -23,12 +23,12 @@
             <div class="nav-links-container">
                 <nav>
                     <ul>
-                        <li><a href="/index.html" {% if page.url == '/index.html' or page.url == '/' %}class="active"{% endif %}>Readme</a></li>
+                        <li><a href="/index" {% if page.url == '/index.html' or page.url == '/' %}class="active"{% endif %}>Readme</a></li>
                         <li><a href="/blog" {% if page.url contains '/blog' %}class="active"{% endif %}>Geek</a></li>
-                        <li><a href="/timeline.html" {% if page.url contains '/timeline' %}class="active"{% endif %}>Timeline</a></li>
-                        <li><a href="/stack.html" {% if page.url contains '/stack' %}class="active"{% endif %}>Stack</a></li>
-                        <li><a href="/hall.html" {% if page.url contains '/hall' %}class="active"{% endif %}>Hall</a></li>
-                        <li><a href="/archive.html" {% if page.url contains '/archive' %}class="active"{% endif %}>Archive</a></li>
+                        <li><a href="/timeline" {% if page.url contains '/timeline' %}class="active"{% endif %}>Timeline</a></li>
+                        <li><a href="/stack" {% if page.url contains '/stack' %}class="active"{% endif %}>Stack</a></li>
+                        <li><a href="/hall" {% if page.url contains '/hall' %}class="active"{% endif %}>Hall</a></li>
+                        <li><a href="/archive" {% if page.url contains '/archive' %}class="active"{% endif %}>Archive</a></li>
                     </ul>
                 </nav>
             </div>

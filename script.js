@@ -89,12 +89,12 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // 时间轴导航淡出跳转
-    document.querySelectorAll('a[href="timeline.html"]').forEach(link => {
+    document.querySelectorAll('a[href="/timeline/"]').forEach(link => {
         link.addEventListener('click', function(e) {
             e.preventDefault();
             document.body.classList.add('fade-out');
             setTimeout(() => {
-                window.location.href = 'timeline.html';
+                window.location.href = '/timeline/';
             }, 500);
         });
     });
