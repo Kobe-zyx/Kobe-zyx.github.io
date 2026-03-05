@@ -1,33 +1,31 @@
 ---
 layout: default
 title: Kobe Zhang | Geek
-permalink: /blog/        
-pagination: 
-  enabled: true
+permalink: /blog/
 ---
 
 <section class="timeline-section" style="margin-top: 100px;">
     <div class="container">
-        <h1 style="margin-bottom: 10px;">{% if page.autopages %}🏷️ {{ page.autopages.display_name }}{% else %}Geek{% endif %}</h1>
+        <h1 style="margin-bottom: 10px;">Geek</h1>
         <p class="blog-intro-text">Here, you can see my all blog list.</p>
         <p class="blog-intro-text" style="margin-bottom: 30px;">以下是我的所有博文列表：</p>
         
         <div class="tags-cloud">
-            <a href="{{ '/blog.html' | relative_url }}" class="tag-pill {% unless page.autopages %}active{% endunless %}">全部 All</a>
+            <span class="tag-pill active" data-tag="all">全部 All</span>
             
             {% for tag in site.tags %}
-            <a href="{{ '/tag/' | append: tag[0] | append: '/' | relative_url }}" class="tag-pill {% if page.autopages.display_name == tag[0] %}active{% endif %}">
+            <span class="tag-pill" data-tag="{{ tag[0] }}">
                 {{ tag[0] }} <sup>{{ tag[1].size }}</sup>
-            </a>
+            </span>
             {% endfor %}
 
-            <a href="{{ '/archive' | relative_url }}" class="tag-pill" style="margin-left: auto; color: var(--primary-color); border-color: var(--primary-color); text-decoration: none; display: inline-flex; align-items: center;">
+            <a href="{{ '/archive/' | relative_url }}" class="tag-pill" style="margin-left: auto; color: var(--primary-color); border-color: var(--primary-color); text-decoration: none; display: inline-flex; align-items: center;">
                 <i data-feather="archive" style="width: 14px; height: 14px; margin-right: 4px;"></i>归档时光机
             </a>
         </div>
         
         <div class="post-list-hux" id="post-list">                
-            {% for post in paginator.posts %}
+            {% for post in site.posts %}
             <div class="post-item-hux" data-tags="{{ post.tags | join: ',' }}">
                 <a href="{{ post.url | relative_url }}">
                     <h2 class="post-title-hux">
@@ -54,33 +52,47 @@ pagination:
             </div>
             {% endfor %}
         </div>
-
-        {% if paginator.total_pages > 1 %}
-        <div class="pagination-container">
-            {% if paginator.previous_page %}
-                <a href="{{ paginator.previous_page_path | relative_url }}" class="page-btn">&lt; 上一页</a>
-            {% else %}
-                <span class="page-btn disabled">&lt; 上一页</span>
-            {% endif %}
-
-            <span class="page-number">第 {{ paginator.page }} / {{ paginator.total_pages }} 页</span>
-
-            {% if paginator.next_page %}
-                <a href="{{ paginator.next_page_path | relative_url }}" class="page-btn">下一页 &gt;</a>
-            {% else %}
-                <span class="page-btn disabled">下一页 &gt;</span>
-            {% endif %}
-        </div>
-        {% endif %}
-        
     </div>
 </section>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // 确保新加的归档小图标能够正常渲染
         if(typeof feather !== 'undefined') {
             feather.replace();
         }
+
+        const tagPills = document.querySelectorAll('.tag-pill[data-tag]');
+        const posts = document.querySelectorAll('.post-item-hux');
+
+        tagPills.forEach(pill => {
+            pill.addEventListener('click', function() {
+                // 1. 切换按钮的 active 状态
+                tagPills.forEach(p => p.classList.remove('active'));
+                this.classList.add('active');
+
+                // 2. 获取被点击的标签名
+                const selectedTag = this.getAttribute('data-tag');
+
+                // 3. 过滤文章（极简的淡入淡出效果）
+                posts.forEach(post => {
+                    post.style.opacity = '0'; // 先变透明
+                    
+                    setTimeout(() => {
+                        if (selectedTag === 'all') {
+                            post.style.display = 'block';
+                            setTimeout(() => post.style.opacity = '1', 50);
+                        } else {
+                            const postTags = post.getAttribute('data-tags').split(',');
+                            if (postTags.includes(selectedTag)) {
+                                post.style.display = 'block';
+                                setTimeout(() => post.style.opacity = '1', 50);
+                            } else {
+                                post.style.display = 'none';
+                            }
+                        }
+                    }, 300); 
+                });
+            });
+        });
     });
 </script>

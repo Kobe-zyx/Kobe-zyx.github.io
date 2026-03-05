@@ -50,8 +50,6 @@ GEM
       sinatra-contrib (~> 4.0)
     jekyll-feed (0.17.0)
       jekyll (>= 3.7, < 5.0)
-    jekyll-paginate-v2 (3.0.0)
-      jekyll (>= 3.0, < 5.0)
     jekyll-sass-converter (3.1.0)
       sass-embedded (~> 1.75)
     jekyll-seo-tag (2.8.0)
@@ -128,7 +126,6 @@ DEPENDENCIES
   jekyll
   jekyll-admin
   jekyll-feed
-  jekyll-paginate-v2
   jekyll-seo-tag
   jekyll-sitemap
   wdm (>= 0.1.0)
@@ -153,7 +150,6 @@ CHECKSUMS
   jekyll (4.4.1) sha256=4c1144d857a5b2b80d45b8cf5138289579a9f8136aadfa6dd684b31fe2bc18c1
   jekyll-admin (0.12.0) sha256=9a48cceace1bd5a58081ab474619fbe863252a921503c9f9c35ac66505670d2f
   jekyll-feed (0.17.0) sha256=689aab16c877949bb9e7a5c436de6278318a51ecb974792232fd94d8b3acfcc3
-  jekyll-paginate-v2 (3.0.0) sha256=001be6c1963caa41fed9c2f43b0d47201defa0395381eb8830487c1c2fc4f4e3
   jekyll-sass-converter (3.1.0) sha256=83925d84f1d134410c11d0c6643b0093e82e3a3cf127e90757a85294a3862443
   jekyll-seo-tag (2.8.0) sha256=3f2ed1916d56f14ebfa38e24acde9b7c946df70cb183af2cb5f0598f21ae6818
   jekyll-sitemap (1.4.0) sha256=0de08c5debc185ea5a8f980e1025c7cd3f8e0c35c8b6ef592f15c46235cf4218

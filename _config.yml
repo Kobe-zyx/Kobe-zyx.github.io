@@ -18,7 +18,7 @@ plugins:
   - jekyll-feed         
   - jekyll-admin
   - jekyll-sitemap
-  - jekyll-paginate-v2
+  # - jekyll-paginate-v2
 
 # ==========================================================
 # 分页插件配置 (Jekyll Paginate V2)
