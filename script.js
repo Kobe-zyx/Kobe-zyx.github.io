@@ -372,40 +372,46 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// 目录折叠/展开逻辑
+// ==========================================
+// 极客版图片懒加载与淡入引擎
+// ==========================================
 document.addEventListener('DOMContentLoaded', function() {
-    let currentlyOpenSubmenu = null; // 用于跟踪当前展开的子菜单
+    const images = document.querySelectorAll('.markdown-content img');
+    if (images.length === 0) return;
 
-    document.querySelectorAll('.toc-main-item').forEach(item => {
-        const mainLink = item.querySelector('a[href^="#"]');
+    // 1. 物理拦截：给所有图片强制加上 HTML5 原生懒加载属性
+    // 这行代码会让浏览器底层接管网络请求，不在屏幕内的图片坚决不下载！
+    images.forEach(img => img.setAttribute('loading', 'lazy'));
 
-        if (mainLink) {
-            mainLink.addEventListener('click', event => {
-                const submenu = item.querySelector('.submenu'); // 获取子菜单，如果没有则为 null
+    // 2. 视觉魔法：使用 Intersection Observer 监控图片是否进入视口
+    const observerOptions = {
+        root: null,
+        rootMargin: '50px 0px', // 提前 50px 触发，让用户感觉不到延迟
+        threshold: 0.1 // 露出 10% 就开始动画
+    };
 
-                if (submenu) {
-                    if (submenu.style.display === 'block') {
-                        // 如果点击的子菜单已经展开，则不做任何操作（它保持展开，锚点跳转会发生）
-                    } else {
-                        // 如果点击的子菜单是关闭的
-                        // 折叠任何当前展开的子菜单，如果它存在且与当前点击的不同
-                        if (currentlyOpenSubmenu && currentlyOpenSubmenu !== submenu) {
-                            currentlyOpenSubmenu.style.display = 'none';
-                        }
-                        // 展开当前点击的子菜单
-                        submenu.style.display = 'block';
-                        // 更新当前展开的子菜单
-                        currentlyOpenSubmenu = submenu;
-                    }
+    const imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                
+                // 为了确保图片真的下载完了再显示，我们监听它的 load 事件
+                if (img.complete) {
+                    img.classList.add('lazy-loaded');
                 } else {
-                    // 如果当前点击的项没有子菜单，则只折叠其他已展开的子菜单
-                    if (currentlyOpenSubmenu) {
-                        currentlyOpenSubmenu.style.display = 'none';
-                        currentlyOpenSubmenu = null; // 重置为 null，因为没有子菜单被展开
-                    }
+                    img.addEventListener('load', () => {
+                        img.classList.add('lazy-loaded');
+                    });
                 }
-                // 锚点导航会自动发生，因为没有调用 preventDefault
-            });
-        }
+                
+                // 观察过并且触发动画后，就解除观察，节省 CPU 性能
+                observer.unobserve(img);
+            }
+        });
+    }, observerOptions);
+
+    // 3. 开始监视所有文章内的图片
+    images.forEach(img => {
+        imageObserver.observe(img);
     });
 });

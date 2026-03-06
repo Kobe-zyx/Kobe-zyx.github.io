@@ -60,17 +60,50 @@ layout: default
     .toc-title { font-size: 12px; font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-color); opacity: 0.8; }
     .toc-list { list-style: none; padding: 0; margin: 0; }
     .toc-item { margin-bottom: 8px; }
-    .toc-item a { color: var(--secondary-text-color); text-decoration: none; font-size: 14px; display: block; transition: color 0.2s ease, transform 0.2s ease; line-height: 1.5; }
-    .toc-item a:hover { color: var(--text-color); transform: translateX(2px); }
     
-    .toc-level-1 > a { font-weight: 600; color: var(--text-color); margin-top: 12px; }
-    .toc-level-2 > a { padding-left: 12px; }
-    .toc-level-3 > a { padding-left: 24px; font-size: 13px; opacity: 0.9; }
-
-    @media (max-width: 1024px) {
-        .post-toc-sidebar { display: none !important; }
-        .post-layout-wrapper { display: block; }
+    /* 🌟 极客防抖版链接样式：只用 padding 位移，绝不抖动 */
+    .toc-item a { 
+        color: var(--secondary-text-color); 
+        text-decoration: none; 
+        font-size: 14px; 
+        display: block; 
+        transition: color 0.3s ease, padding-left 0.3s ease; 
+        line-height: 1.5; 
+        position: relative;
+        box-sizing: border-box;
+        padding: 4px 0;
     }
+    
+    .toc-item a:hover { color: var(--text-color); }
+    .toc-item a.active { color: var(--text-color); font-weight: 600; }
+    
+/* 🌟 极客小箭头 (全新左侧高清 SVG Base64 防丢版) */
+    .geek-toc-arrow {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        /* 核心魔法：向左偏移 20px，完美塞进左侧的内边距里，绝对不影响文字对齐 */
+        margin-left: -20px; 
+        margin-right: 4px;  
+        vertical-align: -3px; /* 微调垂直居中对齐 */
+        
+        background-color: var(--secondary-text-color); /* 箭头的默认颜色 */
+        
+        /* 🌟 核心修复：采用 Base64 编码，彻底解决 Chrome 渲染 SVG 遮罩变成透明的 Bug！ */
+        -webkit-mask: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cG9seWxpbmUgcG9pbnRzPSI5IDE4IDE1IDEyIDkgNiI+PC9wb2x5bGluZT48L3N2Zz4=") center / contain no-repeat;
+        mask: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cG9seWxpbmUgcG9pbnRzPSI5IDE4IDE1IDEyIDkgNiI+PC9wb2x5bGluZT48L3N2Zz4=") center / contain no-repeat;
+        
+        transition: transform 0.3s ease, background-color 0.3s ease;
+        cursor: pointer;
+        transform: rotate(0deg); /* 默认向右指，代表收起 */
+    }
+    
+    /* 展开时箭头顺滑地向下旋转 90 度 */
+    .toc-item a.is-open .geek-toc-arrow { transform: rotate(90deg); } 
+    
+    /* 悬停和高亮时，箭头颜色跟着文字一起变深/变白 */
+    .toc-item a:hover .geek-toc-arrow,
+    .toc-item a.active .geek-toc-arrow { background-color: var(--text-color); }
 </style>
 
 <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
@@ -130,41 +163,146 @@ layout: default
         });
         if(typeof feather !== 'undefined') { feather.replace(); }
 
-        // 3. 生成支持 H1, H2, H3 的右侧目录
+// 3. 终极极客版：生成支持折叠与滚动监听的侧边栏目录
         const tocNav = document.getElementById('toc-nav');
         const sidebar = document.querySelector('.post-toc-sidebar');
-        const headings = content.querySelectorAll('h1, h2, h3');
+        const headings = content.querySelectorAll('h1, h2, h3, h4, h5, h6');
         
         if (headings.length > 0 && tocNav) {
             sidebar.style.display = 'block'; 
             const ul = document.createElement('ul');
             ul.className = 'toc-list';
             
+            let minLevel = 6;
+            headings.forEach(h => {
+                const level = parseInt(h.tagName.substring(1));
+                if (level < minLevel) minLevel = level;
+            });
+
+            const tocData = [];
+
+            // 1. 构建基础 DOM 并计算缩进
             headings.forEach((heading, index) => {
                 if (!heading.id) { heading.id = 'heading-' + index; }
+                const level = parseInt(heading.tagName.substring(1));
                 
                 const li = document.createElement('li');
-                let levelClass = 'toc-level-1';
-                if (heading.tagName.toLowerCase() === 'h2') levelClass = 'toc-level-2';
-                if (heading.tagName.toLowerCase() === 'h3') levelClass = 'toc-level-3';
-                
-                li.className = 'toc-item ' + levelClass;
+                li.className = 'toc-item';
                 
                 const a = document.createElement('a');
                 a.href = '#' + heading.id;
                 a.textContent = heading.textContent;
                 
-                a.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const target = document.getElementById(heading.id);
-                    const offsetPosition = target.getBoundingClientRect().top + window.pageYOffset - 70;
-                    window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
-                });
+                // 🌟 数学排版：按层级动态分配左边距
+                const basePadding = (level - minLevel) * 16 + 20;
+                a.style.paddingLeft = basePadding + 'px';
+                a.dataset.basePadding = basePadding; // 存入数据集供防抖动画使用
                 
                 li.appendChild(a);
                 ul.appendChild(li);
+                
+                tocData.push({
+                    heading: heading, li: li, a: a, level: level,
+                    isParent: false, isOpen: false
+                });
             });
+            
             tocNav.appendChild(ul);
+
+            // 2. 识别父节点并插入极客箭头
+            for (let i = 0; i < tocData.length; i++) {
+                if (i + 1 < tocData.length && tocData[i+1].level > tocData[i].level) {
+                    tocData[i].isParent = true;
+                    const arrow = document.createElement('span');
+                    arrow.className = 'geek-toc-arrow';
+                    tocData[i].a.prepend(arrow);
+                }
+            }
+
+            // 3. 核心视图更新引擎 (控制折叠隐藏)
+            function updateTocVisibility() {
+                let hideLevelTrigger = 99;
+                for (let i = 0; i < tocData.length; i++) {
+                    const item = tocData[i];
+                    if (item.level <= hideLevelTrigger && hideLevelTrigger !== 99) {
+                        hideLevelTrigger = 99;
+                    }
+                    item.li.style.display = (hideLevelTrigger !== 99) ? 'none' : 'block';
+                    
+                    if (item.isParent && !item.isOpen && hideLevelTrigger === 99) {
+                        hideLevelTrigger = item.level;
+                    }
+                }
+            }
+
+            // 默认收起所有子菜单
+            updateTocVisibility();
+
+            // 4. 事件绑定：防抖悬停与精准点击
+            tocData.forEach(item => {
+                const basePad = parseInt(item.a.dataset.basePadding);
+                
+                // 丝滑悬停：修改 padding 避免 1像素抽搐Bug
+                item.a.addEventListener('mouseenter', () => item.a.style.paddingLeft = (basePad + 6) + 'px');
+                item.a.addEventListener('mouseleave', () => {
+                    if (!item.a.classList.contains('active')) item.a.style.paddingLeft = basePad + 'px';
+                });
+
+                item.a.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    // 如果点的是箭头，只折叠不跳转
+                    if (e.target.classList.contains('geek-toc-arrow')) {
+                        item.isOpen = !item.isOpen;
+                        item.a.classList.toggle('is-open', item.isOpen);
+                        updateTocVisibility();
+                    } else {
+                        // 点的是文字：展开老爸并平滑跳转
+                        if (item.isParent && !item.isOpen) {
+                            item.isOpen = true;
+                            item.a.classList.add('is-open');
+                            updateTocVisibility();
+                        }
+                        const offsetPosition = item.heading.getBoundingClientRect().top + window.pageYOffset - 70;
+                        window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+                    }
+                });
+            });
+
+            // 5. ScrollSpy：自动高亮并向上展开家族树
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        tocData.forEach(item => {
+                            item.a.classList.remove('active');
+                            item.a.style.paddingLeft = item.a.dataset.basePadding + 'px';
+                        });
+                        
+                        const activeIndex = tocData.findIndex(item => item.heading.id === entry.target.id);
+                        if (activeIndex !== -1) {
+                            const activeItem = tocData[activeIndex];
+                            activeItem.a.classList.add('active');
+                            activeItem.a.style.paddingLeft = (parseInt(activeItem.a.dataset.basePadding) + 6) + 'px';
+                            
+                            // 🌟 核心：往上寻找被关上的父辈，强行踹开！
+                            let currentLevel = activeItem.level;
+                            let needsUpdate = false;
+                            for (let i = activeIndex - 1; i >= 0; i--) {
+                                if (tocData[i].level < currentLevel) {
+                                    if (tocData[i].isParent && !tocData[i].isOpen) {
+                                        tocData[i].isOpen = true;
+                                        tocData[i].a.classList.add('is-open');
+                                        needsUpdate = true;
+                                    }
+                                    currentLevel = tocData[i].level;
+                                }
+                            }
+                            if (needsUpdate) updateTocVisibility();
+                        }
+                    }
+                });
+            }, { rootMargin: '-80px 0px -70% 0px', threshold: 0 });
+
+            headings.forEach(h => observer.observe(h));
         }
     });
-</script>  
+</script>
