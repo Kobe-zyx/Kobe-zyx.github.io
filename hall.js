@@ -1,4 +1,6 @@
-// 音乐馆功能实现 (iTunes API 稳定试听版)
+// ==========================================
+// 极客版音乐馆引擎 (纯净 iTunes API 原生版 + 全局同步)
+// ==========================================
 class MusicHall {
     constructor() {
         this.currentAudio = null;
@@ -9,9 +11,10 @@ class MusicHall {
 
     async init() {
         this.bindEvents();
-        // 极客品味：默认搜索 Coldplay 或 Linkin Park 作为精选展示，比官方推荐靠谱
-        await this.loadFeaturedMusic("One Direction"); 
+        // 默认加载推荐的歌手或关键词，你可以随意改成喜欢的名字
+        await this.loadFeaturedMusic("周杰伦"); 
         this.setupAudioPlayer();
+        this.restoreFromLocal();
     }
 
     bindEvents() {
@@ -24,12 +27,8 @@ class MusicHall {
         searchInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.performSearch();
         });
-        if(playPauseBtn) {
-            playPauseBtn.addEventListener('click', () => this.togglePlayPause());
-        }
-        if(closePlayerBtn) {
-            closePlayerBtn.addEventListener('click', () => this.hidePlayer());
-        }
+        if(playPauseBtn) playPauseBtn.addEventListener('click', () => this.togglePlayPause());
+        if(closePlayerBtn) closePlayerBtn.addEventListener('click', () => this.hidePlayer());
     }
 
     async performSearch() {
@@ -38,7 +37,7 @@ class MusicHall {
 
         const searchResultsGrid = document.getElementById('searchResultsGrid');
         const searchResultsContainer = document.getElementById('searchResults');
-        searchResultsGrid.innerHTML = '<p>Searching via iTunes API...</p>';
+        searchResultsGrid.innerHTML = '<p>Searching...</p>';
         searchResultsContainer.style.display = 'block';
 
         try {
@@ -48,12 +47,13 @@ class MusicHall {
             this.displaySearchResults(data.results, searchResultsGrid);
         } catch (error) {
             console.error('Search failed:', error);
-            searchResultsGrid.innerHTML = '<p class="no-results">Search failed. Please try again later.</p>';
+            searchResultsGrid.innerHTML = '<p class="no-results" style="color:#ff4d4f;">Search failed. Please check your network connection.</p>';
         }
     }
 
     async loadFeaturedMusic(defaultArtist) {
         const featuredGrid = document.getElementById('featuredMusic');
+        if(!featuredGrid) return;
         featuredGrid.innerHTML = '<p>Loading featured tracks...</p>';
 
         try {
@@ -62,37 +62,32 @@ class MusicHall {
             const data = await response.json();
             this.displaySearchResults(data.results, featuredGrid);
         } catch (error) {
-            console.error('Failed to load featured music:', error);
             featuredGrid.innerHTML = '<p class="no-results">Failed to load API data.</p>';
         }
     }
 
     displaySearchResults(results, targetContainer) {
         targetContainer.innerHTML = '';
-
         if (results.length === 0) {
             targetContainer.innerHTML = '<p class="no-results">No music found.</p>';
             return;
         }
 
         results.forEach(track => {
-            // iTunes 专属：只展示有 30 秒预览音频的歌曲
             if(track.previewUrl) {
                 const trackElement = this.createTrackElement(track);
                 targetContainer.appendChild(trackElement);
             }
         });
         
-        // 渲染 Feather 图标
         if(typeof feather !== 'undefined') feather.replace();
     }
 
     createTrackElement(track) {
         const trackDiv = document.createElement('div');
         trackDiv.className = 'music-track';
-        
-        // 获取更高清的 300x300 封面图
-        const highResArtwork = track.artworkUrl100 ? track.artworkUrl100.replace('100x100', '300x300') : '';
+        // 提取 iTunes 的高清大图封面
+        const highResArtwork = track.artworkUrl100 ? track.artworkUrl100.replace('100x100', '300x300') : '/img/jesus.png';
 
         trackDiv.innerHTML = `
             <div class="track-image">
@@ -104,7 +99,7 @@ class MusicHall {
             <div class="track-info">
                 <h3>${track.trackName}</h3>
                 <p>${track.artistName}</p>
-                <p class="track-duration">Preview · 30s</p>
+                <p class="track-duration">Preview (30s)</p>
             </div>
         `;
         trackDiv.addEventListener('click', () => this.playTrack(track));
@@ -114,52 +109,104 @@ class MusicHall {
     playTrack(track) {
         if (!track.previewUrl) return;
         
+        // 切歌时彻底释放上一首歌的内存
         if (this.currentAudio) {
             this.currentAudio.pause();
+            this.currentAudio.src = ''; 
         }
         
         this.currentTrack = track;
-        // 使用 iTunes 的 30 秒预览链接
-        this.currentAudio = new Audio(track.previewUrl);
-        this.setupAudioEvents();
-        this.currentAudio.play();
         this.updatePlayerInfo();
         this.showPlayer();
+        
+        // 极其干脆：直接调用苹果服务器的预览音频
+        this.currentAudio = new Audio(track.previewUrl);
+        
+        // 将当前歌曲信息存入本地，供其它页面的左下角小圆盘接力播放
+        const highResArtwork = track.artworkUrl100 ? track.artworkUrl100.replace('100x100', '600x600') : '/img/jesus.png';
+        const songData = {
+            title: track.trackName,
+            artist: track.artistName,
+            cover: highResArtwork,
+            src: track.previewUrl,
+            currentTime: 0
+        };
+        localStorage.setItem('geekCurrentSong', JSON.stringify(songData));
+
+        this.setupAudioEvents();
+        
+        this.currentAudio.play().then(() => {
+            this.isPlaying = true;
+            this.updatePlayerUI();
+        }).catch(e => {
+            console.log('自动播放被浏览器拦截', e);
+            this.isPlaying = false;
+            this.updatePlayerUI();
+        });
     }
 
     setupAudioEvents() {
         if (!this.currentAudio) return;
-        this.currentAudio.addEventListener('timeupdate', () => this.updateProgress());
+        
+        this.currentAudio.addEventListener('loadedmetadata', () => {
+            const totalTimeSpan = document.getElementById('totalTime');
+            if (totalTimeSpan && this.currentAudio.duration && this.currentAudio.duration !== Infinity) {
+                totalTimeSpan.textContent = this.formatTime(this.currentAudio.duration * 1000);
+            } else {
+                totalTimeSpan.textContent = '0:30'; 
+            }
+        });
+
+        this.currentAudio.addEventListener('timeupdate', () => {
+            this.updateProgress();
+            
+            // 进度实时存档，供跨页面同步
+            let savedSong = JSON.parse(localStorage.getItem('geekCurrentSong'));
+            if (savedSong) {
+                savedSong.currentTime = this.currentAudio.currentTime;
+                localStorage.setItem('geekCurrentSong', JSON.stringify(savedSong));
+            }
+        });
+
         this.currentAudio.addEventListener('ended', () => {
             this.isPlaying = false;
             this.updatePlayerUI();
-            // 播放完毕进度条归零
             document.getElementById('progressFill').style.width = '0%';
             document.getElementById('currentTime').textContent = '0:00';
         });
-        this.currentAudio.addEventListener('play', () => {
-            this.isPlaying = true;
-            this.updatePlayerUI();
-        });
-        this.currentAudio.addEventListener('pause', () => {
-            this.isPlaying = false;
-            this.updatePlayerUI();
-        });
+        
+        this.currentAudio.addEventListener('play', () => { this.isPlaying = true; this.updatePlayerUI(); });
+        this.currentAudio.addEventListener('pause', () => { this.isPlaying = false; this.updatePlayerUI(); });
+    }
+
+    restoreFromLocal() {
+        const savedSongInfo = localStorage.getItem('geekCurrentSong');
+        if (!savedSongInfo) return;
+        try {
+            const songData = JSON.parse(savedSongInfo);
+            this.currentTrack = {
+                trackName: songData.title,
+                artistName: songData.artist,
+                artworkUrl100: songData.cover, 
+                previewUrl: songData.src
+            };
+            this.currentAudio = new Audio(songData.src);
+            this.currentAudio.currentTime = songData.currentTime || 0;
+            this.setupAudioEvents();
+            this.updatePlayerInfo();
+            this.showPlayer();
+        } catch(e) {}
     }
 
     togglePlayPause() {
         if (!this.currentAudio) return;
-        if (this.isPlaying) {
-            this.currentAudio.pause();
-        } else {
-            this.currentAudio.play();
-        }
+        if (this.isPlaying) this.currentAudio.pause();
+        else this.currentAudio.play();
     }
 
     updatePlayerUI() {
         const playPauseBtn = document.getElementById('playPauseBtn');
         if (!playPauseBtn) return;
-        // 使用 innerHTML 重新绘制 SVG 解决 feather 无法实时切换图标的问题
         playPauseBtn.innerHTML = `<i data-feather="${this.isPlaying ? 'pause' : 'play'}"></i>`;
         if(typeof feather !== 'undefined') feather.replace();
     }
@@ -170,7 +217,7 @@ class MusicHall {
         const progressFill = document.getElementById('progressFill');
         const currentTimeSpan = document.getElementById('currentTime');
         
-        if (duration) {
+        if (duration && duration !== Infinity) {
             const progress = (currentTime / duration) * 100;
             progressFill.style.width = `${progress}%`;
         }
@@ -179,36 +226,32 @@ class MusicHall {
 
     updatePlayerInfo() {
         if (!this.currentTrack) return;
-        // 播放器左下角使用 600x600 的超高清封面
         const ultraResArtwork = this.currentTrack.artworkUrl100 ? this.currentTrack.artworkUrl100.replace('100x100', '600x600') : '/img/jesus.png';
         
         document.getElementById('playerAlbumArt').src = ultraResArtwork;
         document.getElementById('playerTitle').textContent = this.currentTrack.trackName;
         document.getElementById('playerArtist').textContent = this.currentTrack.artistName;
-        
-        // 强制把总时间显示为 30 秒 (因为 iTunes 接口返回的 trackTimeMillis 是整首歌的时间，但音频只有 30 秒)
-        document.getElementById('totalTime').textContent = '0:30';
+        document.getElementById('totalTime').textContent = '--:--'; 
     }
 
     showPlayer() {
         const player = document.getElementById('musicPlayer');
+        if(!player) return;
         player.style.display = 'block';
-        // 使用一小段延迟来触发 CSS 的滑入动画
-        setTimeout(() => {
-            player.classList.add('show');
-        }, 10);
+        setTimeout(() => player.classList.add('show'), 10);
     }
 
     hidePlayer() {
         if (this.currentAudio) {
             this.currentAudio.pause();
+            this.currentAudio.src = ''; // 释放音频内存
         }
+        
         const player = document.getElementById('musicPlayer');
+        if(!player) return;
+        
         player.classList.remove('show');
-        // 等待动画结束后隐藏
-        setTimeout(() => {
-            player.style.display = 'none';
-        }, 400);
+        setTimeout(() => player.style.display = 'none', 400);
     }
 
     setupAudioPlayer() {
@@ -218,14 +261,13 @@ class MusicHall {
                 if (!this.currentAudio || !this.currentAudio.duration) return;
                 const rect = progressBar.getBoundingClientRect();
                 const clickX = e.clientX - rect.left;
-                const percentage = clickX / rect.width;
-                this.currentAudio.currentTime = percentage * this.currentAudio.duration;
+                this.currentAudio.currentTime = (clickX / rect.width) * this.currentAudio.duration;
             });
         }
     }
 
     formatTime(ms) {
-        if (!ms || isNaN(ms)) return '0:00';
+        if (!ms || isNaN(ms) || ms === Infinity) return '0:00';
         const totalSeconds = Math.floor(ms / 1000);
         const minutes = Math.floor(totalSeconds / 60);
         const seconds = totalSeconds % 60;
@@ -233,6 +275,4 @@ class MusicHall {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    new MusicHall();
-});
+document.addEventListener('DOMContentLoaded', () => new MusicHall());

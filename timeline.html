@@ -866,20 +866,22 @@ permalink: /timeline/
             }
         });
 
+// 🌟 核心：注入无限循环逻辑的向左按钮
         modalPrev.onclick = function (event) {
             event.stopPropagation();
-            if (currentImageIndex > 0) {
-                currentImageIndex--;
-                updateModalImage();
-            }
+            if (currentImageGroup.length <= 1) return;
+            // 如果是第一张，点左键直接跳到最后一张
+            currentImageIndex = (currentImageIndex > 0) ? currentImageIndex - 1 : currentImageGroup.length - 1;
+            updateModalImage();
         };
 
+        // 🌟 核心：注入无限循环逻辑的向右按钮
         modalNext.onclick = function (event) {
             event.stopPropagation();
-            if (currentImageIndex < currentImageGroup.length - 1) {
-                currentImageIndex++;
-                updateModalImage();
-            }
+            if (currentImageGroup.length <= 1) return;
+            // 如果是最后一张，点右键直接跳回第一张
+            currentImageIndex = (currentImageIndex < currentImageGroup.length - 1) ? currentImageIndex + 1 : 0;
+            updateModalImage();
         };
 
         function updateModalImage() {
@@ -892,7 +894,7 @@ permalink: /timeline/
             else modalImage.classList.remove('portrait');
             imageModalCaption.innerHTML = img.alt;
             
-            // 🌟 核心：更新图片计数器
+            // 更新图片计数器
             document.getElementById('modal-counter').textContent = (currentImageIndex + 1) + ' / ' + currentImageGroup.length;
             
             updateModalNavButtons();
@@ -903,34 +905,33 @@ permalink: /timeline/
                 modalPrev.classList.add('disabled');
                 modalNext.classList.add('disabled');
             } else {
+                // 🌟 核心：取消首尾的禁用状态，只要图片大于1张，左右按钮永远可用！
                 modalPrev.classList.remove('disabled');
                 modalNext.classList.remove('disabled');
-                if (currentImageIndex === 0) modalPrev.classList.add('disabled');
-                if (currentImageIndex === currentImageGroup.length - 1) modalNext.classList.add('disabled');
             }
         }
 
-        // 键盘左右键切换与 ESC 关闭
+        // 键盘左右键切换与 ESC 关闭 (同步复用无限循环逻辑)
         document.addEventListener('keydown', function (e) {
-            if (imageModal.style.display === 'flex') {
-                if (e.key === 'ArrowRight' && currentImageIndex < currentImageGroup.length - 1) {
-                    currentImageIndex++; updateModalImage();
-                } else if (e.key === 'ArrowLeft' && currentImageIndex > 0) {
-                    currentImageIndex--; updateModalImage();
+            if (imageModal.classList.contains('show-modal') || imageModal.style.display === 'flex') {
+                if (e.key === 'ArrowRight') {
+                    modalNext.onclick(e);
+                } else if (e.key === 'ArrowLeft') {
+                    modalPrev.onclick(e);
                 } else if (e.key === 'Escape') {
                     modalCloseButton.click();
                 }
             }
         });
 
-        // 鼠标滚轮切换
+        // 鼠标滚轮切换 (同步复用无限循环逻辑)
         document.addEventListener('wheel', function (e) {
-            if (imageModal.style.display === 'flex') {
+            if (imageModal.classList.contains('show-modal') || imageModal.style.display === 'flex') {
                 e.preventDefault();
-                if (e.deltaY > 0 && currentImageIndex < currentImageGroup.length - 1) {
-                    currentImageIndex++; updateModalImage();
-                } else if (e.deltaY <= 0 && currentImageIndex > 0) {
-                    currentImageIndex--; updateModalImage();
+                if (e.deltaY > 0) {
+                    modalNext.onclick(e);
+                } else if (e.deltaY <= 0) {
+                    modalPrev.onclick(e);
                 }
             }
         }, { passive: false });

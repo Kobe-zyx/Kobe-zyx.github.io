@@ -10,6 +10,126 @@ permalink: /blog/
         <p class="blog-intro-text">Here, you can see my all blog list.</p>
         <p class="blog-intro-text" style="margin-bottom: 30px;">以下是我的所有博文列表：</p>
         
+        <style>
+            .blog-search-box {
+                position: relative;
+                width: 100%;
+                margin-bottom: 30px;
+            }
+            .blog-search-box input {
+                width: 100%;
+                padding: 14px 20px 14px 45px;
+                border-radius: 30px;
+                border: 1px solid var(--border-color);
+                background-color: var(--card-background);
+                color: var(--text-color);
+                font-size: 15px;
+                outline: none;
+                transition: all 0.3s ease;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.02);
+                box-sizing: border-box;
+                font-family: var(--font-main);
+            }
+            .blog-search-box input:focus {
+                border-color: var(--primary-color);
+                box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            }
+            .blog-search-box .search-icon {
+                position: absolute;
+                left: 16px;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--secondary-text-color);
+                width: 18px;
+                height: 18px;
+                pointer-events: none;
+            }
+        </style>
+        <div class="blog-search-box">
+            <i data-feather="search" class="search-icon"></i>
+            <input type="text" id="blog-search-input" placeholder="搜索博文标题、副标题或标签...">
+        </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if(typeof feather !== 'undefined') {
+            feather.replace();
+        }
+
+        const tagPills = document.querySelectorAll('.tag-pill[data-tag]');
+        const posts = document.querySelectorAll('.post-item-hux');
+        const searchInput = document.getElementById('blog-search-input'); // 🌟 获取搜索框
+
+        // ==========================================
+        // 1. 标签点击过滤逻辑
+        // ==========================================
+        tagPills.forEach(pill => {
+            pill.addEventListener('click', function() {
+                // 如果点击了标签，自动清空搜索框的内容
+                if (searchInput) searchInput.value = '';
+
+                // 切换按钮的 active 状态
+                tagPills.forEach(p => p.classList.remove('active'));
+                this.classList.add('active');
+
+                // 获取被点击的标签名
+                const selectedTag = this.getAttribute('data-tag');
+
+                // 过滤文章（极简的淡入淡出效果）
+                posts.forEach(post => {
+                    post.style.opacity = '0'; // 先变透明
+                    
+                    setTimeout(() => {
+                        if (selectedTag === 'all') {
+                            post.style.display = 'block';
+                            setTimeout(() => post.style.opacity = '1', 50);
+                        } else {
+                            const postTags = post.getAttribute('data-tags').split(',');
+                            if (postTags.includes(selectedTag)) {
+                                post.style.display = 'block';
+                                setTimeout(() => post.style.opacity = '1', 50);
+                            } else {
+                                post.style.display = 'none';
+                            }
+                        }
+                    }, 300); 
+                });
+            });
+        });
+
+        // ==========================================
+        // 2. 🌟 搜索框实时匹配逻辑 (毫秒级响应)
+        // ==========================================
+        if (searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                const query = e.target.value.toLowerCase().trim();
+
+                // 只要开始打字搜索，自动把标签状态切回 "全部 All"
+                tagPills.forEach(p => p.classList.remove('active'));
+                document.querySelector('.tag-pill[data-tag="all"]')?.classList.add('active');
+
+                posts.forEach(post => {
+                    // 抓取每篇文章的 标题、副标题 和 标签，转换为小写用于匹配
+                    const title = post.querySelector('.post-title-hux')?.textContent.toLowerCase() || '';
+                    const subtitle = post.querySelector('.post-subtitle-hux')?.textContent.toLowerCase() || '';
+                    const tags = post.getAttribute('data-tags').toLowerCase();
+
+                    // 核心匹配算法：只要其中一个包含输入的关键词，就放行！
+                    if (title.includes(query) || subtitle.includes(query) || tags.includes(query)) {
+                        post.style.display = 'block';
+                        // 稍微延迟保证 display 生效后再过渡透明度
+                        setTimeout(() => post.style.opacity = '1', 50); 
+                    } else {
+                        post.style.opacity = '0';
+                        // 稍微延迟等待透明度动画跑完再彻底隐藏节点
+                        setTimeout(() => post.style.display = 'none', 300); 
+                    }
+                });
+            });
+        }
+    });
+</script>
+
         <div class="tags-cloud">
             <span class="tag-pill active" data-tag="all">全部 All</span>
             

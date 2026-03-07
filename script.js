@@ -245,132 +245,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-// 图片查看器逻辑
-document.addEventListener('DOMContentLoaded', function() {
-    const images = document.querySelectorAll('.markdown-content img');
-    if (images.length > 0) {
-        // 创建模态框背景层
-        const imageViewer = document.createElement('div');
-        imageViewer.className = 'image-viewer';
-        document.body.appendChild(imageViewer);
 
-        // 创建右上角计数器
-        const counter = document.createElement('span');
-        counter.className = 'viewer-counter';
-        imageViewer.appendChild(counter);
-
-        // 创建关闭按钮
-        const closeBtn = document.createElement('button');
-        closeBtn.className = 'close-btn';
-        closeBtn.innerHTML = '&times;';
-        imageViewer.appendChild(closeBtn);
-
-        // 创建左右翻页按钮
-        const prevBtn = document.createElement('button');
-        prevBtn.className = 'prev-btn';
-        prevBtn.innerHTML = '&lt;';
-        imageViewer.appendChild(prevBtn);
-
-        const nextBtn = document.createElement('button');
-        nextBtn.className = 'next-btn';
-        nextBtn.innerHTML = '&gt;';
-        imageViewer.appendChild(nextBtn);
-
-        // 🌟 核心修改：创建内部内容包裹层，用于实现缩放动效
-        const contentWrapper = document.createElement('div');
-        contentWrapper.className = 'image-viewer-content';
-        imageViewer.appendChild(contentWrapper);
-
-        const viewerImg = document.createElement('img');
-        contentWrapper.appendChild(viewerImg);
-
-        let currentIndex = 0;
-
-        // 更新按钮禁用状态
-        const updateNavButtons = () => {
-            if (images.length <= 1) {
-                prevBtn.classList.add('disabled');
-                nextBtn.classList.add('disabled');
-            } else {
-                prevBtn.classList.remove('disabled');
-                nextBtn.classList.remove('disabled');
-                if (currentIndex === 0) prevBtn.classList.add('disabled');
-                if (currentIndex === images.length - 1) nextBtn.classList.add('disabled');
-            }
-        };
-
-        // 打开/切换图片
-        const showImage = (index) => {
-            if (index >= 0 && index < images.length) {
-                currentIndex = index;
-                viewerImg.src = images[currentIndex].src;
-                counter.textContent = `${currentIndex + 1} / ${images.length}`;
-                updateNavButtons();
-                imageViewer.classList.add('show');
-                document.body.classList.add('body-no-scroll');
-            }
-        };
-
-        // 🌟 关闭图片（CSS中的 visibility 会自动处理 0.3s 的延时淡出，无需 setTimeout）
-        const hideImage = () => {
-            imageViewer.classList.remove('show');
-            document.body.classList.remove('body-no-scroll');
-        };
-
-        images.forEach((img, index) => {
-            img.style.cursor = 'pointer';
-            img.addEventListener('click', () => {
-                showImage(index);
-            });
-        });
-
-        closeBtn.addEventListener('click', hideImage);
-        
-        // 点击背景区域关闭
-        imageViewer.addEventListener('click', (e) => {
-            if (e.target === imageViewer || e.target === contentWrapper) {
-                hideImage();
-            }
-        });
-
-        prevBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            showImage(currentIndex - 1);
-        });
-
-        nextBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            showImage(currentIndex + 1);
-        });
-
-        // 键盘操作：左右切换与 Esc 关闭
-        document.addEventListener('keydown', (e) => {
-            if (imageViewer.classList.contains('show')) {
-                if (e.key === 'Escape') {
-                    hideImage();
-                }
-                if (e.key === 'ArrowLeft' && currentIndex > 0) {
-                    showImage(currentIndex - 1);
-                }
-                if (e.key === 'ArrowRight' && currentIndex < images.length - 1) {
-                    showImage(currentIndex + 1);
-                }
-            }
-        });
-
-        // 🌟 新增：鼠标滚轮切换图片功能
-        imageViewer.addEventListener('wheel', function (e) {
-            if (imageViewer.classList.contains('show')) {
-                e.preventDefault();
-                if (e.deltaY > 0 && currentIndex < images.length - 1) {
-                    showImage(currentIndex + 1);
-                } else if (e.deltaY <= 0 && currentIndex > 0) {
-                    showImage(currentIndex - 1);
-                }
-            }
-        }, { passive: false });
-    }
-});
 
 // ==========================================
 // 极客版图片懒加载与淡入引擎
@@ -415,3 +290,119 @@ document.addEventListener('DOMContentLoaded', function() {
         imageObserver.observe(img);
     });
 });
+
+
+// ==========================================
+// 极客全局迷你播放器引擎 (非音乐馆页面接收器)
+// ==========================================
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. 判断是否在音乐馆：如果是，则不显示小圆圈（因为已有大播放器）
+    const isHallPage = window.location.pathname.includes('/hall');
+    if (isHallPage) return;
+
+    // 2. 从本地缓存读取刚刚在音乐馆听的歌
+    const savedSongInfo = localStorage.getItem('geekCurrentSong');
+    if (!savedSongInfo) return; 
+
+    const songData = JSON.parse(savedSongInfo);
+
+    // 3. 动态生成迷你播放器并注入到网页左下角
+    const miniPlayerHTML = `
+        <div class="global-mini-player" id="global-mini-player">
+            <img src="${songData.cover}" class="mini-player-cover" id="mini-cover" alt="cover">
+            <div class="mini-player-info">
+                <p class="mini-player-title" id="mini-title">${songData.title}</p>
+                <p class="mini-player-artist">${songData.artist}</p>
+            </div>
+            <div class="mini-player-controls">
+                <button class="mini-play-btn" id="mini-play-btn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                </button>
+            </div>
+            <audio id="global-audio" src="${songData.src}"></audio>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', miniPlayerHTML);
+
+    // 4. 为小圆盘绑定点击与状态接力逻辑
+    const miniPlayer = document.getElementById('global-mini-player');
+    const audio = document.getElementById('global-audio');
+    const playBtn = document.getElementById('mini-play-btn');
+
+    // 完美接力：恢复你刚才在音乐馆听到的秒数
+    audio.currentTime = songData.currentTime || 0;
+
+    let isPlaying = false;
+
+    // 播放/暂停控制
+    playBtn.addEventListener('click', function() {
+        if (audio.paused) {
+            audio.play().then(() => {
+                isPlaying = true;
+                miniPlayer.classList.add('is-playing');
+                // 切换为暂停图标
+                playBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>`;
+            }).catch(e => console.log('浏览器阻止了自动播放', e));
+        } else {
+            audio.pause();
+            isPlaying = false;
+            miniPlayer.classList.remove('is-playing');
+            // 切换回播放图标
+            playBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
+        }
+    });
+
+    // 其它页面放歌时，也要实时把进度存起来，保证切页面不掉线
+    audio.addEventListener('timeupdate', function() {
+        songData.currentTime = audio.currentTime;
+        localStorage.setItem('geekCurrentSong', JSON.stringify(songData));
+    });
+});
+
+// ==========================================
+// 极客阅读体验：列表滚动位置记忆引擎 (终极精准版)
+// ==========================================
+// 取消浏览器原生的滚动恢复，由我们的极客引擎全面接管
+if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+}
+
+// 1. 监听点击事件，像读心术一样判断用户意图 (替代不可靠的离开事件)
+document.addEventListener('click', (e) => {
+    // 意图 A：用户在列表页点击了文章，准备进入阅读
+    const isPostLink = e.target.closest('.post-item-hux a, .archive-item a');
+    if (isPostLink) {
+        // 死死锁定当前列表页的路径和精确的滚动坐标
+        const currentPath = window.location.pathname.replace(/\/$/, '');
+        sessionStorage.setItem('geekScroll_' + currentPath, window.scrollY);
+    }
+    
+    // 意图 B：用户点击了顶部导航栏 (Navbar)，说明想看全新的页面
+    const isNavLink = e.target.closest('.navbar a');
+    if (isNavLink) {
+        // 无情擦除目标页面的记忆，保证通过导航栏进入永远从第一眼看起
+        let href = isNavLink.getAttribute('href');
+        if (href && !href.startsWith('#')) {
+            let targetPath = new URL(href, window.location.origin).pathname.replace(/\/$/, '');
+            sessionStorage.removeItem('geekScroll_' + targetPath);
+        }
+    }
+});
+
+// 2. 页面加载时的强力恢复引擎
+const restoreScrollPos = () => {
+    const currentPath = window.location.pathname.replace(/\/$/, '');
+    const savedPos = sessionStorage.getItem('geekScroll_' + currentPath);
+    
+    if (savedPos && parseInt(savedPos) > 0) {
+        const pos = parseInt(savedPos, 10);
+        // 三重保险瞬间移动：彻底打败网络延迟、图片撑开和页面的淡入动画
+        window.scrollTo({ top: pos, behavior: 'instant' });
+        setTimeout(() => window.scrollTo({ top: pos, behavior: 'instant' }), 50);
+        setTimeout(() => window.scrollTo({ top: pos, behavior: 'instant' }), 300);
+    }
+};
+
+// 3. 挂载到两大核心生命周期上
+document.addEventListener('DOMContentLoaded', restoreScrollPos);
+window.addEventListener('pageshow', restoreScrollPos);

@@ -1,6 +1,56 @@
 /* style.css */
 
+/* 字体声明 */
+@font-face {
+    font-family: 'Lexend';
+    src: url('fonts/Lexend-Regular.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
 
+@font-face {
+    font-family: 'Lexend';
+    src: url('fonts/Lexend-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Lexend';
+    src: url('fonts/Lexend-SemiBold.ttf') format('truetype');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Lexend';
+    src: url('fonts/Lexend-Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'Lexend';
+    src: url('fonts/Lexend-Thin.ttf') format('truetype');
+    font-weight: 100;
+    /* Thin */
+    font-style: normal;
+    font-display: swap;
+}
+
+/* 添加 Lexend-ExtraLight 字体声明 */
+@font-face {
+    font-family: 'Lexend';
+    src: url('fonts/Lexend-ExtraLight.ttf') format('truetype');
+    font-weight: 200;
+    /* Extra Light */
+    font-style: normal;
+    font-display: swap;
+}
 
 
 
@@ -2273,7 +2323,62 @@ blockquote {
     }
 }
 
+/* Tech Stack Table Styles */
+.tech-stack-table {
+    background-color: var(--card-background);
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: calc(var(--spacing-unit) * 4);
+    margin-top: calc(var(--spacing-unit) * 4);
+    position: relative;
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    /* 默认边框颜色加深，更易察觉 */
+    transition: border-color 0.3s ease;
+}
 
+.tech-stack-table:hover {
+    border-color: rgba(0, 0, 0, 0.2);
+    /* 悬停时边框颜色更深 */
+}
+
+/* 深色模式下的tech-stack-table边框 */
+[data-theme="dark"] .tech-stack-table {
+    border-color: rgba(255, 255, 255, 0.15);
+    /* 深色模式下默认白色边框 */
+}
+
+[data-theme="dark"] .tech-stack-table:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+    /* 深色模式下悬停时更亮的白色边框 */
+}
+
+.tech-stack-table table {
+    width: 100%;
+    border-collapse: collapse;
+    pointer-events: none;
+    /* 将 pointer-events: none; 应用到表格上 */
+}
+
+.tech-stack-table td {
+    padding: calc(var(--spacing-unit) * 2) 0;
+    border-bottom: 1px solid var(--border-color);
+    text-align: left;
+}
+
+.tech-stack-table tr:last-child td {
+    border-bottom: none;
+}
+
+.tech-stack-table td:first-child {
+    color: var(--secondary-text-color);
+    width: 30%;
+    /* Adjust as needed */
+}
+
+.tech-stack-table td:last-child {
+    font-weight: 500;
+    color: var(--text-color);
+}
 
 /* Footer Links Styles (for stack.html) */
 .footer-links {
@@ -2993,90 +3098,7 @@ blockquote {
         height: 36px;
     }
 }
-/* Tech Stack Table Styles */
-.tech-stack-table {
-    background-color: var(--card-background);
-    border-radius: 16px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    padding: calc(var(--spacing-unit) * 4);
-    margin-top: calc(var(--spacing-unit) * 4);
-    position: relative;
-    border: 3px solid rgba(0, 0, 0, 0.1);
-    /* 默认边框颜色加深，更易察觉 */
-    transition: border-color 0.3s ease;
-}
 
-.tech-stack-table:hover {
-    border-color: rgba(0, 0, 0, 0.2);
-    /* 悬停时边框颜色更深 */
-}
-
-/* 深色模式下的tech-stack-table边框 */
-[data-theme="dark"] .tech-stack-table {
-    border-color: rgba(255, 255, 255, 0.15);
-    /* 深色模式下默认白色边框 */
-}
-
-[data-theme="dark"] .tech-stack-table:hover {
-    border-color: rgba(255, 255, 255, 0.3);
-    /* 深色模式下悬停时更亮的白色边框 */
-}
-
-.tech-stack-table table {
-    width: 100%;
-    border-collapse: collapse;
-    pointer-events: none;
-    /* 将 pointer-events: none; 应用到表格上 */
-}
-
-.tech-stack-table td {
-    padding: calc(var(--spacing-unit) * 2) 0;
-    border-bottom: 1px solid var(--border-color);
-    text-align: left;
-}
-
-.tech-stack-table tr:last-child td {
-    border-bottom: none;
-}
-
-.tech-stack-table td:first-child {
-    color: var(--secondary-text-color);
-    width: 30%;
-    /* Adjust as needed */
-}
-
-.tech-stack-table td:last-child {
-    font-weight: 500;
-    color: var(--text-color);
-}
-
-/* Footer Links Styles (for stack.html) */
-.footer-links {
-    margin: 0;
-    padding: 0;
-    /* 移除所有内边距 */
-    margin-bottom: calc(var(--spacing-unit) * 3);
-    /* Add some space below the links */
-}
-
-.footer-links a {
-    color: var(--text-color);
-    text-decoration: none;
-    font-size: 0.9em;
-    opacity: 0.7;
-    transition: opacity 0.3s ease;
-    margin-right: calc(var(--spacing-unit) * 2);
-    /* 添加右外边距控制间距 */
-}
-
-.footer-links a:last-child {
-    margin-right: 0;
-    /* 最后一个链接不需要右外边距 */
-}
-
-.footer-links a:hover {
-    opacity: 1;
-}
 /* ==========================================================
    极客版图片懒加载特效 (Lazy Load Fade-in)
    ========================================================== */
@@ -3092,132 +3114,4 @@ blockquote {
 .markdown-content img.lazy-loaded {
     opacity: 1;
     transform: translateY(0);
-}
-
-/* ==========================================================
-   极客全局迷你播放器 (其它页面悬浮小圆盘)
-   ========================================================== */
-.global-mini-player {
-    position: fixed;
-    bottom: 30px;
-    left: 30px; /* 避开右侧的回到顶部按钮 */
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border: 1px solid var(--border-color);
-    border-radius: 50px;
-    padding: 5px;
-    
-    /* 核心魔法：默认是一个小小的正圆形 */
-    width: 50px; 
-    height: 50px;
-    box-sizing: border-box;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), background 0.3s;
-    overflow: hidden;
-    white-space: nowrap;
-}
-
-[data-theme="dark"] .global-mini-player {
-    background: rgba(30, 30, 30, 0.85);
-}
-
-/* 悬停展开魔法：触碰时平滑伸长为小横条 */
-.global-mini-player:hover {
-    width: 240px;
-    padding-right: 15px;
-}
-
-/* 旋转的唱片封面 */
-.mini-player-cover {
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    object-fit: cover;
-    flex-shrink: 0;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    animation: mini-spin 6s linear infinite;
-    animation-play-state: paused; /* 默认暂停旋转 */
-}
-
-/* 当获得 is-playing 类名时，封面开始旋转 */
-.global-mini-player.is-playing .mini-player-cover {
-    animation-play-state: running; 
-}
-
-@keyframes mini-spin {
-    100% { transform: rotate(360deg); }
-}
-
-/* 隐藏的歌曲信息 (悬停时显现) */
-.mini-player-info {
-    margin-left: 12px;
-    flex-grow: 1;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-width: 0; /* 👈 核心修复：允许内部文字完美触发省略号，不再硬撑宽度！ */
-}
-
-.global-mini-player:hover .mini-player-info {
-    opacity: 1;
-    transition-delay: 0.1s; /* 稍微延迟，等横条展开一点再显示 */
-}
-
-.mini-player-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-color);
-    margin: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.mini-player-artist {
-    font-size: 11px;
-    color: var(--secondary-text-color);
-    margin: 0;
-}
-
-/* 播放控制按钮 */
-.mini-player-controls {
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    display: flex;
-    align-items: center;
-    flex-shrink: 0; /* 👈 核心修复：播放按钮绝对不许被压缩或挤走！ */
-    margin-left: 10px; /* 可选：给按钮和文字之间加一点呼吸空间 */
-}
-
-.global-mini-player:hover .mini-player-controls {
-    opacity: 1;
-    transition-delay: 0.15s;
-}
-
-.mini-play-btn {
-    background: var(--text-color);
-    color: var(--background-light);
-    border: none;
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-[data-theme="dark"] .mini-play-btn {
-    background: var(--primary-color);
-    color: #fff;
-}
-
-.mini-play-btn:hover {
-    transform: scale(1.1);
 }
