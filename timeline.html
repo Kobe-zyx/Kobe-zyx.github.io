@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Kobe Zhang | TimeLine
+title: TimeLine | 
 permalink: /timeline/
 ---
 
@@ -32,46 +32,60 @@ permalink: /timeline/
         content: none;
     }
 
+/* ==========================================================
+       🌟 极客时间轴：节点与连线 (绝对居中、等距完美留白版)
+       ========================================================== */
+
+    /* 1. Emoji 节点盒子 */
     .timeline-point-text {
         position: absolute;
-        left: -39px;
-        top: 20px;
-        width: 14px;
-        height: 14px;
+        left: -34px; /* 统一设定一条神圣的中轴线坐标 */
+        top: 15px;   /* 和右侧文字区域的 padding-top 完美水平对齐 */
+        transform: translateX(-50%); /* 绝对居中：无论 Emoji 胖瘦，永远死死卡在中轴线上 */
+        
+        width: 32px;  /* 给定一个正方形的固定的物理空间 */
+        height: 32px;
         display: flex;
         justify-content: center;
         align-items: center;
-        font-size: 1em;
+        font-size: 1.25em; 
         color: var(--text-color);
-        border-radius: 50%;
-        z-index: 1;
-        box-sizing: border-box;
-        padding: 2px;
+        z-index: 2;
+        
+        /* 彻底清除以前残留的内外边距干扰 */
+        padding: 0 !important;
+        margin: 0 !important;
         border: none !important;
-        background: none !important;
-        outline: none !important;
+        background: transparent !important;
         box-shadow: none !important;
     }
 
-    .timeline-point-text::before,
-    .timeline-point-text::after {
-        content: none !important;
-        width: 0 !important;
-        height: 0 !important;
-        border: none !important;
-        background: none !important;
-    }
-
+    /* 2. 灰色连接线 */
     .timeline-item:not(:last-child)::after {
         content: '';
         position: absolute;
-        left: -33.5px;
-        top: 27px;
-        height: calc(100% - 27px);
-        width: 2px;
+        left: -34px; /* 必须和上面的点坐标完全一致，共用这根中轴线 */
+        transform: translateX(-50%); /* 线条自身绝对居中 */
+        width: 2px;  /* 灰线的厚重感 */
         background-color: #D2D2D7;
-        border-left: none;
-        z-index: 0;
+        z-index: 1;
+        border-left: none; /* 清理旧代码残留 */
+        
+        /* ==========================================
+           📐 核心数学魔法：实现上下 8px 完美等距缝隙 
+           - 节点从 top:15px 开始，高度 32px，所以它的底边在 47px 处。
+           - 加上 8px 的唯美留白，所以线条必须从 top: 55px 开始画。
+           - 下一个节点在下一行的 top:15px。
+           - 减去 8px 的留白，线条必须在碰到底部的前 7px 处戛然而止。
+           - 因此本线条延伸出底边 7px，即 bottom: -7px;
+           ========================================== */
+        top: 55px; 
+        bottom: -7px; 
+    }
+
+    /* 深色模式连线适配 */
+    [data-theme="dark"] .timeline-item:not(:last-child)::after {
+        background-color: #38383c; 
     }
 
     .timeline-item {

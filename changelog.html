@@ -1,0 +1,244 @@
+---
+layout: default
+title: Kobe Zhang | Changelog
+permalink: /changelog/
+---
+
+<style>
+    /* 完美同步 timeline.html 的专属排版结构 */
+    .timeline-section {
+        margin-top: 100px;
+        transition: margin-top 0.3s ease;
+    }
+
+    .container {
+        padding-top: calc(var(--spacing-unit) * 4);
+        padding-bottom: calc(var(--spacing-unit) * 4);
+    }
+ 
+    .timeline {
+        position: relative;
+        padding-left: 60px;
+        gap: 0;
+        margin-top: 30px;
+    }
+
+    /* 屏蔽默认的蓝色样式 */
+    .timeline::before,
+    .timeline-item::before {
+        content: none !important;
+    }
+
+    /* ==========================================================
+       🌟 极客时间轴：节点与连线 (绝对居中、等距完美留白版)
+       ========================================================== */
+
+    /* 1. Emoji 节点盒子 */
+    .timeline-point-text {
+        position: absolute;
+        left: -34px; /* 统一设定一条神圣的中轴线坐标 */
+        top: 15px;   /* 和右侧文字区域的 padding-top 完美水平对齐 */
+        transform: translateX(-50%); /* 绝对居中：无论 Emoji 胖瘦，永远死死卡在中轴线上 */
+        
+        width: 32px;  /* 给定一个正方形的固定的物理空间 */
+        height: 32px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.25em; 
+        color: var(--text-color);
+        z-index: 2;
+        
+        /* 彻底清除以前残留的内外边距干扰 */
+        padding: 0 !important;
+        margin: 0 !important;
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    /* 2. 灰色连接线 */
+    .timeline-item:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        left: -34px; /* 必须和上面的点坐标完全一致，共用这根中轴线 */
+        transform: translateX(-50%); /* 线条自身绝对居中 */
+        width: 2px;  /* 灰线的厚重感 */
+        background-color: #D2D2D7;
+        z-index: 1;
+        border-left: none; /* 清理旧代码残留 */
+        
+        /* ==========================================
+           📐 核心数学魔法：实现上下 8px 完美等距缝隙 
+           - 节点从 top:15px 开始，高度 32px，所以它的底边在 47px 处。
+           - 加上 8px 的唯美留白，所以线条必须从 top: 55px 开始画。
+           - 下一个节点在下一行的 top:15px。
+           - 减去 8px 的留白，线条必须在碰到底部的前 7px 处戛然而止。
+           - 因此本线条延伸出底边 7px，即 bottom: -7px;
+           ========================================== */
+        top: 55px; 
+        bottom: -7px; 
+    }
+
+    /* 深色模式连线适配 */
+    [data-theme="dark"] .timeline-item:not(:last-child)::after {
+        background-color: #38383c; 
+    }
+
+    /* 深色模式下的线段颜色 */
+    [data-theme="dark"] .timeline-item:not(:last-child)::after {
+        background-color: #38383c; 
+    }
+
+    .timeline-item {
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 15px 0;
+        margin-left: 0;
+        border-bottom: 1px solid var(--border-color);
+        gap: 20px;
+        background: transparent !important;
+        box-shadow: none !important;
+        transition: none !important;
+    }
+
+    .timeline-item:hover {
+        transform: none !important;
+        box-shadow: none !important;
+    }
+
+    .timeline-item:last-child {
+        border-bottom: none;
+    }
+
+    .timeline-main-content {
+        flex-grow: 1;
+        min-width: 0;
+    }
+
+    .timeline-main-content h3 {
+        margin: 0 0 5px 0;
+        font-size: 1.1em;
+        font-weight: 600;
+        color: var(--text-color);
+    }
+
+    .timeline-main-content > p {
+        font-size: 0.9em;
+        color: var(--secondary-text-color);
+        margin: 0 0 10px 0;
+        line-height: 1.5;
+    }
+
+    /* 日期强制靠右对齐 */
+    .timeline-date-right {
+        min-width: 120px;
+        text-align: right;
+        color: var(--secondary-text-color);
+        font-size: 0.85em;
+        padding-top: 2px;
+        font-weight: normal;
+        font-family: var(--font-code);
+    }
+
+    /* 手机端响应式适配 */
+    @media (max-width: 768px) {
+        .timeline-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
+        }
+        .timeline-date-right {
+            text-align: left;
+            padding-top: 0;
+            margin-top: 5px;
+        }
+    }
+</style>
+
+<section class="timeline-section">
+    <div class="container">
+        <h1 style="margin-bottom: 10px;">Changelog</h1>
+        <p class="timeline-intro-text">Documenting the evolution, updates, and improvements of this site.</p>
+        <p class="timeline-intro-text">记录这个网站的每一次进化、更新与修补。</p>
+
+        <div class="timeline">
+            
+            <div class="timeline-item">
+                <div class="timeline-point-text">✨</div>
+                <div class="timeline-main-content">
+                    <h3>极致交互与排版修复</h3>
+                    <p>
+                        1. 重新设计了博客侧边栏自动目录 (TOC)，彻底修复了文章内容挤压的问题，并实现了无抖动的悬停反馈。<br>
+                        2. 注入了「极客滚动记忆引擎」，从文章返回列表时，页面会精准定格在离开时的位置。<br>
+                        3. 增加博文分享社媒功能，便于文章与观点的传播及交流。<br>
+                        4. 优化了迷你播放器，修复了歌曲标题过长导致的播放按钮挤压问题。
+                    </p>
+                </div>
+                <div class="timeline-date-right">2026-03-07</div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-point-text">🎵</div>
+                <div class="timeline-main-content">
+                    <h3>插件及动效修复</h3>
+                    <p>
+                        1. 修改时间轴页面，优化图片懒加载、模态框样式并增加“动态”说明。<br>
+                        2. 博客图片与时间轴的修改版底层架构一致，保证博客一致性。<br>
+                        3. 更新网站路径以及网站地图，优化搜索引擎检索。<br>
+                        4. 彻底摒弃低效、死板的分页插件，具体方法仍在构想。<br>
+                        5. 更新迷你播放器，增进用户【音乐馆】体验。<br>
+                        6. 增加站内全局博文搜索，便于读者查找文章。<br>
+                    </p>
+                </div>
+                <div class="timeline-date-right">2026-03-06</div>
+            </div>
+            
+            
+            
+            
+            <div class="timeline-item">
+                <div class="timeline-point-text">🎵</div>
+                <div class="timeline-main-content">
+                    <h3>Music Hall 音乐馆重构</h3>
+                    <p>回归最纯粹的极客美学，移除了不稳定的跨域代理与 Listen1 依赖。全面采用 Apple iTunes API 原生接口，实现极速秒开与 30 秒高品质无损预览。</p>
+                </div>
+                <div class="timeline-date-right">2026-03-05</div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-point-text">🛠️</div>
+                <div class="timeline-main-content">
+                    <h3>基础部署</h3>
+                    <p>1. 增加归档页，向读者展示我每年的写作成果。<br>
+                       2. 增加RSS转发，便于用户订阅本博客。<br>
+                       3. 增加评论系统，给予用户发挥空间以及反馈漏洞的环境。<br>
+                    </p>
+                </div>
+                <div class="timeline-date-right">2026-03-04</div>
+            </div>
+            
+            
+            <div class="timeline-item">
+                <div class="timeline-point-text">✅</div>
+                <div class="timeline-main-content">
+                    <h3>“首次提交”</h3>
+                    <p>耗时一年，个人博客正式建立。基于 Jekyll 构建，正式告别效率低下的写作。</p>
+                </div>
+                <div class="timeline-date-right">2026-03-03</div>
+            </div>
+            
+            <div class="timeline-item">
+                <div class="timeline-point-text">🚀</div>
+                <div class="timeline-main-content">
+                    <h3>Hello World</h3>
+                    <p>个人网站正式建立。基于 原生开发（HTML/CSS/JS） 构建，支持深浅色模式无缝切换与响应式布局，开启了折腾代码的旅程。</p>
+                </div>
+                <div class="timeline-date-right">2025-03</div>
+            </div>
+
+        </div>
+    </div>
+</section>

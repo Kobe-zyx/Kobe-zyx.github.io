@@ -307,9 +307,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const songData = JSON.parse(savedSongInfo);
 
     // 3. 动态生成迷你播放器并注入到网页左下角
+    // 🌟 细节提升：给 img 加上了 style="cursor: pointer;" (小手图标) 和 title 悬停提示
     const miniPlayerHTML = `
         <div class="global-mini-player" id="global-mini-player">
-            <img src="${songData.cover}" class="mini-player-cover" id="mini-cover" alt="cover">
+            <img src="${songData.cover}" class="mini-player-cover" id="mini-cover" alt="cover" title="返回音乐馆" style="cursor: pointer;">
             <div class="mini-player-info">
                 <p class="mini-player-title" id="mini-title">${songData.title}</p>
                 <p class="mini-player-artist">${songData.artist}</p>
@@ -328,6 +329,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const miniPlayer = document.getElementById('global-mini-player');
     const audio = document.getElementById('global-audio');
     const playBtn = document.getElementById('mini-play-btn');
+    const miniCover = document.getElementById('mini-cover'); // 🌟 新增：获取封面圆圈元素
+
+    // 🌟 新增：点击封面圆圈跳转音乐馆 (完美继承页面的极客淡出动画)
+    miniCover.addEventListener('click', function() {
+        document.body.classList.add('fade-out'); // 触发变暗淡出
+        setTimeout(() => {
+            // 如果你的音乐馆路径是 /hall.html，请把下面的 '/hall/' 改为 '/hall.html'
+            window.location.href = '/hall/'; 
+        }, 500); // 配合动画等待 0.5 秒再跳转
+    });
 
     // 完美接力：恢复你刚才在音乐馆听到的秒数
     audio.currentTime = songData.currentTime || 0;
