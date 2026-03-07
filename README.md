@@ -1,5 +1,5 @@
 ## 1. 基础实现
-本博客由 [Ruby]https://www.ruby-lang.org/en/)中的 [Jekyll ]https://jekyllrb.com/)+ Github Pages 搭建，采用Apple极简风格。
+本博客由 [Ruby](https://www.ruby-lang.org/en/) 中的 [Jekyll ](https://jekyllrb.com/) + Github Pages 搭建，采用Apple极简风格。
 
 ## 2. 相关页面
 ### 2.1 Readme
