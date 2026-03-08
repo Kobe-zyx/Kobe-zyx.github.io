@@ -296,18 +296,14 @@ document.addEventListener('DOMContentLoaded', function() {
 // 极客全局迷你播放器引擎 (非音乐馆页面接收器)
 // ==========================================
 document.addEventListener('DOMContentLoaded', function() {
-    // 1. 判断是否在音乐馆：如果是，则不显示小圆圈（因为已有大播放器）
     const isHallPage = window.location.pathname.includes('/hall');
     if (isHallPage) return;
 
-    // 2. 从本地缓存读取刚刚在音乐馆听的歌
     const savedSongInfo = localStorage.getItem('geekCurrentSong');
     if (!savedSongInfo) return; 
 
     const songData = JSON.parse(savedSongInfo);
 
-    // 3. 动态生成迷你播放器并注入到网页左下角
-    // 🌟 细节提升：给 img 加上了 style="cursor: pointer;" (小手图标) 和 title 悬停提示
     const miniPlayerHTML = `
         <div class="global-mini-player" id="global-mini-player">
             <img src="${songData.cover}" class="mini-player-cover" id="mini-cover" alt="cover" title="返回音乐馆" style="cursor: pointer;">
@@ -325,45 +321,35 @@ document.addEventListener('DOMContentLoaded', function() {
     `;
     document.body.insertAdjacentHTML('beforeend', miniPlayerHTML);
 
-    // 4. 为小圆盘绑定点击与状态接力逻辑
     const miniPlayer = document.getElementById('global-mini-player');
     const audio = document.getElementById('global-audio');
     const playBtn = document.getElementById('mini-play-btn');
-    const miniCover = document.getElementById('mini-cover'); // 🌟 新增：获取封面圆圈元素
+    const miniCover = document.getElementById('mini-cover');
 
-    // 🌟 新增：点击封面圆圈跳转音乐馆 (完美继承页面的极客淡出动画)
+    // 点击封面：正常返回音乐馆
     miniCover.addEventListener('click', function() {
-        document.body.classList.add('fade-out'); // 触发变暗淡出
-        setTimeout(() => {
-            // 如果你的音乐馆路径是 /hall.html，请把下面的 '/hall/' 改为 '/hall.html'
-            window.location.href = '/hall/'; 
-        }, 500); // 配合动画等待 0.5 秒再跳转
+        document.body.classList.add('fade-out'); 
+        setTimeout(() => { window.location.href = '/hall/'; }, 500); 
     });
 
-    // 完美接力：恢复你刚才在音乐馆听到的秒数
     audio.currentTime = songData.currentTime || 0;
-
     let isPlaying = false;
 
-    // 播放/暂停控制
     playBtn.addEventListener('click', function() {
         if (audio.paused) {
             audio.play().then(() => {
                 isPlaying = true;
                 miniPlayer.classList.add('is-playing');
-                // 切换为暂停图标
                 playBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>`;
-            }).catch(e => console.log('浏览器阻止了自动播放', e));
+            }).catch(e => console.log('自动播放被拦截', e));
         } else {
             audio.pause();
             isPlaying = false;
             miniPlayer.classList.remove('is-playing');
-            // 切换回播放图标
             playBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>`;
         }
     });
 
-    // 其它页面放歌时，也要实时把进度存起来，保证切页面不掉线
     audio.addEventListener('timeupdate', function() {
         songData.currentTime = audio.currentTime;
         localStorage.setItem('geekCurrentSong', JSON.stringify(songData));

@@ -1,5 +1,5 @@
 // ==========================================
-// 极客版音乐馆引擎 (纯净 iTunes API 原生版 + 全局同步)
+// 极客版音乐馆引擎 (纯净原生版)
 // ==========================================
 class MusicHall {
     constructor() {
@@ -11,8 +11,8 @@ class MusicHall {
 
     async init() {
         this.bindEvents();
-        // 默认加载推荐的歌手或关键词，你可以随意改成喜欢的名字
-        await this.loadFeaturedMusic("周杰伦"); 
+        // 默认加载推荐的歌手或关键词
+        await this.loadFeaturedMusic("OneDirection"); 
         this.setupAudioPlayer();
         this.restoreFromLocal();
     }
@@ -29,6 +29,34 @@ class MusicHall {
         });
         if(playPauseBtn) playPauseBtn.addEventListener('click', () => this.togglePlayPause());
         if(closePlayerBtn) closePlayerBtn.addEventListener('click', () => this.hidePlayer());
+
+        // 🌟 新增：绑定滚动与窗口调整事件，驱动底部停靠引擎
+        window.addEventListener('scroll', () => this.handleScrollDocking());
+        window.addEventListener('resize', () => this.handleScrollDocking());
+    }
+
+    // ==========================================
+    // 🌟 极客物理碰撞与停靠引擎
+    // ==========================================
+    handleScrollDocking() {
+        const player = document.getElementById('musicPlayer');
+        // 自动抓取页面最底部的导航栏 (或者 footer) 作为碰撞参考物
+        const bottomNav = document.querySelector('.bottom-nav') || document.querySelector('footer');
+        
+        if (!player || !bottomNav) return;
+
+        const rect = bottomNav.getBoundingClientRect();
+        // 计算底部导航栏此时“侵入”屏幕可视区域的高度
+        const visibleHeight = window.innerHeight - rect.top;
+
+        if (visibleHeight > 0) {
+            // 如果底栏露出来了，就把播放器一比一向上推，实现完美的“搁置”效果
+            // (这里的 +10 是为了给它一点呼吸空间，如果你想让它完全贴死，可以把 +10 删掉)
+            player.style.bottom = `${visibleHeight + 10}px`; 
+        } else {
+            // 如果底栏没露出来，播放器死死吸附在屏幕最底端
+            player.style.bottom = '0px';
+        }
     }
 
     async performSearch() {
@@ -86,7 +114,6 @@ class MusicHall {
     createTrackElement(track) {
         const trackDiv = document.createElement('div');
         trackDiv.className = 'music-track';
-        // 提取 iTunes 的高清大图封面
         const highResArtwork = track.artworkUrl100 ? track.artworkUrl100.replace('100x100', '300x300') : '/img/jesus.png';
 
         trackDiv.innerHTML = `
@@ -109,7 +136,6 @@ class MusicHall {
     playTrack(track) {
         if (!track.previewUrl) return;
         
-        // 切歌时彻底释放上一首歌的内存
         if (this.currentAudio) {
             this.currentAudio.pause();
             this.currentAudio.src = ''; 
@@ -119,10 +145,8 @@ class MusicHall {
         this.updatePlayerInfo();
         this.showPlayer();
         
-        // 极其干脆：直接调用苹果服务器的预览音频
         this.currentAudio = new Audio(track.previewUrl);
         
-        // 将当前歌曲信息存入本地，供其它页面的左下角小圆盘接力播放
         const highResArtwork = track.artworkUrl100 ? track.artworkUrl100.replace('100x100', '600x600') : '/img/jesus.png';
         const songData = {
             title: track.trackName,
@@ -160,7 +184,6 @@ class MusicHall {
         this.currentAudio.addEventListener('timeupdate', () => {
             this.updateProgress();
             
-            // 进度实时存档，供跨页面同步
             let savedSong = JSON.parse(localStorage.getItem('geekCurrentSong'));
             if (savedSong) {
                 savedSong.currentTime = this.currentAudio.currentTime;
@@ -206,8 +229,9 @@ class MusicHall {
 
     updatePlayerUI() {
         const playPauseBtn = document.getElementById('playPauseBtn');
-        if (!playPauseBtn) return;
-        playPauseBtn.innerHTML = `<i data-feather="${this.isPlaying ? 'pause' : 'play'}"></i>`;
+        if (playPauseBtn) {
+            playPauseBtn.innerHTML = `<i data-feather="${this.isPlaying ? 'pause' : 'play'}"></i>`;
+        }
         if(typeof feather !== 'undefined') feather.replace();
     }
 
@@ -244,12 +268,10 @@ class MusicHall {
     hidePlayer() {
         if (this.currentAudio) {
             this.currentAudio.pause();
-            this.currentAudio.src = ''; // 释放音频内存
+            this.currentAudio.src = ''; 
         }
-        
         const player = document.getElementById('musicPlayer');
         if(!player) return;
-        
         player.classList.remove('show');
         setTimeout(() => player.style.display = 'none', 400);
     }
@@ -275,4 +297,7 @@ class MusicHall {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => new MusicHall());
+document.addEventListener('DOMContentLoaded', () => {
+    new MusicHall();
+    if(typeof feather !== 'undefined') feather.replace(); 
+});

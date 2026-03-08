@@ -8,7 +8,7 @@ layout: default
             <i data-feather="arrow-left"></i> 返回 Geek
         </a>
         
-<div class="post-layout-wrapper">
+        <div class="post-layout-wrapper">
             <div class="blog-main-content">
                 <h1 style="margin-top: 0; font-size: 2.5em; line-height: 1.2; letter-spacing: -0.02em;">{{ page.title }}</h1>
                 <div class="post-meta" style="color: var(--secondary-text-color); font-size: 0.9em; margin-bottom: 40px;">
@@ -41,6 +41,7 @@ layout: default
                         </button>
                     </div>
                 </div>
+
                 <div style="margin-top: 60px; margin-bottom: 60px;">
                     <hr style="border: none; border-top: 1px solid var(--border-color); margin-bottom: 40px;">
                     <script src="https://giscus.app/client.js"
@@ -59,13 +60,14 @@ layout: default
                         async>
                     </script>
                 </div>
-            </div> <aside class="post-toc-sidebar">
+            </div> 
+            
+            <aside class="post-toc-sidebar">
                 <div class="toc-wrapper">
                     <div class="toc-title">目录</div>
                     <nav id="toc-nav"></nav>
                 </div>
             </aside>
-        </div>
         </div>
     </div>
 </div>
@@ -117,7 +119,6 @@ layout: default
         transition: transform 0.3s ease;
     }
 
-    /* 悬停时的品牌色展现魔法 */
     .share-btn:hover { transform: translateY(-3px); }
     .share-btn:hover svg { transform: scale(1.1); }
     
@@ -127,6 +128,9 @@ layout: default
     .share-btn.weibo:hover { border-color: #E6162D; color: #E6162D; background: rgba(230, 22, 45, 0.1); }
     .share-btn.copy-link:hover { border-color: var(--text-color); color: var(--text-color); background: var(--background-dark); }
     
+    /* ==========================================
+       博文排版与自动目录样式
+       ========================================== */
     .post-layout-wrapper { display: flex; gap: 60px; align-items: flex-start; position: relative; }
     .blog-main-content { flex: 1; min-width: 0; }
     .post-toc-sidebar { width: 240px; flex-shrink: 0; position: sticky; top: 100px; display: none; }
@@ -136,7 +140,6 @@ layout: default
     .toc-list { list-style: none; padding: 0; margin: 0; }
     .toc-item { margin-bottom: 8px; }
     
-    /* 🌟 极客防抖版链接样式：只用 padding 位移，绝不抖动 */
     .toc-item a { 
         color: var(--secondary-text-color); 
         text-decoration: none; 
@@ -152,31 +155,22 @@ layout: default
     .toc-item a:hover { color: var(--text-color); }
     .toc-item a.active { color: var(--text-color); font-weight: 600; }
     
-/* 🌟 极客小箭头 (全新左侧高清 SVG Base64 防丢版) */
     .geek-toc-arrow {
         display: inline-block;
         width: 16px;
         height: 16px;
-        /* 核心魔法：向左偏移 20px，完美塞进左侧的内边距里，绝对不影响文字对齐 */
         margin-left: -20px; 
         margin-right: 4px;  
-        vertical-align: -3px; /* 微调垂直居中对齐 */
-        
-        background-color: var(--secondary-text-color); /* 箭头的默认颜色 */
-        
-        /* 🌟 核心修复：采用 Base64 编码，彻底解决 Chrome 渲染 SVG 遮罩变成透明的 Bug！ */
+        vertical-align: -3px; 
+        background-color: var(--secondary-text-color); 
         -webkit-mask: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cG9seWxpbmUgcG9pbnRzPSI5IDE4IDE1IDEyIDkgNiI+PC9wb2x5bGluZT48L3N2Zz4=") center / contain no-repeat;
         mask: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cG9seWxpbmUgcG9pbnRzPSI5IDE4IDE1IDEyIDkgNiI+PC9wb2x5bGluZT48L3N2Zz4=") center / contain no-repeat;
-        
         transition: transform 0.3s ease, background-color 0.3s ease;
         cursor: pointer;
-        transform: rotate(0deg); /* 默认向右指，代表收起 */
+        transform: rotate(0deg); 
     }
     
-    /* 展开时箭头顺滑地向下旋转 90 度 */
     .toc-item a.is-open .geek-toc-arrow { transform: rotate(90deg); } 
-    
-    /* 悬停和高亮时，箭头颜色跟着文字一起变深/变白 */
     .toc-item a:hover .geek-toc-arrow,
     .toc-item a.active .geek-toc-arrow { background-color: var(--text-color); }
 </style>
@@ -238,7 +232,7 @@ layout: default
         });
         if(typeof feather !== 'undefined') { feather.replace(); }
 
-// 3. 终极极客版：生成支持折叠与滚动监听的侧边栏目录
+        // 3. 终极极客版：生成支持折叠与滚动监听的侧边栏目录
         const tocNav = document.getElementById('toc-nav');
         const sidebar = document.querySelector('.post-toc-sidebar');
         const headings = content.querySelectorAll('h1, h2, h3, h4, h5, h6');
@@ -256,7 +250,6 @@ layout: default
 
             const tocData = [];
 
-            // 1. 构建基础 DOM 并计算缩进
             headings.forEach((heading, index) => {
                 if (!heading.id) { heading.id = 'heading-' + index; }
                 const level = parseInt(heading.tagName.substring(1));
@@ -268,10 +261,9 @@ layout: default
                 a.href = '#' + heading.id;
                 a.textContent = heading.textContent;
                 
-                // 🌟 数学排版：按层级动态分配左边距
                 const basePadding = (level - minLevel) * 16 + 20;
                 a.style.paddingLeft = basePadding + 'px';
-                a.dataset.basePadding = basePadding; // 存入数据集供防抖动画使用
+                a.dataset.basePadding = basePadding; 
                 
                 li.appendChild(a);
                 ul.appendChild(li);
@@ -284,7 +276,6 @@ layout: default
             
             tocNav.appendChild(ul);
 
-            // 2. 识别父节点并插入极客箭头
             for (let i = 0; i < tocData.length; i++) {
                 if (i + 1 < tocData.length && tocData[i+1].level > tocData[i].level) {
                     tocData[i].isParent = true;
@@ -294,7 +285,6 @@ layout: default
                 }
             }
 
-            // 3. 核心视图更新引擎 (控制折叠隐藏)
             function updateTocVisibility() {
                 let hideLevelTrigger = 99;
                 for (let i = 0; i < tocData.length; i++) {
@@ -310,14 +300,11 @@ layout: default
                 }
             }
 
-            // 默认收起所有子菜单
             updateTocVisibility();
 
-            // 4. 事件绑定：防抖悬停与精准点击
             tocData.forEach(item => {
                 const basePad = parseInt(item.a.dataset.basePadding);
                 
-                // 丝滑悬停：修改 padding 避免 1像素抽搐Bug
                 item.a.addEventListener('mouseenter', () => item.a.style.paddingLeft = (basePad + 6) + 'px');
                 item.a.addEventListener('mouseleave', () => {
                     if (!item.a.classList.contains('active')) item.a.style.paddingLeft = basePad + 'px';
@@ -325,13 +312,11 @@ layout: default
 
                 item.a.addEventListener('click', function(e) {
                     e.preventDefault();
-                    // 如果点的是箭头，只折叠不跳转
                     if (e.target.classList.contains('geek-toc-arrow')) {
                         item.isOpen = !item.isOpen;
                         item.a.classList.toggle('is-open', item.isOpen);
                         updateTocVisibility();
                     } else {
-                        // 点的是文字：展开老爸并平滑跳转
                         if (item.isParent && !item.isOpen) {
                             item.isOpen = true;
                             item.a.classList.add('is-open');
@@ -343,7 +328,6 @@ layout: default
                 });
             });
 
-            // 5. ScrollSpy：自动高亮并向上展开家族树
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -358,7 +342,6 @@ layout: default
                             activeItem.a.classList.add('active');
                             activeItem.a.style.paddingLeft = (parseInt(activeItem.a.dataset.basePadding) + 6) + 'px';
                             
-                            // 🌟 核心：往上寻找被关上的父辈，强行踹开！
                             let currentLevel = activeItem.level;
                             let needsUpdate = false;
                             for (let i = activeIndex - 1; i >= 0; i--) {
@@ -379,56 +362,95 @@ layout: default
 
             headings.forEach(h => observer.observe(h));
         }
-    });
 
-// ==========================================
-        // 社交媒体原生分享引擎
         // ==========================================
-        window.shareToPlatform = function(e, platform) {
-            e.preventDefault();
-            const url = encodeURIComponent(window.location.href);
-            const title = encodeURIComponent(document.title);
-            let shareUrl = '';
+        // 🌟 极客博文图片放大镜引擎 (移入 DOMContentLoaded 内部)
+        // ==========================================
+        const postImages = document.querySelectorAll('.markdown-content img');
+        if (postImages.length > 0) {
+            const viewerHTML = `
+                <div id="geek-image-viewer" class="image-viewer">
+                    <button class="close-btn" id="viewer-close-btn" title="关闭 (ESC)">&times;</button>
+                    <div class="image-viewer-content">
+                        <img id="viewer-image" src="" alt="Full View">
+                    </div>
+                </div>
+            `;
+            document.body.insertAdjacentHTML('beforeend', viewerHTML);
 
-            switch(platform) {
-                case 'twitter':
-                    shareUrl = `https://twitter.com/intent/tweet?text=${title}&url=${url}`;
-                    break;
-                case 'linkedin':
-                    shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
-                    break;
-                case 'facebook':
-                    shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
-                    break;
-                case 'weibo':
-                    shareUrl = `http://service.weibo.com/share/share.php?url=${url}&title=${title}`;
-                    break;
-            }
-            // 弹出一个干净的独立分享小窗口
-            window.open(shareUrl, '_blank', 'width=600,height=500,left=200,top=200');
-        };
+            const viewer = document.getElementById('geek-image-viewer');
+            const viewerImg = document.getElementById('viewer-image');
+            const closeBtn = document.getElementById('viewer-close-btn');
 
-        // 一键复制链接 (带优雅的打勾反馈)
-        window.copyPageUrl = function(btn) {
-            navigator.clipboard.writeText(window.location.href).then(() => {
-                const originalHtml = btn.innerHTML;
-                btn.innerHTML = '<i data-feather="check"></i>';
-                if(typeof feather !== 'undefined') { feather.replace(); }
-                
-                // 变成极其治愈的绿色成功状态
-                btn.style.color = '#10B981';
-                btn.style.borderColor = '#10B981';
-                btn.style.background = 'rgba(16, 185, 129, 0.1)';
-                
-                // 2秒后恢复原状
-                setTimeout(() => {
-                    btn.innerHTML = originalHtml;
-                    if(typeof feather !== 'undefined') { feather.replace(); }
-                    btn.style.color = '';
-                    btn.style.borderColor = '';
-                    btn.style.background = '';
-                }, 2000);
+            postImages.forEach(img => {
+                img.style.cursor = 'zoom-in'; 
+                img.addEventListener('click', () => {
+                    viewerImg.src = img.src; 
+                    viewer.classList.add('show'); 
+                    document.body.style.overflow = 'hidden'; 
+                });
             });
-        };
 
+            const closeViewer = () => {
+                viewer.classList.remove('show');
+                setTimeout(() => { document.body.style.overflow = ''; }, 300);
+            };
+
+            closeBtn.addEventListener('click', closeViewer);
+            viewer.addEventListener('click', (e) => {
+                if (e.target === viewer || e.target.classList.contains('image-viewer-content')) {
+                    closeViewer();
+                }
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && viewer.classList.contains('show')) closeViewer();
+            });
+        }
+    }); // <--- DOMContentLoaded 完美闭合处
+
+    // ==========================================
+    // 社交媒体原生分享引擎 (保持在全局)
+    // ==========================================
+    window.shareToPlatform = function(e, platform) {
+        e.preventDefault();
+        const url = encodeURIComponent(window.location.href);
+        const title = encodeURIComponent(document.title);
+        let shareUrl = '';
+
+        switch(platform) {
+            case 'twitter':
+                shareUrl = `https://twitter.com/intent/tweet?text=${title}&url=${url}`;
+                break;
+            case 'linkedin':
+                shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
+                break;
+            case 'facebook':
+                shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
+                break;
+            case 'weibo':
+                shareUrl = `http://service.weibo.com/share/share.php?url=${url}&title=${title}`;
+                break;
+        }
+        window.open(shareUrl, '_blank', 'width=600,height=500,left=200,top=200');
+    };
+
+    window.copyPageUrl = function(btn) {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i data-feather="check"></i>';
+            if(typeof feather !== 'undefined') { feather.replace(); }
+            
+            btn.style.color = '#10B981';
+            btn.style.borderColor = '#10B981';
+            btn.style.background = 'rgba(16, 185, 129, 0.1)';
+            
+            setTimeout(() => {
+                btn.innerHTML = originalHtml;
+                if(typeof feather !== 'undefined') { feather.replace(); }
+                btn.style.color = '';
+                btn.style.borderColor = '';
+                btn.style.background = '';
+            }, 2000);
+        });
+    };
 </script>

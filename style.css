@@ -456,7 +456,33 @@ p {
     
 }
 
+/* 🌟 专属学校链接极客样式 (绝对静止版) */
+.hero-section p a.school-link {
+    color: #18181b !important; 
+    font-weight: 600 !important; 
+    text-decoration: underline !important; 
+    text-decoration-thickness: 2px !important; 
+    text-underline-offset: 4px !important; 
+    opacity: 1 !important; /* 彻底切断全局透明度干扰 */
+}
 
+.hero-section p a.school-link:hover {
+    color: #18181b !important; 
+    opacity: 1 !important; /* 悬停时强制 100% 不透明，纹丝不动 */
+    background: transparent !important;
+}
+
+/* 深色模式兜底 */
+[data-theme="dark"] .hero-section p a.school-link,
+[data-theme="dark"] .hero-section p a.school-link:hover {
+    color: #f4f4f5 !important; 
+    opacity: 1 !important;
+}
+
+.hero-section p a.school-link:hover {
+    color: var(--text-color); /* 确保悬停时也绝不会变回蓝色 */
+    opacity: 0.6; /* 悬停时微微变淡，提供极其克制的交互反馈 */
+}
 
 .hero-section .social-links {
     margin-top: calc(var(--spacing-unit) * 8);
@@ -2707,12 +2733,25 @@ blockquote {
 .music-player-container {
     position: fixed;
     bottom: 0;
+    /* 🌟 核心修改：利用 left, right 和 margin 让绝对定位的元素水平完美居中 */
     left: 0;
-    width: 100%;
+    right: 0;
+    margin: 0 auto;
+    
+    /* 🌟 核心修改：宽度完美对齐上方内容 (1000px - 左24px - 右24px) */
+    width: calc(100% - 48px); 
+    max-width: 952px; 
+    
     background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(20px); /* 苹果原生毛玻璃效果 */
+    backdrop-filter: blur(20px); 
     -webkit-backdrop-filter: blur(20px);
+    
+    /* 🌟 核心修改：既然两边悬空了，就补齐左右边框，并加上一个极其克制的顶部圆角，防止直角显得像切图失误 */
     border-top: 1px solid rgba(0,0,0,0.08);
+    border-left: 1px solid rgba(0,0,0,0.08);
+    border-right: 1px solid rgba(0,0,0,0.08);
+    border-radius: 16px 16px 0 0; 
+    
     z-index: 9999;
     padding: 15px 0;
     box-shadow: 0 -10px 30px rgba(0,0,0,0.05);
@@ -2728,6 +2767,9 @@ blockquote {
 [data-theme="dark"] .music-player-container {
     background: rgba(30, 30, 30, 0.85);
     border-top: 1px solid rgba(255,255,255,0.08);
+    /* 同步补齐深色模式下的侧边框 */
+    border-left: 1px solid rgba(255,255,255,0.08);
+    border-right: 1px solid rgba(255,255,255,0.08);
 }
 
 .music-player {
@@ -3104,3 +3146,4 @@ blockquote {
 .mini-play-btn:hover {
     transform: scale(1.1);
 }
+
