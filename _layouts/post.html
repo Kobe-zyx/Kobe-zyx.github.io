@@ -21,22 +21,22 @@ layout: default
                     {{ content }}
                 </div>
                 
-                <div class="post-share-section">
-                    <span class="share-label">Share this post</span>
-                    <div class="share-buttons">
-                        <a href="#" class="share-btn twitter" onclick="shareToPlatform(event, 'twitter')" title="Share to Twitter">
+                <div class="geek-action-area">
+                    <span class="action-label">Share this post</span>
+                    <div class="action-grid">
+                        <a href="#" class="action-item icon-tw" onclick="shareToPlatform(event, 'twitter')" title="Share to Twitter">
                             <i data-feather="twitter"></i>
                         </a>
-                        <a href="#" class="share-btn linkedin" onclick="shareToPlatform(event, 'linkedin')" title="Share to LinkedIn">
+                        <a href="#" class="action-item icon-in" onclick="shareToPlatform(event, 'linkedin')" title="Share to LinkedIn">
                             <i data-feather="linkedin"></i>
                         </a>
-                        <a href="#" class="share-btn facebook" onclick="shareToPlatform(event, 'facebook')" title="Share to Facebook">
+                        <a href="#" class="action-item icon-fb" onclick="shareToPlatform(event, 'facebook')" title="Share to Facebook">
                             <i data-feather="facebook"></i>
                         </a>
-                        <a href="#" class="share-btn weibo" onclick="shareToPlatform(event, 'weibo')" title="分享到微博">
+                        <a href="#" class="action-item icon-wb" onclick="shareToPlatform(event, 'weibo')" title="分享到微博">
                             <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                         </a>
-                        <button class="share-btn copy-link" onclick="copyPageUrl(this)" title="Copy Link">
+                        <button class="action-item icon-cp" onclick="copyPageUrl(this)" title="Copy Link">
                             <i data-feather="link"></i>
                         </button>
                     </div>
@@ -74,9 +74,9 @@ layout: default
 
 <style>
     /* ==========================================
-       博文底部社交分享组件样式
+       博文底部社交分享组件样式 (极客防屏蔽版)
        ========================================== */
-    .post-share-section {
+    .geek-action-area {
         margin-top: 60px;
         display: flex;
         align-items: center;
@@ -85,7 +85,7 @@ layout: default
         border-top: 1px dashed var(--border-color);
     }
 
-    .share-label {
+    .action-label {
         font-family: var(--font-code);
         font-size: 14px;
         color: var(--secondary-text-color);
@@ -93,12 +93,12 @@ layout: default
         letter-spacing: 1px;
     }
 
-    .share-buttons {
+    .action-grid {
         display: flex;
         gap: 12px;
     }
 
-    .share-btn {
+    .action-item {
         display: flex;
         align-items: center;
         justify-content: center;
@@ -113,20 +113,21 @@ layout: default
         text-decoration: none;
     }
 
-    .share-btn svg {
+    .action-item svg {
         width: 16px;
         height: 16px;
         transition: transform 0.3s ease;
     }
 
-    .share-btn:hover { transform: translateY(-3px); }
-    .share-btn:hover svg { transform: scale(1.1); }
+    /* 悬停时的品牌色展现魔法 */
+    .action-item:hover { transform: translateY(-3px); }
+    .action-item:hover svg { transform: scale(1.1); }
     
-    .share-btn.twitter:hover { border-color: #1DA1F2; color: #1DA1F2; background: rgba(29, 161, 242, 0.1); }
-    .share-btn.linkedin:hover { border-color: #0A66C2; color: #0A66C2; background: rgba(10, 102, 194, 0.1); }
-    .share-btn.facebook:hover { border-color: #1877F2; color: #1877F2; background: rgba(24, 119, 242, 0.1); }
-    .share-btn.weibo:hover { border-color: #E6162D; color: #E6162D; background: rgba(230, 22, 45, 0.1); }
-    .share-btn.copy-link:hover { border-color: var(--text-color); color: var(--text-color); background: var(--background-dark); }
+    .action-item.icon-tw:hover { border-color: #1DA1F2; color: #1DA1F2; background: rgba(29, 161, 242, 0.1); }
+    .action-item.icon-in:hover { border-color: #0A66C2; color: #0A66C2; background: rgba(10, 102, 194, 0.1); }
+    .action-item.icon-fb:hover { border-color: #1877F2; color: #1877F2; background: rgba(24, 119, 242, 0.1); }
+    .action-item.icon-wb:hover { border-color: #E6162D; color: #E6162D; background: rgba(230, 22, 45, 0.1); }
+    .action-item.icon-cp:hover { border-color: var(--text-color); color: var(--text-color); background: var(--background-dark); }
     
     /* ==========================================
        博文排版与自动目录样式
@@ -364,7 +365,7 @@ layout: default
         }
 
         // ==========================================
-        // 🌟 极客博文图片放大镜引擎 (移入 DOMContentLoaded 内部)
+        // 🌟 极客博文图片放大镜引擎 (Medium-style)
         // ==========================================
         const postImages = document.querySelectorAll('.markdown-content img');
         if (postImages.length > 0) {
@@ -406,10 +407,10 @@ layout: default
                 if (e.key === 'Escape' && viewer.classList.contains('show')) closeViewer();
             });
         }
-    }); // <--- DOMContentLoaded 完美闭合处
+    });
 
     // ==========================================
-    // 社交媒体原生分享引擎 (保持在全局)
+    // 社交媒体原生分享引擎 (极客防屏蔽版)
     // ==========================================
     window.shareToPlatform = function(e, platform) {
         e.preventDefault();

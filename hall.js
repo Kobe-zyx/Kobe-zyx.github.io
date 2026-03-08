@@ -266,14 +266,30 @@ class MusicHall {
     }
 
     hidePlayer() {
+        // 1. 优先执行轻量的暂停操作
         if (this.currentAudio) {
             this.currentAudio.pause();
-            this.currentAudio.src = ''; 
         }
+        
         const player = document.getElementById('musicPlayer');
         if(!player) return;
+        
+        // 🌟 终极修复：获取当前被“停靠引擎”顶起来的精确高度
+        const currentBottom = window.getComputedStyle(player).bottom;
+        
+        // 强行增加下滑距离（自身高度 100% + 被顶起的高度），确保绝对掉出屏幕可视区
+        player.style.transform = `translateY(calc(100% + ${currentBottom}))`;
         player.classList.remove('show');
-        setTimeout(() => player.style.display = 'none', 400);
+        
+        // 等待 400ms 丝滑下滑动画完全结束后，再处理重负载的隐藏与内存释放
+        setTimeout(() => {
+            player.style.display = 'none';
+            player.style.transform = ''; // 🌟 必须清空刚才加上的行内样式，以免影响下次弹出！
+            
+            if (this.currentAudio) {
+                this.currentAudio.src = ''; 
+            }
+        }, 400);
     }
 
     setupAudioPlayer() {
