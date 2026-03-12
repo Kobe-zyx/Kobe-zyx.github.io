@@ -14,7 +14,7 @@ layout: default
                 <div class="post-meta" style="color: var(--secondary-text-color); font-size: 0.9em; margin-bottom: 40px;">
                     {{ page.author | default: site.author | default: "Kobe_zyx" }} · 
                     {{ page.date | date: "%Y年%m月%d日" }} 
-                    {% if page.tag %} · <span style="background: var(--border-color); padding: 2px 8px; border-radius: 4px; font-size: 0.85em;">{{ page.tag }}</span>{% endif %}
+                    {% if page.categories.size > 0 %} · <span style="background: var(--border-color); padding: 2px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 600;">{{ page.categories.first }}</span>{% endif %}
                 </div>
                 
                 <div class="markdown-content" id="markdown-content">
@@ -119,7 +119,6 @@ layout: default
         transition: transform 0.3s ease;
     }
 
-    /* 悬停时的品牌色展现魔法 */
     .action-item:hover { transform: translateY(-3px); }
     .action-item:hover svg { transform: scale(1.1); }
     
@@ -186,12 +185,10 @@ layout: default
         const content = document.getElementById('markdown-content');
         if (!content) return;
 
-        // 1. 解析 Obsidian 的 ==高亮文字== 语法
         let html = content.innerHTML;
         html = html.replace(/==([^=]+)==/g, '<mark>$1</mark>');
         content.innerHTML = html;
 
-        // 2. 解析 Obsidian Callout 块
         const blockquotes = content.querySelectorAll('blockquote');
         const calloutIcons = {
             'note': '<i data-feather="edit-2"></i>',
@@ -233,7 +230,6 @@ layout: default
         });
         if(typeof feather !== 'undefined') { feather.replace(); }
 
-        // 3. 终极极客版：生成支持折叠与滚动监听的侧边栏目录
         const tocNav = document.getElementById('toc-nav');
         const sidebar = document.querySelector('.post-toc-sidebar');
         const headings = content.querySelectorAll('h1, h2, h3, h4, h5, h6');
@@ -364,9 +360,6 @@ layout: default
             headings.forEach(h => observer.observe(h));
         }
 
-        // ==========================================
-        // 🌟 极客博文图片放大镜引擎 (Medium-style)
-        // ==========================================
         const postImages = document.querySelectorAll('.markdown-content img');
         if (postImages.length > 0) {
             const viewerHTML = `
@@ -409,9 +402,6 @@ layout: default
         }
     });
 
-    // ==========================================
-    // 社交媒体原生分享引擎 (极客防屏蔽版)
-    // ==========================================
     window.shareToPlatform = function(e, platform) {
         e.preventDefault();
         const url = encodeURIComponent(window.location.href);

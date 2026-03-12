@@ -7,8 +7,66 @@ permalink: /archive/
 <section class="timeline-section" style="margin-top: 100px;">
     <div class="container">
         <h1 style="margin-bottom: 10px;">Archive</h1>
-        <p class="blog-intro-text">Time machine: Browse all my posts by year.</p>
-        <p class="blog-intro-text" style="margin-bottom: 40px;">时光机：在这里按年份浏览我所有的博文。</p>
+        <p class="blog-intro-text">You can browse all my posts by year and tags.</p>
+        <p class="blog-intro-text" style="margin-bottom: 30px;">你可以按年份和标签检索我所有的博文。</p>
+
+        <style>
+            /* ==========================================================
+               标签云系统样式 (Tags Cloud)
+               ========================================================== */
+            .tags-cloud {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 12px;
+                margin-bottom: 20px;
+                padding-bottom: 30px;
+                border-bottom: 1px solid var(--border-color);
+            }
+            
+            .tag-pill {
+                padding: 6px 16px;
+                border: 1px solid var(--border-color);
+                border-radius: 30px; 
+                font-size: 13px;
+                font-weight: 500;
+                color: var(--secondary-text-color);
+                cursor: pointer;
+                transition: all 0.3s ease;
+                user-select: none;
+                font-family: var(--font-main);
+            }
+            
+            .tag-pill sup {
+                font-size: 10px;
+                opacity: 0.6;
+                margin-left: 2px;
+            }
+            
+            .tag-pill:hover {
+                border-color: var(--text-color);
+                color: var(--text-color);
+            }
+            
+            .tag-pill.active {
+                background-color: var(--text-color);
+                color: var(--background-light);
+                border-color: var(--text-color);
+            }
+            
+            [data-theme="dark"] .tag-pill.active {
+                color: #000000; 
+            }
+        </style>
+
+        <div class="tags-cloud">
+            <span class="tag-pill active" data-tag="all">全部 All</span>
+            
+            {% for tag in site.tags %}
+            <span class="tag-pill" data-tag="{{ tag[0] }}">
+                #{{ tag[0] }} <sup>{{ tag[1].size }}</sup>
+            </span>
+            {% endfor %}
+        </div>
 
         <div class="archive-container">
             {% for post in site.posts %}
@@ -23,7 +81,7 @@ permalink: /archive/
                     {% capture year %}{{ current_year }}{% endcapture %}
                 {% endif %}
                 
-                <li class="archive-item">
+                <li class="archive-item" data-tags="{{ post.tags | join: ',' }}">
                     <span class="archive-date">{{ post.date | date: "%m-%d" }}</span>
                     <a href="{{ post.url | relative_url }}" class="archive-title">{{ post.title }}</a>
                 </li>
@@ -35,3 +93,58 @@ permalink: /archive/
         </div>
     </div>
 </section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // 核心 JS 引擎全面切换为识别 tag
+        const tagPills = document.querySelectorAll('.tag-pill[data-tag]');
+        const archiveItems = document.querySelectorAll('.archive-item');
+        const archiveLists = document.querySelectorAll('.archive-list');
+
+        tagPills.forEach(pill => {
+            pill.addEventListener('click', function() {
+                
+                tagPills.forEach(p => p.classList.remove('active'));
+                this.classList.add('active');
+
+                const selectedTag = this.getAttribute('data-tag');
+
+                archiveItems.forEach(item => {
+                    // 🌟 终极修复：同时赋予 opacity(淡出) 和 transform(悬停) 的丝滑过渡！
+                    item.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                    item.style.opacity = '0';
+                    
+                    setTimeout(() => {
+                        if (selectedTag === 'all') {
+                            item.style.display = 'flex';
+                            setTimeout(() => item.style.opacity = '1', 50);
+                        } else {
+                            // 这里读取的是 data-tags
+                            const postTags = item.getAttribute('data-tags').split(',');
+                            if (postTags.includes(selectedTag)) {
+                                item.style.display = 'flex';
+                                setTimeout(() => item.style.opacity = '1', 50);
+                            } else {
+                                item.style.display = 'none';
+                            }
+                        }
+                    }, 300); 
+                });
+
+                // 智能检测：如果某一年份下没有这个标签的文章，隐藏该年份大标题
+                setTimeout(() => {
+                    archiveLists.forEach(list => {
+                        const yearHeader = list.previousElementSibling; 
+                        const hasVisibleItems = Array.from(list.querySelectorAll('.archive-item')).some(item => item.style.display !== 'none');
+                        
+                        if (hasVisibleItems) {
+                            yearHeader.style.display = 'block';
+                        } else {
+                            yearHeader.style.display = 'none';
+                        }
+                    });
+                }, 350); 
+            });
+        });
+    });
+</script>

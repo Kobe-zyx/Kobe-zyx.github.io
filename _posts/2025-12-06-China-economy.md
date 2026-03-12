@@ -1,9 +1,12 @@
 ---
+title: "【经济分析】2025中国经济小结"
 layout: post
 date: '2025-12-06 00:00:00'
-tags:
+categories:
 - 经济分析
-title: "【经济分析】2025中国经济小结"
+tags:
+- economy
+- China
 ---
 
 ## 一、内需

@@ -1,7 +1,13 @@
 ---
+title: "【关于本站】Hello World: 第一篇 Jekyll 架构博客"
 layout: post
-title: "Hello World: 我的第一篇 Jekyll 架构博客"
-date: 2025-12-02 12:00:00 +0800
+date: '2025-12-02 12:00:00 +0800'
+tags:
+- jekyll
+- blog
+- website
+categories:
+- 关于本站
 ---
 
 欢迎来到我的全新博客！

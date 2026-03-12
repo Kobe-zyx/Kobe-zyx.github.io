@@ -181,9 +181,9 @@ body.body-no-scroll {
 
 a {
     color: var(--primary-color);
-    /* 使用变量 */
     text-decoration: none;
-    transition: color 0.3s ease;
+    /* 🌟 核心修复：补齐 opacity 的过渡，彻底解决文章卡顿闪烁 */
+    transition: color 0.3s ease, opacity 0.3s ease; 
 }
 
 a:hover {

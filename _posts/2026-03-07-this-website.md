@@ -2,8 +2,11 @@
 title: "【关于本站】关于本博客的功能及使用指南"
 layout: post
 date: '2026-03-07 16:52:43'
-tags:
+categories:
 - 关于本站
+tags:
+- blog
+- website
 ---
 
 ## 1. 基础实现

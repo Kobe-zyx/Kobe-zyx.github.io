@@ -7,10 +7,11 @@ permalink: /blog/
 <section class="timeline-section" style="margin-top: 100px;">
     <div class="container">
         <h1 style="margin-bottom: 10px;">Geek</h1>
-        <p class="blog-intro-text">Here, you can see my all blog list.</p>
-        <p class="blog-intro-text" style="margin-bottom: 30px;">以下是我的所有博文列表：</p>
+        <p class="blog-intro-text">You can see my all blog list.</p>
+        <p class="blog-intro-text" style="margin-bottom: 30px;">你可以查看我的所有博文列表。</p>
         
         <style>
+            /* 1. 搜索框样式 */
             .blog-search-box {
                 position: relative;
                 width: 100%;
@@ -44,109 +45,92 @@ permalink: /blog/
                 height: 18px;
                 pointer-events: none;
             }
+
+            /* ==========================================================
+                🌟 博客分类系统样式 (Categories Cloud 内嵌防脱轨)
+               ========================================================== */
+            .categories-cloud {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 12px;
+                margin-bottom: 40px;
+                padding-bottom: 30px;
+                border-bottom: 1px solid var(--border-color);
+            }
+            
+            .category-pill {
+                padding: 6px 16px;
+                border: 1px solid var(--border-color);
+                border-radius: 30px; 
+                font-size: 13px;
+                font-weight: 500;
+                color: var(--secondary-text-color);
+                cursor: pointer;
+                transition: all 0.3s ease;
+                user-select: none;
+                font-family: var(--font-main);
+            }
+            
+            .category-pill sup {
+                font-size: 10px;
+                opacity: 0.6;
+                margin-left: 2px;
+            }
+            
+            .category-pill:hover {
+                border-color: var(--text-color);
+                color: var(--text-color);
+            }
+            
+            .category-pill.active {
+                background-color: var(--text-color);
+                color: var(--background-light);
+                border-color: var(--text-color);
+            }
+            
+            [data-theme="dark"] .category-pill.active {
+                color: #000000; 
+            }
+            
+            /* 🌟 修改后的分类标签：正常不加粗，悬停变深 */
+            .post-inline-category {
+                font-size: 13px;
+                color: var(--secondary-text-color); /* 默认呈现低调的灰色 */
+                margin-right: 8px;
+                transition: color 0.2s ease;
+                font-weight: 400; /* 🌟 核心修改：取消原来的 600 加粗，恢复正常字重 */
+            }
+            
+            /* 当鼠标悬停在文章卡片上时，颜色变深 */
+            .post-item-hux:hover .post-inline-category {
+                color: var(--text-color); /* 🌟 核心修改：原来是变成蓝色，现在改为深黑色/主文字色 */
+            }
+            
+            .post-item-hux {
+                transition: opacity 0.3s ease;
+            }
         </style>
+
         <div class="blog-search-box">
             <i data-feather="search" class="search-icon"></i>
-            <input type="text" id="blog-search-input" placeholder="搜索博文标题、副标题或标签...">
+            <input type="text" id="blog-search-input" placeholder="搜索博文标题、副标题或分类...">
         </div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        if(typeof feather !== 'undefined') {
-            feather.replace();
-        }
-
-        const tagPills = document.querySelectorAll('.tag-pill[data-tag]');
-        const posts = document.querySelectorAll('.post-item-hux');
-        const searchInput = document.getElementById('blog-search-input'); // 🌟 获取搜索框
-
-        // ==========================================
-        // 1. 标签点击过滤逻辑
-        // ==========================================
-        tagPills.forEach(pill => {
-            pill.addEventListener('click', function() {
-                // 如果点击了标签，自动清空搜索框的内容
-                if (searchInput) searchInput.value = '';
-
-                // 切换按钮的 active 状态
-                tagPills.forEach(p => p.classList.remove('active'));
-                this.classList.add('active');
-
-                // 获取被点击的标签名
-                const selectedTag = this.getAttribute('data-tag');
-
-                // 过滤文章（极简的淡入淡出效果）
-                posts.forEach(post => {
-                    post.style.opacity = '0'; // 先变透明
-                    
-                    setTimeout(() => {
-                        if (selectedTag === 'all') {
-                            post.style.display = 'block';
-                            setTimeout(() => post.style.opacity = '1', 50);
-                        } else {
-                            const postTags = post.getAttribute('data-tags').split(',');
-                            if (postTags.includes(selectedTag)) {
-                                post.style.display = 'block';
-                                setTimeout(() => post.style.opacity = '1', 50);
-                            } else {
-                                post.style.display = 'none';
-                            }
-                        }
-                    }, 300); 
-                });
-            });
-        });
-
-        // ==========================================
-        // 2. 🌟 搜索框实时匹配逻辑 (毫秒级响应)
-        // ==========================================
-        if (searchInput) {
-            searchInput.addEventListener('input', function(e) {
-                const query = e.target.value.toLowerCase().trim();
-
-                // 只要开始打字搜索，自动把标签状态切回 "全部 All"
-                tagPills.forEach(p => p.classList.remove('active'));
-                document.querySelector('.tag-pill[data-tag="all"]')?.classList.add('active');
-
-                posts.forEach(post => {
-                    // 抓取每篇文章的 标题、副标题 和 标签，转换为小写用于匹配
-                    const title = post.querySelector('.post-title-hux')?.textContent.toLowerCase() || '';
-                    const subtitle = post.querySelector('.post-subtitle-hux')?.textContent.toLowerCase() || '';
-                    const tags = post.getAttribute('data-tags').toLowerCase();
-
-                    // 核心匹配算法：只要其中一个包含输入的关键词，就放行！
-                    if (title.includes(query) || subtitle.includes(query) || tags.includes(query)) {
-                        post.style.display = 'block';
-                        // 稍微延迟保证 display 生效后再过渡透明度
-                        setTimeout(() => post.style.opacity = '1', 50); 
-                    } else {
-                        post.style.opacity = '0';
-                        // 稍微延迟等待透明度动画跑完再彻底隐藏节点
-                        setTimeout(() => post.style.display = 'none', 300); 
-                    }
-                });
-            });
-        }
-    });
-</script>
-
-        <div class="tags-cloud">
-            <span class="tag-pill active" data-tag="all">全部 All</span>
+        <div class="categories-cloud">
+            <span class="category-pill active" data-category="all">全部 All</span>
             
-            {% for tag in site.tags %}
-            <span class="tag-pill" data-tag="{{ tag[0] }}">
-                {{ tag[0] }} <sup>{{ tag[1].size }}</sup>
+            {% for category in site.categories %}
+            <span class="category-pill" data-category="{{ category[0] }}">
+                {{ category[0] }} <sup>{{ category[1].size }}</sup>
             </span>
             {% endfor %}
 
-            <a href="{{ '/archive/' | relative_url }}" class="tag-pill" style="margin-left: auto; color: var(--primary-color); border-color: var(--primary-color); text-decoration: none; display: inline-flex; align-items: center;">
-                <i data-feather="archive" style="width: 14px; height: 14px; margin-right: 4px;"></i>归档时光机
-            </a>
+            
         </div>
         
         <div class="post-list-hux" id="post-list">                
             {% for post in site.posts %}
-            <div class="post-item-hux" data-tags="{{ post.tags | join: ',' }}">
+            <div class="post-item-hux" data-categories="{{ post.categories | join: ',' }}">
                 <a href="{{ post.url | relative_url }}">
                     <h2 class="post-title-hux">
                         {{ post.title }}
@@ -162,10 +146,10 @@ permalink: /blog/
                 <p class="post-meta-hux">
                     Posted by {{ post.author | default: site.author | default: "Kobe_zyx" }} on {{ post.date | date: "%Y年%m月%d日" }}
                     
-                    {% if post.tags.size > 0 %}
+                    {% if post.categories.size > 0 %}
                         &nbsp;·&nbsp; 
-                        {% for tag in post.tags %}
-                            <span class="post-inline-tag">#{{ tag }}</span>
+                        {% for category in post.categories %}
+                            <span class="post-inline-category">#{{ category }}</span>
                         {% endfor %}
                     {% endif %}
                 </p>
@@ -181,29 +165,35 @@ permalink: /blog/
             feather.replace();
         }
 
-        const tagPills = document.querySelectorAll('.tag-pill[data-tag]');
+        const categoryPills = document.querySelectorAll('.category-pill[data-category]');
         const posts = document.querySelectorAll('.post-item-hux');
+        const searchInput = document.getElementById('blog-search-input'); 
 
-        tagPills.forEach(pill => {
-            pill.addEventListener('click', function() {
-                // 1. 切换按钮的 active 状态
-                tagPills.forEach(p => p.classList.remove('active'));
+        // ==========================================
+        // 1. 分类点击过滤逻辑
+        // ==========================================
+        categoryPills.forEach(pill => {
+            pill.addEventListener('click', function(e) {
+                // 如果点的是带有 href 的链接(比如归档时光机)，就不执行过滤动画，让它正常跳转
+                if (this.getAttribute('href')) return;
+
+                if (searchInput) searchInput.value = '';
+
+                categoryPills.forEach(p => p.classList.remove('active'));
                 this.classList.add('active');
 
-                // 2. 获取被点击的标签名
-                const selectedTag = this.getAttribute('data-tag');
+                const selectedCategory = this.getAttribute('data-category');
 
-                // 3. 过滤文章（极简的淡入淡出效果）
                 posts.forEach(post => {
-                    post.style.opacity = '0'; // 先变透明
+                    post.style.opacity = '0'; 
                     
                     setTimeout(() => {
-                        if (selectedTag === 'all') {
+                        if (selectedCategory === 'all') {
                             post.style.display = 'block';
                             setTimeout(() => post.style.opacity = '1', 50);
                         } else {
-                            const postTags = post.getAttribute('data-tags').split(',');
-                            if (postTags.includes(selectedTag)) {
+                            const postCategories = post.getAttribute('data-categories').split(',');
+                            if (postCategories.includes(selectedCategory)) {
                                 post.style.display = 'block';
                                 setTimeout(() => post.style.opacity = '1', 50);
                             } else {
@@ -214,5 +204,31 @@ permalink: /blog/
                 });
             });
         });
+
+        // ==========================================
+        // 2. 搜索框实时匹配逻辑 (完美支持 Categories)
+        // ==========================================
+        if (searchInput) {
+            searchInput.addEventListener('input', function(e) {
+                const query = e.target.value.toLowerCase().trim();
+
+                categoryPills.forEach(p => p.classList.remove('active'));
+                document.querySelector('.category-pill[data-category="all"]')?.classList.add('active');
+
+                posts.forEach(post => {
+                    const title = post.querySelector('.post-title-hux')?.textContent.toLowerCase() || '';
+                    const subtitle = post.querySelector('.post-subtitle-hux')?.textContent.toLowerCase() || '';
+                    const categories = post.getAttribute('data-categories').toLowerCase();
+
+                    if (title.includes(query) || subtitle.includes(query) || categories.includes(query)) {
+                        post.style.display = 'block';
+                        setTimeout(() => post.style.opacity = '1', 50); 
+                    } else {
+                        post.style.opacity = '0';
+                        setTimeout(() => post.style.display = 'none', 300); 
+                    }
+                });
+            });
+        }
     });
 </script>
