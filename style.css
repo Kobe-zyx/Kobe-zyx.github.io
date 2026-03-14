@@ -11,8 +11,7 @@
     --card-background: #ffffff;
     --card-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
     --hover-color: #f5f5f7;
-    --font-family: 'Lexend', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-
+   
     /* 亮色模式变量 */
     --primary-color: #007AFF;
     /* Apple 蓝色 */
@@ -54,29 +53,13 @@
     --background-dark-rgb: 18, 18, 18;
 }
 
-/* Dark mode portfolio card adjustments */
-[data-theme="dark"] .portfolio-item {
-    background-color: #1e1e1e;
-    border-color: rgba(255, 255, 255, 0.1);
-}
 
-[data-theme="dark"] .portfolio-item:hover {
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-    border-color: rgba(255, 255, 255, 0.15);
-}
-
-[data-theme="dark"] .portfolio-item::after {
-    background: radial-gradient(circle at var(--mouse-x) var(--mouse-y),
-            rgba(255, 255, 255, 0.03) 0%,
-            rgba(255, 255, 255, 0.01) 40%,
-            transparent 70%);
-}
 
 /* 深浅模式切换按钮 */
 .theme-toggle {
     position: absolute;
-    top: 20px;
-    right: 275px;
+    top: 25px;
+    right: 40px; /* 🌟 核心修复：解除硬编码炸弹，让它乖乖待在右上角 */
     z-index: 1000;
     width: 40px;
     height: 40px;
@@ -172,11 +155,7 @@ body.body-no-scroll {
     max-width: 1000px;
     /* 控制内容宽度 */
     margin: 0 auto;
-    padding: 0 calc(var(--spacing-unit) * 4);
-    /* 左右内边距 */
-    padding-top: calc(var(--spacing-unit) * 4);
-    /* 增加顶部内边距 */
-    padding-bottom: calc(var(--spacing-unit) * 4);
+    padding: calc(var(--spacing-unit) * 4);
 }
 
 a {
@@ -273,13 +252,7 @@ p {
     /* 如果 LOGO 是圆形，可以添加此样式 */
 }
 
-.navbar .nav-links-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-grow: 0;
-    /* 不允许grow */
-}
+
 
 .navbar ul {
     display: flex;
@@ -295,14 +268,15 @@ p {
 }
 
 .navbar a {
-    color: var(--secondary-text-color);
+    color: var(--text-color); /* 告别灰暗，恢复主文本色 */
+    font-size: 1.1rem; /* 🌟 核心修复：恢复 1.1rem 的大气字号 */
     font-weight: 500;
     padding: 0;
     text-decoration: none;
     transition: all 0.3s ease;
     text-align: center;
     line-height: 1.2;
-    opacity: 0.5;
+    opacity: 0.5; /* 未选中时半透明 */
     font-family: var(--font-main);
 }
 
@@ -311,12 +285,10 @@ p {
     opacity: 0.8;
 }
 
-/* 删除激活状态样式 */
 .navbar a.active {
-    color: var(--primary-color);
-    /* 激活状态使用主题蓝色 */
+    color: var(--text-color); /* 激活状态保持纯色，去掉多余的蓝色 */
+    font-weight: 600; /* 激活时稍微加粗一点点，质感更好 */
     opacity: 1;
-    /* 激活状态完全不透明 */
 }
 
 /* 按钮样式 */
@@ -370,10 +342,6 @@ p {
     /* 添加过渡效果 */
 }
 
-.section:nth-of-type(even) {
-    background-color: var(--background-light);
-    /* 使用变量替代硬编码的白色 */
-}
 
 /* Hero Section */
 .hero-section {
@@ -418,29 +386,16 @@ p {
 }
 
 .hero-section h1 {
-    font-family: 'Lexend';
-    /* 设置为 Lexend 字体 */
-    font-weight: 625;
-    /* Bold */
-    font-size: 3 em;
+    font-weight: 600;
+    font-size: 3.5em; /* 🌟 修复空格语法错误，完美接轨大字号 */
     line-height: 1.1;
     margin-bottom: calc(var(--spacing-unit) * 1);
-    max-width: none;
-    margin-left: 0;
-    margin-right: 0;
-    color: var(--text-color);
-    /* 使用CSS变量替代硬编码的黑色 */
 }
 
 .hero-section h2 {
-    font-family: 'Lexend';
-    /* 设置为 Lexend 字体 */
-    font-weight: 395;
-    /* 加粗字体 */
-    font-size: 2 em;
-    /* Adjust size as needed */
-    color: #71717A;
-    /* 设置文字颜色为 #71717A */
+    font-weight: 400;
+    font-size: 2em; /* 🌟 修复空格语法错误 */
+    color: var(--secondary-text-color); /* 🌟 使用全局变量替代硬编码的灰色，完美适配深色模式 */
     margin-top: calc(var(--spacing-unit) * 1);
     margin-bottom: calc(var(--spacing-unit) * 3);
 }
@@ -449,39 +404,22 @@ p {
     font-size: 1.1em;
     color: var(--secondary-text-color);
     margin-bottom: calc(var(--spacing-unit) * 2);
-    max-width: none;
-    margin-left: 0;
-    margin-right: 0;
-    
-    
+
 }
 
-/* 🌟 专属学校链接极客样式 (绝对静止版) */
-.hero-section p a.school-link {
-    color: #18181b !important; 
-    font-weight: 600 !important; 
-    text-decoration: underline !important; 
-    text-decoration-thickness: 2px !important; 
-    text-underline-offset: 4px !important; 
-    opacity: 1 !important; /* 彻底切断全局透明度干扰 */
-}
-
-.hero-section p a.school-link:hover {
-    color: #18181b !important; 
-    opacity: 1 !important; /* 悬停时强制 100% 不透明，纹丝不动 */
+/* 🌟 专属学校链接极客样式 (纯静止、无动效版) */
+.hero-section p a.school-link,
+.hero-section p a.school-link:hover,
+.hero-section p a.school-link:active {
+    color: var(--text-color) !important; /* 自动跟随深浅模式的主文字颜色 */
+    font-weight: 600 !important; /* 保持你要求的粗体 */
+    text-decoration: underline !important; /* 保持你要求的下划线 */
+    text-decoration-thickness: 2px !important;
+    text-underline-offset: 4px !important;
+    opacity: 1 !important; /* 悬停时绝对不透明度变化 */
+    transition: none !important; /* 彻底封杀所有过渡动画 */
     background: transparent !important;
-}
-
-/* 深色模式兜底 */
-[data-theme="dark"] .hero-section p a.school-link,
-[data-theme="dark"] .hero-section p a.school-link:hover {
-    color: #f4f4f5 !important; 
-    opacity: 1 !important;
-}
-
-.hero-section p a.school-link:hover {
-    color: var(--text-color); /* 确保悬停时也绝不会变回蓝色 */
-    opacity: 0.6; /* 悬停时微微变淡，提供极其克制的交互反馈 */
+    cursor: pointer;
 }
 
 .hero-section .social-links {
@@ -516,411 +454,13 @@ p {
 .hero-section .social-links .twitter-icon,
 .hero-section .social-links .github-icon,
 .hero-section .social-links .bilibili-icon,
-.hero-section .social-links .youtube-icon {
+.hero-section .social-links .youtube-icon,
+.hero-section .social-links .rss-icon { /* 🌟 核心修复：补上漏掉的 RSS 图标 */
     width: 24px;
     height: 24px;
     stroke-width: 2;
     color: var(--secondary-text-color);
     transition: none;
-}
-
-/* 移除悬停时的颜色变化 */
-.hero-section .social-links a:hover .twitter-icon,
-.hero-section .social-links a:hover .github-icon,
-.hero-section .social-links a:hover .bilibili-icon,
-.hero-section .social-links a:hover .youtube-icon {
-    color: var(--secondary-text-color);
-}
-
-/* 移除原有的 icon-grid 样式 */
-.hero-section .icon-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: calc(var(--spacing-unit) * 4);
-    margin-top: calc(var(--spacing-unit) * 4);
-}
-
-.hero-section .icon-item {
-    text-align: center;
-    text-decoration: none;
-    color: var(--text-color);
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.hero-section .icon-item:hover {
-    transform: translateY(-5px);
-}
-
-.hero-section .icon-item i {
-    width: 48px;
-    height: 48px;
-    margin-bottom: calc(var(--spacing-unit) * 2);
-    color: var(--primary-color);
-    transition: all 0.3s ease;
-}
-
-.hero-section .icon-item span {
-    display: block;
-    font-size: 1.1em;
-    font-weight: 500;
-    transition: all 0.3s ease;
-}
-
-.hero-section .icon-item:hover span {
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    color: var(--primary-color);
-}
-
-.hero-section .icon-item:hover i {
-    transform: scale(1.1);
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
-}
-
-/* 移除原有的卡片样式 */
-.hero-section .icon-item .icon-card {
-    display: none;
-}
-
-/* 作品集 */
-.portfolio-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(200px, 1fr));
-    gap: calc(var(--spacing-unit) * 4);
-    margin-top: calc(var(--spacing-unit) * 6);
-    max-width: 100%;
-    margin-left: 0;
-    margin-right: auto;
-}
-
-@media (max-width: 768px) {
-    .portfolio-grid {
-        grid-template-columns: 1fr;
-        /* 小屏幕上改为单列 */
-    }
-}
-
-.portfolio-item {
-    background-color: var(--card-background);
-    border-radius: 16px;
-    overflow: hidden;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-    border: 1px solid rgba(0, 0, 0, 0.06);
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    text-align: left;
-    display: flex;
-    flex-direction: column;
-    padding: calc(var(--spacing-unit) * 4);
-    text-decoration: none;
-    color: inherit;
-    position: relative;
-    width: 400px;
-    height: 150px;
-    cursor: pointer;
-    transform: translateY(0);
-}
-
-.portfolio-item:hover {
-    transform: translateY(-8px) scale(1.02);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
-    border-color: rgba(0, 0, 0, 0.1);
-}
-
-.portfolio-item::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, rgba(0, 122, 255, 0.05) 0%, rgba(0, 122, 255, 0.02) 100%);
-    border-radius: 16px;
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    z-index: 1;
-}
-
-.portfolio-item:hover::before {
-    opacity: 1;
-}
-
-.portfolio-icon {
-    margin-bottom: calc(var(--spacing-unit) * 2);
-    width: 48px;
-    height: 48px;
-    background-color: var(--background-dark);
-    border-radius: 12px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    z-index: 2;
-    position: relative;
-}
-
-.portfolio-item:hover .portfolio-icon {
-    transform: translateY(-4px) scale(1.1);
-}
-
-.portfolio-icon i {
-    width: 24px;
-    height: 24px;
-    stroke-width: 2;
-    color: var(--secondary-text-color);
-    transition: all 0.3s ease;
-}
-
-.portfolio-item:hover .portfolio-icon i {
-    transform: scale(1.1);
-}
-
-.portfolio-content {
-    z-index: 2;
-    flex-grow: 1;
-    padding: 0;
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    position: relative;
-}
-
-.portfolio-item:hover .portfolio-content {
-    transform: translateY(-6px);
-}
-
-.portfolio-item h3 {
-    margin-bottom: 8px;
-    font-size: 1.4em;
-    color: var(--text-color);
-    font-weight: 600;
-    transition: all 0.3s ease;
-    line-height: 1.3;
-}
-
-.portfolio-item:hover h3 {
-    transform: translateX(4px);
-}
-
-.portfolio-item p {
-    padding: 0;
-    margin-top: 4px;
-    margin-bottom: calc(var(--spacing-unit) * 2);
-    font-size: 1em;
-    color: var(--secondary-text-color);
-    line-height: 1.5;
-    transition: all 0.3s ease;
-    opacity: 0.8;
-}
-
-.portfolio-item:hover p {
-    opacity: 1;
-    transform: translateX(4px);
-}
-
-/* 移除原有的 ::after visit 文字样式，因为现在使用 HTML 元素 */
-
-/* 添加箭头 */
-.portfolio-item .arrow {
-    position: absolute;
-    bottom: 20px;
-    right: 24px;
-    width: 24px;
-    height: 24px;
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    opacity: 0;
-    transform: translateX(10px);
-    z-index: 3;
-}
-
-.portfolio-item:hover .arrow {
-    opacity: 1;
-    transform: translateX(0);
-}
-
-.portfolio-item .arrow::before {
-    content: '→';
-    font-size: 1.2em;
-    color: var(--secondary-text-color);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100%;
-}
-
-/* 移除不再需要的图片样式 */
-.portfolio-item img {
-    display: none;
-}
-
-/* 移除不再需要的按钮样式 */
-.portfolio-item .button {
-    display: none;
-}
-
-/* 添加鼠标跟随光效 */
-.portfolio-item {
-    --mouse-x: 50%;
-    --mouse-y: 50%;
-}
-
-.portfolio-item::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle at var(--mouse-x) var(--mouse-y),
-            rgba(128, 128, 128, 0.03) 0%,
-            rgba(128, 128, 128, 0.01) 40%,
-            transparent 70%);
-    border-radius: 16px;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    pointer-events: none;
-    z-index: 1;
-}
-
-.portfolio-item:hover::after {
-    opacity: 1;
-}
-
-/* Visit 文字样式 */
-.portfolio-item .visit-text {
-    position: absolute;
-    bottom: 20px;
-    left: 24px;
-    font-size: 0.9em;
-    font-weight: 500;
-    color: var(--secondary-text-color);
-    opacity: 0;
-    transform: translateY(10px);
-    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    z-index: 4;
-}
-
-.portfolio-item:hover .visit-text {
-    opacity: 1;
-    transform: translateY(0);
-}
-
-/* 博文列表栏目样式 */
-.blog-posts-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    /* Responsive grid */
-    gap: calc(var(--spacing-unit) * 4);
-    margin-top: calc(var(--spacing-unit) * 6);
-}
-
-.blog-post-item {
-    background-color: var(--background-dark);
-    /* Use variable */
-    border-radius: 20px;
-    /* Increase rounded corners */
-    overflow: hidden;
-    box-shadow: 0 5px 20px var(--shadow-color-light);
-    /* Use variable */
-    transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease;
-    /* Add transition effect */
-    text-align: left;
-    display: flex;
-    /* Use Flexbox to ensure vertical content arrangement */
-    flex-direction: column;
-    position: relative;
-    /* For positioning publish date */
-    cursor: pointer;
-    /* Add pointer cursor */
-    text-decoration: none;
-    /* Remove link underline */
-    color: inherit;
-    /* Inherit parent color */
-}
-
-.blog-post-item:hover {
-    transform: translateY(-5px);
-    /* Reduce lift effect */
-}
-
-.blog-post-item:hover h3 {
-    color: var(--primary-color);
-    /* Title turns blue on hover */
-    transition: color 0.3s ease;
-}
-
-.blog-post-item:active {
-    transform: translateY(-2px);
-    /* Effect on click */
-    box-shadow: 0 8px 20px var(--shadow-color-dark);
-}
-
-.blog-post-item img {
-    width: 100%;
-    height: 200px;
-    /* Adjust image height */
-    object-fit: cover;
-    display: block;
-}
-
-.blog-post-item .post-date {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    background-color: rgba(0, 0, 0, 0.6);
-    color: white;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 0.8em;
-}
-
-.blog-post-item h3 {
-    margin: calc(var(--spacing-unit) * 3) calc(var(--spacing-unit) * 3) calc(var(--spacing-unit) * 1);
-    font-size: 1.5em;
-    min-height: 3em;
-    /* Ensure title has minimum height to prevent content shifting */
-    transition: color 0.3s ease;
-}
-
-.blog-post-item p {
-    padding: 0 calc(var(--spacing-unit) * 3) 8px;
-    color: var(--secondary-text-color);
-    /* Use variable */
-    flex-grow: 1;
-    /* Let paragraph fill remaining space */
-}
-
-.post-tags {
-    display: flex;
-    gap: 10px;
-    padding: 0 15px 15px;
-}
-
-.tag {
-    background-color: #eee;
-    color: #333;
-    padding: 5px 10px;
-    border-radius: 15px;
-    font-size: 0.8em;
-}
-
-.details-button {
-    background-color: #eee;
-    color: #333;
-    padding: 5px 10px;
-    border-radius: 15px;
-    font-size: 0.8em;
-    text-decoration: none;
-    transition: background-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-.details-button:hover {
-    background-color: #e0e0e0;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-    color: #333;
-}
-
-/* 移除按钮样式 */
-.blog-post-item .button {
-    display: none;
 }
 
 /* 博客文章页面样式 */
@@ -1049,299 +589,164 @@ p {
     background-color: var(--primary-color);
     box-shadow: 0 0 0 4px var(--background-dark), 0 0 10px var(--primary-color);
 }
-/* Markdown 样式 */
+/* ==========================================================
+   全格式 Markdown 渲染核心 (Obsidian Geek 风格)
+   ========================================================== */
 .markdown-content {
     line-height: 1.8;
     color: var(--text-color);
     font-size: 1.1em;
+    word-wrap: break-word;
 }
 
-.markdown-content h1,
-.markdown-content h2,
-.markdown-content h3,
-.markdown-content h4,
-.markdown-content h5,
-.markdown-content h6 {
-    margin: calc(var(--spacing-unit) * 3) 0 calc(var(--spacing-unit) * 2);
+/* --- 1. 标题 (Headings 1-6) --- */
+.markdown-content h1, .markdown-content h2, .markdown-content h3, 
+.markdown-content h4, .markdown-content h5, .markdown-content h6 {
+    margin: 1.8em 0 0.8em;
     color: var(--text-color);
     line-height: 1.4;
-}
-
-.markdown-content p {
-    margin-bottom: calc(var(--spacing-unit) * 2);
-    line-height: 1.8;
-}
-
-.markdown-content ul,
-.markdown-content ol {
-    margin-bottom: calc(var(--spacing-unit) * 2);
-    padding-left: calc(var(--spacing-unit) * 4);
-}
-
-.markdown-content li {
-    margin-bottom: calc(var(--spacing-unit));
-    line-height: 1.8;
-}
-
-.markdown-content code {
-    background: var(--background-light);
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-family: var(--font-code);
-    font-size: 0.9em;
-}
-
-.markdown-content pre {
-    background: var(--background-light);
-    padding: calc(var(--spacing-unit) * 2);
-    border-radius: 8px;
-    overflow-x: auto;
-    margin: calc(var(--spacing-unit) * 2) 0;
-    font-size: 0.9em;
-}
-
-.markdown-content blockquote {
-    border-left: 4px solid var(--primary-color);
-    margin: calc(var(--spacing-unit) * 2) 0;
-    padding: calc(var(--spacing-unit)) 0 calc(var(--spacing-unit)) calc(var(--spacing-unit) * 2);
-    color: var(--secondary-text-color);
-    font-style: italic;
-    font-family: var(--font-quote);
-}
-
-.markdown-content img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 12px;
-    margin: calc(var(--spacing-unit) * 2) 0;
-}
-
-.markdown-content table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: calc(var(--spacing-unit) * 2) 0;
-}
-
-.markdown-content th,
-.markdown-content td {
-    padding: calc(var(--spacing-unit) * 1.5);
-    border: 1px solid var(--border-color);
-}
-
-.markdown-content th {
-    background: var(--background-light);
-}
-
-.markdown-content mark {
-    background-color: #fff59d;
-    color: #000;
-    padding: 2px 4px;
-    border-radius: 3px;
-    font-weight: 500;
-}
-
-.markdown-content del {
-    text-decoration: line-through;
-    color: var(--secondary-text-color);
-    opacity: 0.7;
-}
-
-.markdown-content strong {
     font-weight: 600;
-    color: var(--text-color);
+    position: relative;
 }
+.markdown-content h1 { font-size: 2.2em; border-bottom: 2px solid var(--border-color); padding-bottom: 10px; }
+.markdown-content h2 { font-size: 1.8em; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
+.markdown-content h3 { font-size: 1.5em; }
+.markdown-content h4 { font-size: 1.25em; }
+.markdown-content h5 { font-size: 1.1em; color: var(--secondary-text-color); }
+.markdown-content h6 { font-size: 1em; color: var(--secondary-text-color); text-transform: uppercase; }
 
-.markdown-content em {
-    font-style: italic;
-}
+/* --- 2. 基础文本 (段落、加粗、斜体、删除线) --- */
+.markdown-content p { margin-bottom: 1.5em; }
+.markdown-content strong { font-weight: 700; color: var(--text-color); }
+.markdown-content em { font-style: italic; color: var(--secondary-text-color); }
+.markdown-content del { text-decoration: line-through; opacity: 0.6; }
 
+/* --- 3. 网站外部链接 (带小箭头标识) --- */
 .markdown-content a {
     color: var(--primary-color);
     text-decoration: none;
-    transition: color 0.3s ease;
+    border-bottom: 1px solid transparent;
+    transition: all 0.3s ease;
+    word-break: break-all;
+}
+.markdown-content a:hover { border-bottom: 1px solid var(--primary-color); }
+.markdown-content a[href^="http"]::after {
+    content: ' ↗';
+    font-size: 0.8em;
+    opacity: 0.6;
+    font-family: var(--font-main);
+    display: inline-block;
+    transform: translateY(-2px);
 }
 
-.markdown-content a:hover {
-    color: var(--primary-hover);
-    text-decoration: underline;
-}
-
-.markdown-content hr {
-    border: none;
-    border-top: 2px solid var(--border-color);
-    margin: calc(var(--spacing-unit) * 4) 0;
-}
-
-.markdown-content ul.task-list {
-    list-style: none;
-    padding-left: 0;
-}
-
-.markdown-content ul.task-list li {
-    display: flex;
-    align-items: flex-start;
-    gap: calc(var(--spacing-unit));
-}
-
-.markdown-content ul.task-list input[type="checkbox"] {
-    margin-top: 4px;
-    cursor: not-allowed;
-}
-
-/* 深色模式下的高亮标记 */
-[data-theme="dark"] .markdown-content mark {
-    background-color: #ffd54f;
-    color: #000;
-}
-
-/* 移除底部卡片 */
-.blog-post-item {
-    display: block !important;
-}
-
-/* 确保文章内容显示 */
-.blog-full-post .blog-content {
-    display: block;
-}
-
-.blog-full-post .blog-main-content {
-    width: 100%;
-    padding-right: 0;
-}
-
-.blog-full-post .markdown-content {
-    line-height: 1.8;
-    color: var(--text-color);
-    font-size: 1.1em;
-}
-
-.blog-full-post .markdown-content h1,
-.blog-full-post .markdown-content h2,
-.blog-full-post .markdown-content h3,
-.blog-full-post .markdown-content h4,
-.blog-full-post .markdown-content h5,
-.blog-full-post .markdown-content h6 {
-    margin: calc(var(--spacing-unit) * 3) 0 calc(var(--spacing-unit) * 2);
-    color: var(--text-color);
-    line-height: 1.4;
-}
-
-.blog-full-post .markdown-content p {
-    margin-bottom: calc(var(--spacing-unit) * 2);
-    line-height: 1.8;
-}
-
-.blog-full-post .markdown-content ul,
-.blog-full-post .markdown-content ol {
-    margin-bottom: calc(var(--spacing-unit) * 2);
-    padding-left: calc(var(--spacing-unit) * 4);
-}
-
-.blog-full-post .markdown-content li {
-    margin-bottom: calc(var(--spacing-unit));
-    line-height: 1.8;
-}
-
-.blog-full-post .markdown-content code {
-    background: var(--background-light);
-    padding: 2px 6px;
+/* --- 4. 高亮 (==Mark==) --- */
+.markdown-content mark {
+    background-color: rgba(255, 212, 0, 0.4);
+    color: inherit;
+    padding: 0.1em 0.3em;
     border-radius: 4px;
-    font-family: var(--font-code);
-    font-size: 0.9em;
-}
-
-.blog-full-post .markdown-content pre {
-    background: var(--background-light);
-    padding: calc(var(--spacing-unit) * 2);
-    border-radius: 8px;
-    overflow-x: auto;
-    margin: calc(var(--spacing-unit) * 2) 0;
-    font-size: 0.9em;
-}
-
-
-.blog-full-post .markdown-content img {
-    max-width: 100%;
-    height: auto;
-    border-radius: 12px;
-    margin: calc(var(--spacing-unit) * 2) 0;
-}
-
-.blog-full-post .markdown-content table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: calc(var(--spacing-unit) * 2) 0;
-}
-
-.blog-full-post .markdown-content th,
-.blog-full-post .markdown-content td {
-    padding: calc(var(--spacing-unit) * 1.5);
-    border: 1px solid var(--border-color);
-}
-
-.blog-full-post .markdown-content th {
-    background: var(--background-light);
-}
-
-.blog-full-post .markdown-content mark {
-    background-color: #fff59d;
-    color: #000;
-    padding: 2px 4px;
-    border-radius: 3px;
     font-weight: 500;
 }
+[data-theme="dark"] .markdown-content mark { background-color: rgba(255, 212, 0, 0.25); color: #fff; }
 
-.blog-full-post .markdown-content del {
-    text-decoration: line-through;
+/* --- 5. 列表 (有序、无序、任务) --- */
+.markdown-content ul, .markdown-content ol { margin-bottom: 1.5em; padding-left: 2em; }
+.markdown-content li { margin-bottom: 0.5em; }
+.markdown-content li > ul, .markdown-content li > ol { margin-top: 0.5em; margin-bottom: 0; }
+
+/* 任务列表 */
+.markdown-content ul.task-list { list-style: none; padding-left: 0; }
+.markdown-content ul.task-list li { display: flex; align-items: flex-start; gap: 8px; }
+.markdown-content ul.task-list input[type="checkbox"] { margin-top: 6px; cursor: not-allowed; accent-color: var(--primary-color); }
+
+/* --- 6. 极客代码 (Inline Code & Code Block Mac风) --- */
+.markdown-content code {
+    background: var(--background-dark);
+    padding: 0.2em 0.4em;
+    border-radius: 4px;
+    font-family: var(--font-code);
+    font-size: 0.85em;
+    color: #eb5757; /* 代码红色字 */
+}
+[data-theme="dark"] .markdown-content code { color: #ff6b6b; }
+
+.markdown-content pre {
+    background: #282c34; /* 深色代码块背景 */
+    padding: 1.5em;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1.5em 0;
+    position: relative;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+}
+/* 伪造 Mac 窗口红黄绿小圆点 */
+.markdown-content pre::before {
+    content: '';
+    display: block;
+    margin-bottom: 15px;
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: #ff5f56;
+    box-shadow: 20px 0 0 #ffbd2e, 40px 0 0 #27c93f;
+}
+.markdown-content pre code {
+    background: transparent;
+    padding: 0;
+    color: #abb2bf;
+    font-size: 0.9em;
+    line-height: 1.6;
+}
+
+/* --- 7. 普通引用 (Blockquote) --- */
+.markdown-content blockquote {
+    border-left: 4px solid #d2d2d7;
+    background-color: rgba(0, 0, 0, 0.03);
     color: var(--secondary-text-color);
-    opacity: 0.7;
+    padding: 12px 16px;
+    border-radius: 0 4px 4px 0;
+    margin: 1.5em 0;
 }
+.markdown-content blockquote p { margin: 0; }
+[data-theme="dark"] .markdown-content blockquote { background-color: rgba(255, 255, 255, 0.05); border-left-color: #5c5c5c; }
 
-.blog-full-post .markdown-content strong {
-    font-weight: 600;
-    color: var(--text-color);
+/* --- 8. 表格 (Table) --- */
+.markdown-content table { width: 100%; border-collapse: collapse; margin: 1.5em 0; border-radius: 8px; overflow: hidden; box-shadow: 0 0 0 1px var(--border-color); }
+.markdown-content th, .markdown-content td { padding: 12px 15px; border: 1px solid var(--border-color); }
+.markdown-content th { background: var(--background-dark); font-weight: 600; text-align: left; }
+.markdown-content tr:nth-child(even) { background-color: rgba(0,0,0,0.02); }
+[data-theme="dark"] .markdown-content tr:nth-child(even) { background-color: rgba(255,255,255,0.02); }
+
+/* --- 9. 分割线 --- */
+.markdown-content hr { border: none; height: 1px; background: linear-gradient(to right, transparent, var(--border-color), transparent); margin: 2.5em 0; }
+
+/* --- 10. 注释/脚注 (Footnotes) --- */
+.footnotes { margin-top: 3em; padding-top: 1em; border-top: 1px solid var(--border-color); font-size: 0.9em; color: var(--secondary-text-color); }
+.footnotes ol { padding-left: 1.5em; }
+.footnote { vertical-align: super; font-size: 0.8em; margin: 0 2px; }
+
+/* --- 11. 数学块 (MathJax 居中修正) --- */
+.MathJax_Display { margin: 1.5em 0 !important; overflow-x: auto; overflow-y: hidden; padding: 10px 0; }
+
+/* --- 12. Obsidian 标注 (Callouts 灵魂复刻) --- */
+.obsidian-callout {
+    border-left: 4px solid var(--callout-color, var(--primary-color)) !important;
+    background-color: var(--callout-bg, rgba(0, 122, 255, 0.05)) !important;
+    border-radius: 4px !important;
+    padding: 16px !important;
+    margin: 1.5em 0 !important;
+    color: var(--text-color) !important;
 }
+.obsidian-callout .callout-title { display: flex; align-items: center; font-weight: 600; color: var(--callout-color, var(--primary-color)); margin-bottom: 8px; font-size: 1.05em; }
+.obsidian-callout .callout-icon { width: 18px; height: 18px; margin-right: 8px; background-color: currentColor; mask-size: contain; mask-repeat: no-repeat; mask-position: center; -webkit-mask-size: contain; -webkit-mask-repeat: no-repeat; -webkit-mask-position: center; }
+
+/* 各种标注类型的颜色映射 */
+.callout-info, .callout-note { --callout-color: #086dd7; --callout-bg: rgba(8, 109, 215, 0.06); }
+.callout-warning { --callout-color: #e67e22; --callout-bg: rgba(230, 126, 34, 0.06); }
+.callout-danger, .callout-error, .callout-bug { --callout-color: #e74c3c; --callout-bg: rgba(231, 76, 60, 0.06); }
+.callout-success, .callout-check { --callout-color: #27ae60; --callout-bg: rgba(39, 174, 96, 0.06); }
+.callout-question, .callout-faq { --callout-color: #8e44ad; --callout-bg: rgba(142, 68, 173, 0.06); }
 
 
-
-.blog-full-post .markdown-content a {
-    color: var(--primary-color);
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.blog-full-post .markdown-content a:hover {
-    color: var(--primary-hover);
-    text-decoration: underline;
-}
-
-.blog-full-post .markdown-content hr {
-    border: none;
-    border-top: 2px solid var(--border-color);
-    margin: calc(var(--spacing-unit) * 4) 0;
-}
-
-.blog-full-post .markdown-content ul.task-list {
-    list-style: none;
-    padding-left: 0;
-}
-
-.blog-full-post .markdown-content ul.task-list li {
-    display: flex;
-    align-items: flex-start;
-    gap: calc(var(--spacing-unit));
-}
-
-.blog-full-post .markdown-content ul.task-list input[type="checkbox"] {
-    margin-top: 4px;
-    cursor: not-allowed;
-}
-
-/* 深色模式下的高亮标记 */
-[data-theme="dark"] .blog-full-post .markdown-content mark {
-    background-color: #ffd54f;
-    color: #000;
-}
 
 /* 响应式调整 */
 @media (max-width: 768px) {
@@ -1382,119 +787,7 @@ p {
     stroke-width: 2;
 }
 
-/* 联系表单 */
-.contact-form {
-    display: flex;
-    flex-direction: column;
-    gap: calc(var(--spacing-unit) * 2);
-    max-width: 500px;
-    margin: 0 auto calc(var(--spacing-unit) * 4);
-    /* Increase bottom spacing */
-    text-align: left;
-}
 
-.contact-form input,
-.contact-form textarea {
-    padding: calc(var(--spacing-unit) * 2);
-    border: 1px solid var(--border-color);
-    /* Use variable */
-    border-radius: 8px;
-    font-size: 1em;
-    color: var(--text-color);
-    /* Use variable */
-    background-color: var(--background-light);
-    /* Use variable */
-    transition: border-color 0.3s ease, background-color 0.3s ease, color 0.3s ease;
-    /* Add transition effect */
-}
-
-.contact-form input:focus,
-.contact-form textarea:focus {
-    outline: none;
-    border-color: var(--primary-color);
-    /* Use variable */
-}
-
-.contact-form textarea {
-    min-height: 120px;
-    resize: vertical;
-}
-
-.contact-form button {
-    width: auto;
-    /* Button width adapts */
-    align-self: flex-start;
-    /* Left align */
-}
-
-/* 新增的联系信息样式 */
-.contact-info {
-    margin-top: calc(var(--spacing-unit) * 4);
-    font-size: 1.1em;
-    color: var(--secondary-text-color);
-    text-align: center;
-    /* Center display */
-}
-
-.contact-info p {
-    display: flex;
-    /* Let icon and text be on one line */
-    align-items: center;
-    /* Vertically center align */
-    justify-content: center;
-    /* Center display */
-    margin-bottom: calc(var(--spacing-unit) * 1.5);
-}
-
-.contact-info i {
-    width: 20px;
-    height: 20px;
-    stroke-width: 2;
-    margin-right: calc(var(--spacing-unit) * 1);
-    color: var(--primary-color);
-    /* Icon color */
-}
-
-.contact-info a {
-    color: var(--secondary-text-color);
-    /* Link default color */
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.contact-info a:hover {
-    color: var(--primary-color);
-    /* Link hover color */
-}
-
-.social-links {
-    margin-top: calc(var(--spacing-unit) * 3);
-    display: flex;
-    justify-content: center;
-    gap: calc(var(--spacing-unit) * 1.5);
-    /* Adjust spacing here */
-}
-
-.social-links a {
-    color: var(--secondary-text-color);
-    transition: color 0.5s ease, box-shadow 0.5s ease;
-    /* 将过渡时间从 0.3s 增加到 0.5s */
-}
-
-.social-links a:hover {
-    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.2);
-    /* 修改为内凹阴影 */
-    border-radius: 50%;
-    /* 修改为圆形 */
-}
-
-.social-links i {
-    width: 30px;
-    height: 30px;
-    stroke-width: 2;
-    color: var(--secondary-text-color);
-    transition: color 0.3s ease;
-}
 
 /* 页脚 */
 footer {
@@ -1591,152 +884,44 @@ footer .container {
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-    h1 {
-        font-size: 2.8em;
+    /* 🌟 新增修复：让手机端的深浅切换按钮往右上角靠，防止撞上导航栏 */
+    .theme-toggle {
+        right: 20px;
+        top: 15px;
     }
 
-    h2 {
-        font-size: 2em;
+    h1 { font-size: 2.8em; }
+    h2 { font-size: 2em; }
+
+    .navbar .container { flex-direction: column; }
+    .navbar ul { 
+        margin-top: calc(var(--spacing-unit) * 2); 
+        flex-wrap: wrap; 
+        justify-content: center; 
+        gap: 15px; /* 🌟 核心修复：用原生的 gap 控制手机端菜单间距 */
     }
 
-    .navbar .container {
-        flex-direction: column;
-    }
+    .hero-section { padding-top: calc(var(--spacing-unit) * 8); }
+    .profile-photo { width: 150px; height: 150px; }
 
-    .navbar ul {
-        margin-top: calc(var(--spacing-unit) * 2);
-        flex-wrap: wrap;
-        justify-content: center;
-    }
+    .blog-full-post { padding: calc(var(--spacing-unit) * 4); }
+    .blog-content { grid-template-columns: 1fr; }
+    .blog-main-content { padding-right: 0; }
+    .blog-toc { position: static; margin-top: calc(var(--spacing-unit) * 4); }
 
-    .navbar li {
-        margin: 0 calc(var(--spacing-unit) * 2) calc(var(--spacing-unit) * 2);
-    }
-
-    .hero-section {
-        padding-top: calc(var(--spacing-unit) * 8);
-    }
-
-    .profile-photo {
-        width: 150px;
-        height: 150px;
-    }
-
-    .hero-section .icon-grid {
-        /* Adjust responsive layout */
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        /* Two columns or adaptive on tablets */
-        gap: calc(var(--spacing-unit) * 4);
-        /* Adjust spacing */
-    }
-
-    .hero-section .icon-item {
-        /* Adjust padding to fit larger icons */
-        padding: calc(var(--spacing-unit) * 2.5);
-    }
-
-    .hero-section .icon-item i {
-        width: 45px;
-        /* Icon size on tablets */
-        height: 45px;
-    }
-
-    .hero-section .icon-item span {
-        font-size: 1em;
-        /* Text size on tablets */
-    }
-
-    .portfolio-grid,
-    .blog-posts-grid {
-        /* Portfolio and blog posts both display in single column */
-        grid-template-columns: 1fr;
-    }
-
-    .portfolio-item,
-    .blog-post-item {
-        margin-bottom: calc(var(--spacing-unit) * 4);
-    }
-
-    .blog-full-post {
-        padding: calc(var(--spacing-unit) * 4);
-    }
-
-    /* Mobile adjustment for back-to-top button position */
+    /* 手机端回到顶部按钮微调 */
     .back-to-top {
         bottom: calc(var(--spacing-unit) * 2);
         right: calc(var(--spacing-unit) * 2);
         width: 45px;
         height: 45px;
     }
-
-    .contact-info p {
-        flex-direction: column;
-        /* Vertical arrangement of icon and text on small screens */
-        align-items: center;
-        /* Vertically center */
-        margin-bottom: calc(var(--spacing-unit) * 2);
-    }
-
-    .contact-info i {
-        margin-right: 0;
-        margin-bottom: calc(var(--spacing-unit) * 0.5);
-        /* A little space below the icon */
-    }
-
-    .blog-content {
-        grid-template-columns: 1fr;
-    }
-
-    .blog-main-content {
-        padding-right: 0;
-    }
-
-    .blog-toc {
-        position: static;
-        margin-top: calc(var(--spacing-unit) * 4);
-    }
 }
 
 @media (max-width: 480px) {
-    h1 {
-        font-size: 2em;
-    }
-
-    .hero-section p {
-        font-size: 1.2em;
-    }
-
-    .container {
-        padding: 0 calc(var(--spacing-unit) * 2);
-    }
-
-    .hero-section .icon-grid {
-        grid-template-columns: 1fr;
-        /* Single column on smaller screens */
-        gap: calc(var(--spacing-unit) * 3);
-    }
-
-    .hero-section .icon-item {
-        width: auto;
-        /* Auto width */
-        margin-bottom: calc(var(--spacing-unit) * 2);
-        /* Slightly reduce bottom margin */
-    }
-
-    .hero-section .icon-item:last-child {
-        margin-bottom: 0;
-    }
-
-    .hero-section .icon-item i {
-        width: 40px;
-        /* Icon size on mobile */
-        height: 40px;
-    }
-
-    .hero-section .icon-item span {
-        font-size: 0.9em;
-        /* Text size on mobile */
-    }
+    h1 { font-size: 2em; }
+    .hero-section p { font-size: 1.2em; }
+    .container { padding: 0 calc(var(--spacing-unit) * 2); }
 }
 
 /* 图片全屏查看器 (现代画廊复刻) */
@@ -1995,9 +1180,7 @@ footer .container {
     /* 深色模式下悬停时更亮的白色边框 */
 }
 
-.career-item-card>* {
-    pointer-events: none;
-}
+
 
 .career-meta-container {
     display: flex;
@@ -2022,8 +1205,9 @@ footer .container {
     line-height: 1.6;
 }
 
-/* 修改 Projects 和 Career 标题样式 */
-#projects h2,
+/* ==========================================================
+   专属 Career 标题大字号样式 (抢救保留版)
+   ========================================================== */
 #career h2 {
     font-size: 3em;
     font-weight: 700;
@@ -2031,85 +1215,15 @@ footer .container {
     margin-bottom: calc(var(--spacing-unit) * 1);
 }
 
-#projects p,
 #career p {
     font-size: 1.1em;
     color: var(--secondary-text-color);
     margin-bottom: calc(var(--spacing-unit) * 2);
 }
 
-.nav-links-container nav ul li a {
-    color: var(--text-color);
-    text-decoration: none;
-    font-size: 1.1rem;
-    transition: all 0.3s ease;
-    opacity: 0.5;
-}
-
-.nav-links-container nav ul li a:hover {
-    color: var(--text-color);
-    opacity: 0.8;
-}
-
-.nav-links-container nav ul li a.active {
-    color: var(--text-color);
-    opacity: 1;
-    font-weight: 500;
-}
-
-/* 标题字体 */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-    font-family: var(--font-heading);
-    color: var(--text-color);
-    margin-bottom: calc(var(--spacing-unit) * 3);
-    font-weight: 600;
-}
-
-/* 正文字体 */
-body {
-    font-family: var(--font-main);
-    line-height: 1.6;
-    color: var(--text-color);
-    margin: 0;
-    padding: 0;
-    background-color: var(--background-light);
-    -webkit-font-smoothing: antialiased;
-    scroll-behavior: smooth;
-    transition: background-color 0.3s ease, color 0.3s ease;
-}
-
-/* 代码字体 */
-code,
-pre {
-    font-family: var(--font-code);
-}
-
-/* 引用文字字体 */
-blockquote {
-    font-family: var(--font-quote);
-}
-
-/* 导航栏字体 */
-.navbar a {
-    font-family: var(--font-main);
-    font-weight: 500;
-}
-
-/* 按钮字体 */
-.button {
-    font-family: var(--font-main);
-    font-weight: 600;
-}
-
 /* 博文介绍文字样式 */
 .blog-intro-text {
-    color: #6E6E73;
-    /* 设置文字颜色 */
+    color: var(--secondary-text-color); /* 🌟 修复：使用变量替代写死的 #6E6E73 */
 }
 
 .timeline-image-row img,
@@ -2119,20 +1233,15 @@ blockquote {
 
 /* 底部导航栏样式 */
 .bottom-nav {
-    background-color: var(--bg-color);
+    background-color: var(--background-light); /* 🌟 核心修复：使用真实存在的变量 */
     border-top: 1px solid var(--border-color);
-    /* 重新添加顶部边框 */
     border-bottom: 1px solid var(--border-color);
-    /* 添加底部边框 */
     padding: 0.25rem 0;
-    /* 垂直内边距 */
     position: relative;
     margin-top: 0.5rem;
     opacity: 0.8;
     max-width: 1100px;
-    /* 增加整体宽度 */
     margin: 0 auto;
-    /* 居中 */
 }
 
 .bottom-nav .container {
@@ -2182,163 +1291,6 @@ blockquote {
     }
 }
 
-
-
-/* Footer Links Styles (for stack.html) */
-.footer-links {
-    margin: 0;
-    padding: 0;
-    /* 移除所有内边距 */
-    margin-bottom: calc(var(--spacing-unit) * 3);
-    /* Add some space below the links */
-}
-
-.footer-links a {
-    color: var(--text-color);
-    text-decoration: none;
-    font-size: 0.9em;
-    opacity: 0.7;
-    transition: opacity 0.3s ease;
-    margin-right: calc(var(--spacing-unit) * 2);
-    /* 添加右外边距控制间距 */
-}
-
-.footer-links a:last-child {
-    margin-right: 0;
-    /* 最后一个链接不需要右外边距 */
-}
-
-.footer-links a:hover {
-    opacity: 1;
-}
-
-/* Career Card Styles */
-.career-card {
-    background-color: var(--card-background);
-    border-radius: 16px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    /* 恢复默认阴影 */
-    padding: calc(var(--spacing-unit) * 4);
-    margin-top: calc(var(--spacing-unit) * 4);
-    transition: box-shadow 0.3s ease;
-    /* 确保过渡效果存在 */
-    position: relative;
-    /* 为伪元素定位 */
-}
-
-.career-card::before {
-    content: '';
-    position: absolute;
-    top: -5px;
-    left: -5px;
-    right: -5px;
-    bottom: -5px;
-    z-index: -1;
-    background-color: transparent;
-    border-radius: 16px;
-    box-shadow: none;
-    /* 默认无阴影 */
-    transition: box-shadow 0.3s ease;
-    /* 为伪元素的阴影添加过渡效果 */
-}
-
-.career-card:hover::before {
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
-    /* 悬停时伪元素显示阴影 */
-}
-
-.career-card:hover {
-    background-color: var(--card-background);
-    /* 确保背景颜色不变 */
-}
-
-
-
-/* ==========================================================
-   Obsidian 补充样式：高亮与图片同款引用块
-   ========================================================== */
-
-/* 1. ==高亮== (mark) 样式复刻 */
-.markdown-content mark {
-    background-color: rgba(255, 212, 0, 0.4);
-    color: inherit;
-    padding: 0.1em 0.3em;
-    border-radius: 4px;
-    font-weight: 500;
-}
-[data-theme="dark"] .markdown-content mark {
-    background-color: rgba(255, 212, 0, 0.3);
-    color: #fff; /* 深色模式下高亮字体变白 */
-}
-
-/* 2. 原生 Blockquote 样式（完美还原你上传的截图） */
-.markdown-content blockquote {
-    margin: 1.5em 0;
-    padding: 12px 16px;
-    border-left: 4px solid #d2d2d7; /* 浅色模式边框 */
-    background-color: rgba(0, 0, 0, 0.03); /* 极浅的背景 */
-    color: var(--secondary-text-color); /* 整体文字偏灰 */
-    border-radius: 0 4px 4px 0;
-}
-.markdown-content blockquote p {
-    margin: 0;
-}
-
-/* 关键：引用内的加粗文字突出显示 */
-.markdown-content blockquote strong {
-    color: var(--text-color); /* 无论深浅模式，都跟随主文字颜色，显得比周围的灰字更亮 */
-    font-weight: 600;
-}
-
-/* 3. 深色模式下的引用块（重点复刻） */
-[data-theme="dark"] .markdown-content blockquote {
-    background-color: rgba(255, 255, 255, 0.05); /* 截图中的深灰背景块 */
-    border-left: 4px solid #5c5c5c; /* 截图中的暗灰色左边框 */
-    color: #a1a1a6; /* 截图中的暗淡主文字 */
-}
-
-/* ==========================================================
-   强制覆盖：Obsidian 风格引用块 (Blockquote) 完美复刻
-   ========================================================== */
-
-/* 1. 浅色模式原生样式 */
-.blog-full-post .markdown-content blockquote,
-.markdown-content blockquote {
-    border-left: 4px solid #d2d2d7 !important; /* 替换掉原来的蓝色边框 */
-    background-color: rgba(0, 0, 0, 0.03) !important;
-    color: var(--secondary-text-color) !important;
-    font-style: normal !important; /* ⚠️重点：取消原来的斜体，Obsidian是不倾斜的 */
-    font-family: var(--font-main) !important; 
-    padding: 12px 16px !important;
-    border-radius: 0 4px 4px 0 !important;
-    margin: 1.5em 0 !important;
-}
-
-.blog-full-post .markdown-content blockquote p,
-.markdown-content blockquote p {
-    margin: 0 !important;
-}
-
-/* 2. 引用内的加粗文字突出显示 */
-.blog-full-post .markdown-content blockquote strong,
-.markdown-content blockquote strong {
-    color: var(--text-color) !important; 
-    font-weight: 600 !important;
-}
-
-/* 3. 深色模式下的引用块（⚠️ 重点复刻你的截图） */
-[data-theme="dark"] .blog-full-post .markdown-content blockquote,
-[data-theme="dark"] .markdown-content blockquote {
-    background-color: rgba(255, 255, 255, 0.05) !important; /* 截图中的深灰背景块 */
-    border-left: 4px solid #5c5c5c !important; /* 截图中的暗灰色左边框 */
-    color: #8b8b8b !important; /* 截图中的暗淡主文字 */
-}
-
-/* 4. 深色模式：加粗文字极亮对比 */
-[data-theme="dark"] .blog-full-post .markdown-content blockquote strong,
-[data-theme="dark"] .markdown-content blockquote strong {
-    color: #e3e3e3 !important; /* 让加粗的“但它永远不合脚”呈现出截图中的高亮白灰色 */
-}
 
 /* ==========================================================
    复刻 Hux Blog (huangxuan.me) 纯文字列表排版
@@ -2950,8 +1902,6 @@ blockquote {
 .tech-stack-table table {
     width: 100%;
     border-collapse: collapse;
-    pointer-events: none;
-    /* 将 pointer-events: none; 应用到表格上 */
 }
 
 .tech-stack-table td {
@@ -2975,33 +1925,7 @@ blockquote {
     color: var(--text-color);
 }
 
-/* Footer Links Styles (for stack.html) */
-.footer-links {
-    margin: 0;
-    padding: 0;
-    /* 移除所有内边距 */
-    margin-bottom: calc(var(--spacing-unit) * 3);
-    /* Add some space below the links */
-}
 
-.footer-links a {
-    color: var(--text-color);
-    text-decoration: none;
-    font-size: 0.9em;
-    opacity: 0.7;
-    transition: opacity 0.3s ease;
-    margin-right: calc(var(--spacing-unit) * 2);
-    /* 添加右外边距控制间距 */
-}
-
-.footer-links a:last-child {
-    margin-right: 0;
-    /* 最后一个链接不需要右外边距 */
-}
-
-.footer-links a:hover {
-    opacity: 1;
-}
 /* ==========================================================
    极客版图片懒加载特效 (Lazy Load Fade-in)
    ========================================================== */

@@ -10,7 +10,7 @@ markdown: kramdown
 kramdown:
   input: GFM          # 开启 GitHub 风格 Markdown（支持表格、任务列表、删除线等）
   hard_wrap: false    # 像 Obsidian 一样，单次回车不换行，双次回车才换段落
-  math_engine: mathjax # 开启 LaTeX 数学公式支持
+  # math_engine: mathjax # 开启 LaTeX 数学公式支持
   syntax_highlighter: rouge # 代码高亮引擎
 
 plugins:
