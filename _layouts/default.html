@@ -20,6 +20,9 @@
                 <img src="https://cdn.jsdelivr.net/gh/Kobe-zyx/PicGo@main/light.svg" alt="切换到浅色模式" class="light-icon">
                 <img src="https://cdn.jsdelivr.net/gh/Kobe-zyx/PicGo@main/dark.svg" alt="切换到深色模式" class="dark-icon">
             </a>
+            <button class="mobile-menu-btn" aria-label="展开菜单">
+                <i data-feather="menu"></i>
+            </button>
             <div class="nav-links-container">
                 <nav>
                     <ul>
@@ -64,6 +67,25 @@
 
     <script>
         feather.replace();
+        
+        // 🌟 新增：手机端导航栏折叠/展开逻辑
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuBtn = document.querySelector('.mobile-menu-btn');
+            const navLinks = document.querySelector('.nav-links-container');
+            if(menuBtn && navLinks) {
+                menuBtn.addEventListener('click', function() {
+                    navLinks.classList.toggle('active');
+                    // 点击后，无缝切换 汉堡图标(menu) 与 关闭图标(x)
+                    const icon = this.querySelector('i');
+                    if(navLinks.classList.contains('active')) {
+                        icon.setAttribute('data-feather', 'x');
+                    } else {
+                        icon.setAttribute('data-feather', 'menu');
+                    }
+                    feather.replace();
+                });
+            }
+        });
     </script>
     <script src="/script.js"></script>
     

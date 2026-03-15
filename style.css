@@ -252,7 +252,10 @@ p {
     /* 如果 LOGO 是圆形，可以添加此样式 */
 }
 
-
+/* 电脑端隐藏汉堡菜单按钮 */
+.mobile-menu-btn {
+    display: none;
+}
 
 .navbar ul {
     display: flex;
@@ -893,12 +896,51 @@ footer .container {
     h1 { font-size: 2.8em; }
     h2 { font-size: 2em; }
 
-    .navbar .container { flex-direction: column; }
+    /* 🌟 1. 顶部导航栏折叠逻辑 */
+    .navbar .container { 
+        flex-direction: column; 
+        padding: 12px 24px; /* 让手机端导航毛玻璃变得更精致紧凑 */
+    }
+    
+    .mobile-menu-btn {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        border: none;
+        color: var(--text-color);
+        cursor: pointer;
+        padding: 2px;
+        outline: none;
+    }
+    
+    .nav-links-container {
+        display: none; /* 默认隐藏列表 */
+        width: 100%;
+        animation: navFadeIn 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    
+    .nav-links-container.active {
+        display: block; /* 点击后显示 */
+    }
+    
     .navbar ul { 
-        margin-top: calc(var(--spacing-unit) * 2); 
-        flex-wrap: wrap; 
+        margin-top: 15px; 
+        flex-direction: column; /* 🌟 垂直纵向排列文字！ */
         justify-content: center; 
-        gap: 15px; /* 🌟 核心修复：用原生的 gap 控制手机端菜单间距 */
+        gap: 16px; 
+    }
+
+    /* 🌟 2. 底部导航栏强制换行与自适应居中 */
+    .bottom-nav ul {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px 15px; /* 上下间距10px，左右间距15px，完美呼吸感 */
+    }
+
+    /* 🌟 3. 彻底抹杀手机端的侧边文章目录 */
+    .post-toc-sidebar {
+        display: none !important; 
     }
 
     .hero-section { padding-top: calc(var(--spacing-unit) * 8); }
@@ -2071,3 +2113,7 @@ footer .container {
     transform: scale(1.1);
 }
 
+@keyframes navFadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
