@@ -11,12 +11,42 @@ layout: default
         <div class="post-layout-wrapper">
             <div class="blog-main-content">
                 <h1 style="margin-top: 0; font-size: 2.5em; line-height: 1.2; letter-spacing: -0.02em;">{{ page.title }}</h1>
-                <div class="post-meta" style="color: var(--secondary-text-color); font-size: 0.9em; margin-bottom: 40px;">
-                    {{ page.author | default: site.author | default: "Kobe_zyx" }} · 
-                    {{ page.date | date: "%Y年%m月%d日" }} 
-                    {% if page.categories.size > 0 %} · <span style="background: var(--border-color); padding: 2px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 600;">{{ page.categories.first }}</span>{% endif %}
+                
+                <div class="post-meta" style="color: var(--secondary-text-color); font-size: 0.9em; margin-bottom: 40px; display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
+                    <span>{{ page.author | default: site.author | default: "Kobe_zyx" }}</span>
+                    <span>·</span>
+                    <span>{{ page.date | date: "%Y年%m月%d日" }}</span>
+                    
+                    {% if page.categories.size > 0 %} 
+                        <span>·</span>
+                        <span style="background: var(--border-color); padding: 2px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 600;">{{ page.categories.first }}</span>
+                    {% endif %}
+                    
+                    {% assign clean_content = content | strip_html | strip_newlines | remove: " " | remove: "　" %}
+                    {% assign char_count = clean_content | size %}
+                    {% assign read_time = char_count | divided_by: 350 | plus: 1 %}
+                    <span>·</span>
+                    <span style="display: inline-flex; align-items: center; gap: 4px;" title="全文字数：约 {{ char_count }} 字">
+                        <i data-feather="clock" style="width: 14px; height: 14px;"></i> 
+                        预计阅读 {{ read_time }} 分钟
+                    </span>
                 </div>
                 
+                {% assign current_date = 'now' | date: '%s' %}
+                {% assign post_date = page.date | date: '%s' %}
+                {% assign diff_seconds = current_date | minus: post_date %}
+                {% assign diff_days = diff_seconds | divided_by: 86400 %}
+                
+                {% if diff_days > 180 %}
+                <div class="outdated-warning fade-in">
+                    <i data-feather="alert-triangle"></i>
+                    <div class="warning-text">
+                        <strong>⚠️ 极客提示：本文最后更新于 {{ diff_days }} 天前。</strong><br>
+                        随着时间的推移，文中的部分技术细节、API 或操作界面可能已发生变化，请在实战中注意甄别。
+                    </div>
+                </div>
+                {% endif %}
+                          
                 <div class="markdown-content" id="markdown-content">
                     {{ content }}
                 </div>
@@ -24,42 +54,122 @@ layout: default
                 <div class="geek-action-area">
                     <span class="action-label">Share this post</span>
                     <div class="action-grid">
-                        <a href="#" class="action-item icon-tw" onclick="shareToPlatform(event, 'twitter')" title="Share to Twitter">
-                            <i data-feather="twitter"></i>
-                        </a>
-                        <a href="#" class="action-item icon-in" onclick="shareToPlatform(event, 'linkedin')" title="Share to LinkedIn">
-                            <i data-feather="linkedin"></i>
-                        </a>
-                        <a href="#" class="action-item icon-fb" onclick="shareToPlatform(event, 'facebook')" title="Share to Facebook">
-                            <i data-feather="facebook"></i>
-                        </a>
+                        <a href="#" class="action-item icon-tw" onclick="shareToPlatform(event, 'twitter')" title="Share to Twitter"><i data-feather="twitter"></i></a>
+                        <a href="#" class="action-item icon-in" onclick="shareToPlatform(event, 'linkedin')" title="Share to LinkedIn"><i data-feather="linkedin"></i></a>
+                        <a href="#" class="action-item icon-fb" onclick="shareToPlatform(event, 'facebook')" title="Share to Facebook"><i data-feather="facebook"></i></a>
                         <a href="#" class="action-item icon-wb" onclick="shareToPlatform(event, 'weibo')" title="分享到微博">
                             <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
                         </a>
-                        <button class="action-item icon-cp" onclick="copyPageUrl(this)" title="Copy Link">
-                            <i data-feather="link"></i>
-                        </button>
+                        <button class="action-item icon-cp" onclick="copyPageUrl(this)" title="Copy Link"><i data-feather="link"></i></button>
                     </div>
                 </div>
 
-                <div style="margin-top: 60px; margin-bottom: 60px;">
+               <div style="margin-top: 60px; margin-bottom: 60px;">
                     <hr style="border: none; border-top: 1px solid var(--border-color); margin-bottom: 40px;">
-                    <script src="https://giscus.app/client.js"
-                        data-repo="Kobe-zyx/Kobe-zyx.github.io"
-                        data-repo-id="R_kgDORdNjTQ"
-                        data-category="General"
-                        data-category-id="DIC_kwDORdNjTc4C3l42"
-                        data-mapping="pathname"
-                        data-strict="0"
-                        data-reactions-enabled="1"
-                        data-emit-metadata="0"
-                        data-input-position="bottom"
-                        data-theme="light"
-                        data-lang="zh-CN"
-                        crossorigin="anonymous"
-                        async>
+                    
+                    <div class="related-posts-section">
+                        <h3 class="related-title">延伸阅读</h3>
+                        <div class="related-grid">
+                            {% assign max_related = 2 %}
+                            {% assign related_counter = 0 %}
+                            
+                            {% for post in site.posts %}
+                                {% if post.url != page.url %}
+                                    {% assign is_related = false %}
+                                    {% for cat in post.categories %}
+                                        {% if page.categories contains cat %}
+                                            {% assign is_related = true %}
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% for tag in post.tags %}
+                                        {% if page.tags contains tag %}
+                                            {% assign is_related = true %}
+                                        {% endif %}
+                                    {% endfor %}
+
+                                    {% if is_related %}
+                                        <a href="{{ post.url | relative_url }}" class="related-post-card">
+                                            <h4>{{ post.title }}</h4>
+                                            <p>{{ post.subtitle | default: post.excerpt | strip_html | truncate: 60 }}</p>
+                                            <div class="related-meta">
+                                                <span>{{ post.date | date: "%Y-%m-%d" }}</span>
+                                                <i data-feather="arrow-right" style="width: 16px; height: 16px;"></i>
+                                            </div>
+                                        </a>
+                                        {% assign related_counter = related_counter | plus: 1 %}
+                                        {% if related_counter >= max_related %}
+                                            {% break %}
+                                        {% endif %}
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if related_counter == 0 %}
+                                {% assign fallback_counter = 0 %}
+                                {% for post in site.posts %}
+                                    {% if post.url != page.url %}
+                                        <a href="{{ post.url | relative_url }}" class="related-post-card">
+                                            <h4>{{ post.title }}</h4>
+                                            <p>{{ post.subtitle | default: post.excerpt | strip_html | truncate: 60 }}</p>
+                                            <div class="related-meta">
+                                                <span>{{ post.date | date: "%Y-%m-%d" }}</span>
+                                                <i data-feather="arrow-right" style="width: 16px; height: 16px;"></i>
+                                            </div>
+                                        </a>
+                                        {% assign fallback_counter = fallback_counter | plus: 1 %}
+                                        {% if fallback_counter >= max_related %}
+                                            {% break %}
+                                        {% endif %}
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div id="giscus-container"></div>
+                    
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                            const initialTheme = isDark ? 'dark' : 'light';
+                            
+                            const script = document.createElement('script');
+                            script.src = "https://giscus.app/client.js";
+                            script.setAttribute("data-repo", "Kobe-zyx/Kobe-zyx.github.io");
+                            script.setAttribute("data-repo-id", "R_kgDORdNjTQ");
+                            script.setAttribute("data-category", "General");
+                            script.setAttribute("data-category-id", "DIC_kwDORdNjTc4C3l42");
+                            script.setAttribute("data-mapping", "pathname");
+                            script.setAttribute("data-strict", "0");
+                            script.setAttribute("data-reactions-enabled", "1");
+                            script.setAttribute("data-emit-metadata", "0");
+                            script.setAttribute("data-input-position", "bottom");
+                            script.setAttribute("data-theme", initialTheme);
+                            script.setAttribute("data-lang", "zh-CN");
+                            script.setAttribute("crossorigin", "anonymous");
+                            script.async = true;
+                            
+                            document.getElementById('giscus-container').appendChild(script);
+
+                            const observer = new MutationObserver((mutations) => {
+                                mutations.forEach((mutation) => {
+                                    if (mutation.attributeName === 'data-theme') {
+                                        const newTheme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+                                        const iframe = document.querySelector('iframe.giscus-frame');
+                                        if (iframe) {
+                                            iframe.contentWindow.postMessage(
+                                                { giscus: { setConfig: { theme: newTheme } } },
+                                                'https://giscus.app'
+                                            );
+                                        }
+                                    }
+                                });
+                            });
+                            observer.observe(document.documentElement, { attributes: true });
+                        });
                     </script>
                 </div>
+            
             </div> 
             
             <aside class="post-toc-sidebar">
@@ -73,64 +183,52 @@ layout: default
 </div>
 
 <style>
-    /* ==========================================
-       博文底部社交分享组件样式 (极客防屏蔽版)
-       ========================================== */
-    .geek-action-area {
-        margin-top: 60px;
+    
+/* ==========================================================
+       🌟 技术文章过期警告框样式
+       ========================================================== */
+    .outdated-warning {
         display: flex;
-        align-items: center;
-        gap: 20px;
-        padding-top: 30px;
-        border-top: 1px dashed var(--border-color);
-    }
-
-    .action-label {
-        font-family: var(--font-code);
-        font-size: 14px;
-        color: var(--secondary-text-color);
-        text-transform: uppercase;
-        letter-spacing: 1px;
-    }
-
-    .action-grid {
-        display: flex;
+        align-items: flex-start;
         gap: 12px;
+        background: rgba(230, 126, 34, 0.08);
+        border-left: 4px solid #e67e22;
+        padding: 16px 20px;
+        border-radius: 4px 8px 8px 4px;
+        margin-bottom: 35px;
+        color: var(--text-color);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+    }
+    [data-theme="dark"] .outdated-warning {
+        background: rgba(230, 126, 34, 0.15);
+    }
+    .outdated-warning svg {
+        color: #e67e22;
+        flex-shrink: 0;
+        width: 20px; 
+        height: 20px;
+        margin-top: 2px;
+    }
+    .outdated-warning .warning-text {
+        font-size: 0.95em;
+        line-height: 1.6;
+        opacity: 0.9;
     }
 
-    .action-item {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 38px;
-        height: 38px;
-        border-radius: 50%;
-        border: 1px solid var(--border-color);
-        background-color: transparent;
-        color: var(--secondary-text-color);
-        cursor: pointer;
-        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-        text-decoration: none;
-    }
-
-    .action-item svg {
-        width: 16px;
-        height: 16px;
-        transition: transform 0.3s ease;
-    }
-
+    /* 基础组件样式 */
+    .geek-action-area { margin-top: 60px; display: flex; align-items: center; gap: 20px; padding-top: 30px; border-top: 1px dashed var(--border-color); }
+    .action-label { font-family: var(--font-code); font-size: 14px; color: var(--secondary-text-color); text-transform: uppercase; letter-spacing: 1px; }
+    .action-grid { display: flex; gap: 12px; }
+    .action-item { display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--border-color); background-color: transparent; color: var(--secondary-text-color); cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); text-decoration: none; }
+    .action-item svg { width: 16px; height: 16px; transition: transform 0.3s ease; }
     .action-item:hover { transform: translateY(-3px); }
     .action-item:hover svg { transform: scale(1.1); }
-    
     .action-item.icon-tw:hover { border-color: #1DA1F2; color: #1DA1F2; background: rgba(29, 161, 242, 0.1); }
     .action-item.icon-in:hover { border-color: #0A66C2; color: #0A66C2; background: rgba(10, 102, 194, 0.1); }
     .action-item.icon-fb:hover { border-color: #1877F2; color: #1877F2; background: rgba(24, 119, 242, 0.1); }
     .action-item.icon-wb:hover { border-color: #E6162D; color: #E6162D; background: rgba(230, 22, 45, 0.1); }
     .action-item.icon-cp:hover { border-color: var(--text-color); color: var(--text-color); background: var(--background-dark); }
     
-    /* ==========================================
-       博文排版与自动目录样式
-       ========================================== */
     .post-layout-wrapper { display: flex; gap: 60px; align-items: flex-start; position: relative; }
     .blog-main-content { flex: 1; min-width: 0; }
     .post-toc-sidebar { width: 240px; flex-shrink: 0; position: sticky; top: 100px; display: none; }
@@ -139,308 +237,429 @@ layout: default
     .toc-title { font-size: 12px; font-weight: 600; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-color); opacity: 0.8; }
     .toc-list { list-style: none; padding: 0; margin: 0; }
     .toc-item { margin-bottom: 8px; }
-    
-    .toc-item a { 
-        color: var(--secondary-text-color); 
-        text-decoration: none; 
-        font-size: 14px; 
-        display: block; 
-        transition: color 0.3s ease, padding-left 0.3s ease; 
-        line-height: 1.5; 
-        position: relative;
-        box-sizing: border-box;
-        padding: 4px 0;
-    }
-    
+    .toc-item a { color: var(--secondary-text-color); text-decoration: none; font-size: 14px; display: block; transition: color 0.3s ease, padding-left 0.3s ease; line-height: 1.5; position: relative; box-sizing: border-box; padding: 4px 0; }
     .toc-item a:hover { color: var(--text-color); }
     .toc-item a.active { color: var(--text-color); font-weight: 600; }
-    
     .geek-toc-arrow {
-        display: inline-block;
-        width: 16px;
-        height: 16px;
-        margin-left: -20px; 
-        margin-right: 4px;  
-        vertical-align: -3px; 
+        display: inline-block; width: 16px; height: 16px; margin-left: -20px; margin-right: 4px; vertical-align: -3px; 
         background-color: var(--secondary-text-color); 
         -webkit-mask: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cG9seWxpbmUgcG9pbnRzPSI5IDE4IDE1IDEyIDkgNiI+PC9wb2x5bGluZT48L3N2Zz4=") center / contain no-repeat;
         mask: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMDAwIiBzdHJva2Utd2lkdGg9IjIuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cG9seWxpbmUgcG9pbnRzPSI5IDE4IDE1IDEyIDkgNiI+PC9wb2x5bGluZT48L3N2Zz4=") center / contain no-repeat;
-        transition: transform 0.3s ease, background-color 0.3s ease;
+        transition: transform 0.3s ease, background-color 0.3s ease; cursor: pointer; transform: rotate(0deg); 
+    }
+    .toc-item a.is-open .geek-toc-arrow { transform: rotate(90deg); } 
+    .toc-item a:hover .geek-toc-arrow, .toc-item a.active .geek-toc-arrow { background-color: var(--text-color); }
+
+    .related-posts-section { margin-bottom: 50px; }
+    .related-title { font-size: 18px; font-weight: 600; color: var(--text-color); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; letter-spacing: 0.5px; }
+    .related-title::before { content: ''; display: inline-block; width: 4px; height: 16px; background: var(--primary-color); border-radius: 2px; }
+    .related-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+    .related-post-card { display: flex; flex-direction: column; padding: 24px; border: 1px solid var(--border-color); border-radius: 16px; background: var(--card-background); text-decoration: none; transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease, border-color 0.3s ease; min-width: 0; }
+    .related-post-card:hover { transform: translateY(-5px); box-shadow: 0 12px 24px var(--shadow-color-light); border-color: var(--primary-color); }
+    [data-theme=\"dark\"] .related-post-card:hover { box-shadow: 0 12px 24px var(--shadow-color-dark); }
+    .related-post-card h4 { margin: 0 0 10px 0; font-size: 18px; color: var(--text-color); line-height: 1.4; transition: color 0.3s ease; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+    .related-post-card p { font-size: 14px; color: var(--secondary-text-color); margin: 0 0 20px 0; line-height: 1.6; flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+    .related-post-card:hover h4 { color: var(--primary-color); }
+    .related-meta { font-size: 13px; color: var(--secondary-text-color); font-family: var(--font-code); display: flex; justify-content: space-between; align-items: center; }
+    .related-meta i { color: var(--primary-color); opacity: 0; transform: translateX(-10px); transition: all 0.3s ease; }
+    .related-post-card:hover .related-meta i { opacity: 1; transform: translateX(0); }
+    @media (max-width: 768px) { .related-grid { grid-template-columns: 1fr; } }
+
+    .code-wrapper { position: relative; margin-bottom: 1.5em; }
+    .code-copy-btn {
+        position: absolute; top: 12px; right: 12px;
+        background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2);
+        color: #abb2bf; border-radius: 6px; padding: 4px 8px; font-size: 12px;
+        font-family: var(--font-code); cursor: pointer; display: flex; align-items: center; gap: 4px;
+        opacity: 0; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        z-index: 10; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+    }
+    .code-wrapper:hover .code-copy-btn { opacity: 1; }
+    .code-copy-btn:hover { background: rgba(255, 255, 255, 0.2); color: #fff; }
+    .code-copy-btn svg { width: 14px; height: 14px; }
+    .code-copy-btn.copied { background: rgba(39, 201, 63, 0.15); border-color: rgba(39, 201, 63, 0.4); color: #27c93f; }
+    /* 🌟 代码语言专属透明水印 */
+    .code-lang-badge {
+        position: absolute;
+        bottom: 12px;
+        right: 16px;
+        font-family: var(--font-code);
+        font-size: 11px;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.2);
+        text-transform: uppercase;
+        pointer-events: none;
+        user-select: none;
+        letter-spacing: 0.5px;
+        z-index: 1;
+    }
+/* ==========================================================
+       🌟 沉浸式禅定模式 (Zen Mode) CSS
+       ========================================================== */
+    .zen-mode-toggle {
+        position: absolute; 
+        top: 25px;         
+        /* 🌟 核心修复：加大距离！给宽大的 ⌘ K 按钮留出绝对充足的空间 */
+        right: 185px;      
+        width: 38px;
+        height: 38px;
+        border-radius: 8px; 
+        background: rgba(var(--background-dark-rgb), 0.5);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--border-color);
+        color: var(--secondary-text-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
         cursor: pointer;
-        transform: rotate(0deg); 
+        z-index: 1001;      
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+    .zen-mode-toggle:hover {
+        transform: translateY(-2px);
+        color: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+    .zen-mode-toggle svg { width: 18px; height: 18px; }
+    
+    /* 手机端响应式同样拉开间距 */
+    @media (max-width: 768px) {
+        .zen-mode-toggle { top: 15px; right: 115px; width: 34px; height: 34px; }
+    }
+
+ /* ========沉浸式禅定模式 (Zen Mode) 特殊状态隐藏逻辑============= */
+       
+       
+    body.zen-mode .navbar,
+    body.zen-mode .bottom-nav,
+    body.zen-mode footer,
+    body.zen-mode .post-toc-sidebar,
+    body.zen-mode .geek-action-area,
+    body.zen-mode .related-posts-section,
+    body.zen-mode #giscus-container,
+    body.zen-mode .back-to-blog-list,
+    body.zen-mode .theme-toggle,
+    body.zen-mode #back-to-top,
+    body.zen-mode .spotlight-trigger { 
+        display: none !important;
+    }
+
+    body.zen-mode .post-layout-wrapper { display: block; }
+    body.zen-mode .blog-main-content { max-width: 760px; margin: 0 auto; padding-top: 20px; font-size: 1.05em; }
+
+/* ==========================================================
+       🌟 GitHub 级：标题锚点悬浮链接 (Heading Anchor Links)
+       ========================================================== */
+    .heading-anchor {
+        position: absolute;
+        /* 放在标题左侧外边距中，不挤压正文空间 */
+        left: -28px; 
+        top: 50%;
+        transform: translateY(-50%);
+        opacity: 0;
+        color: var(--secondary-text-color) !important;
+        text-decoration: none !important;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        padding-right: 8px; /* 增加防误触的隐形点击区域 */
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-bottom: none !important; 
     }
     
-    .toc-item a.is-open .geek-toc-arrow { transform: rotate(90deg); } 
-    .toc-item a:hover .geek-toc-arrow,
-    .toc-item a.active .geek-toc-arrow { background-color: var(--text-color); }
+    /* 鼠标悬停在标题上时，小图标微透并向右滑入 */
+    .markdown-content h1:hover .heading-anchor,
+    .markdown-content h2:hover .heading-anchor,
+    .markdown-content h3:hover .heading-anchor,
+    .markdown-content h4:hover .heading-anchor,
+    .markdown-content h5:hover .heading-anchor,
+    .markdown-content h6:hover .heading-anchor {
+        opacity: 0.5;
+        transform: translateY(-50%) translateX(4px);
+    }
+    
+    /* 鼠标直接悬停在图标上时，全亮并变为主色调 */
+    .heading-anchor:hover {
+        opacity: 1 !important;
+        color: var(--primary-color) !important;
+    }
+    
+    /* 复制成功后的状态 */
+    .heading-anchor.copied {
+        color: #10B981 !important; 
+    }
+    .heading-anchor svg {
+        width: 18px;
+        height: 18px;
+    }
 </style>
-
-
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         if(typeof feather !== 'undefined') { feather.replace(); }
-        
         const content = document.getElementById('markdown-content');
         if (!content) return;
 
+        // 1. 高亮与 Obsidian Callouts
         let html = content.innerHTML;
         html = html.replace(/==([^=]+)==/g, '<mark>$1</mark>');
         content.innerHTML = html;
-
         const blockquotes = content.querySelectorAll('blockquote');
-        const calloutIcons = {
-            'note': '<i data-feather="edit-2"></i>',
-            'info': '<i data-feather="info"></i>',
-            'warning': '<i data-feather="alert-triangle"></i>',
-            'error': '<i data-feather="x-circle"></i>',
-            'success': '<i data-feather="check-circle"></i>'
-        };
-
+        const calloutIcons = {'note': '<i data-feather="edit-2"></i>','info': '<i data-feather="info"></i>','warning': '<i data-feather="alert-triangle"></i>','error': '<i data-feather="x-circle"></i>','success': '<i data-feather="check-circle"></i>'};
         blockquotes.forEach(quote => {
             const firstP = quote.querySelector('p');
             if (!firstP) return;
-            
-            const match = firstP.innerHTML.match(/^\[!(\w+)\]\s*(.*)?<br>/i) || 
-                          firstP.textContent.match(/^\[!(\w+)\]\s*(.*)?/i);
-            
+            const match = firstP.innerHTML.match(/^\[!(\w+)\]\s*(.*)?<br>/i) || firstP.textContent.match(/^\[!(\w+)\]\s*(.*)?/i);
             if (match) {
                 const type = match[1].toLowerCase();
                 let title = match[2] ? match[2].trim() : type.charAt(0).toUpperCase() + type.slice(1);
                 const calloutClass = calloutIcons[type] ? type : 'note';
                 const iconHtml = calloutIcons[calloutClass] || calloutIcons['note'];
-
                 let contentHtml = quote.innerHTML;
-                if (firstP.innerHTML.includes('<br>')) {
-                    contentHtml = contentHtml.replace(/^<p>\[!\w+\][^\n<]*<br>/i, '<p>');
-                } else {
-                    firstP.remove();
-                    contentHtml = quote.innerHTML;
-                }
-
+                if (firstP.innerHTML.includes('<br>')) { contentHtml = contentHtml.replace(/^<p>\[!\w+\][^\n<]*<br>/i, '<p>'); } else { firstP.remove(); contentHtml = quote.innerHTML; }
                 const calloutWrapper = document.createElement('div');
                 calloutWrapper.className = `obsidian-callout callout-${calloutClass}`;
-                calloutWrapper.innerHTML = `
-                    <div class="obsidian-callout-title">${iconHtml} ${title}</div>
-                    <div class="obsidian-callout-content">${contentHtml}</div>
-                `;
+                calloutWrapper.innerHTML = `<div class=\"obsidian-callout-title\">${iconHtml} ${title}</div><div class=\"obsidian-callout-content\">${contentHtml}</div>`;
                 quote.parentNode.replaceChild(calloutWrapper, quote);
             }
         });
-        if(typeof feather !== 'undefined') { feather.replace(); }
 
+        // 2. 侧边栏目录 (TOC)
         const tocNav = document.getElementById('toc-nav');
         const sidebar = document.querySelector('.post-toc-sidebar');
         const headings = content.querySelectorAll('h1, h2, h3, h4, h5, h6');
-        
         if (headings.length > 0 && tocNav) {
             sidebar.style.display = 'block'; 
             const ul = document.createElement('ul');
             ul.className = 'toc-list';
-            
             let minLevel = 6;
-            headings.forEach(h => {
-                const level = parseInt(h.tagName.substring(1));
-                if (level < minLevel) minLevel = level;
-            });
-
+            headings.forEach(h => { const level = parseInt(h.tagName.substring(1)); if (level < minLevel) minLevel = level; });
             const tocData = [];
-
             headings.forEach((heading, index) => {
                 if (!heading.id) { heading.id = 'heading-' + index; }
                 const level = parseInt(heading.tagName.substring(1));
-                
-                const li = document.createElement('li');
-                li.className = 'toc-item';
-                
-                const a = document.createElement('a');
-                a.href = '#' + heading.id;
-                a.textContent = heading.textContent;
-                
+                const li = document.createElement('li'); li.className = 'toc-item';
+                const a = document.createElement('a'); a.href = '#' + heading.id; a.textContent = heading.textContent;
                 const basePadding = (level - minLevel) * 16 + 20;
-                a.style.paddingLeft = basePadding + 'px';
-                a.dataset.basePadding = basePadding; 
-                
-                li.appendChild(a);
-                ul.appendChild(li);
-                
-                tocData.push({
-                    heading: heading, li: li, a: a, level: level,
-                    isParent: false, isOpen: false
-                });
+                a.style.paddingLeft = basePadding + 'px'; a.dataset.basePadding = basePadding; 
+                li.appendChild(a); ul.appendChild(li);
+                tocData.push({heading: heading, li: li, a: a, level: level, isParent: false, isOpen: false});
             });
-            
             tocNav.appendChild(ul);
-
-            for (let i = 0; i < tocData.length; i++) {
-                if (i + 1 < tocData.length && tocData[i+1].level > tocData[i].level) {
-                    tocData[i].isParent = true;
-                    const arrow = document.createElement('span');
-                    arrow.className = 'geek-toc-arrow';
-                    tocData[i].a.prepend(arrow);
-                }
-            }
-
+            for (let i = 0; i < tocData.length; i++) { if (i + 1 < tocData.length && tocData[i+1].level > tocData[i].level) { tocData[i].isParent = true; const arrow = document.createElement('span'); arrow.className = 'geek-toc-arrow'; tocData[i].a.prepend(arrow); } }
             function updateTocVisibility() {
                 let hideLevelTrigger = 99;
                 for (let i = 0; i < tocData.length; i++) {
                     const item = tocData[i];
-                    if (item.level <= hideLevelTrigger && hideLevelTrigger !== 99) {
-                        hideLevelTrigger = 99;
-                    }
+                    if (item.level <= hideLevelTrigger && hideLevelTrigger !== 99) { hideLevelTrigger = 99; }
                     item.li.style.display = (hideLevelTrigger !== 99) ? 'none' : 'block';
-                    
-                    if (item.isParent && !item.isOpen && hideLevelTrigger === 99) {
-                        hideLevelTrigger = item.level;
-                    }
+                    if (item.isParent && !item.isOpen && hideLevelTrigger === 99) { hideLevelTrigger = item.level; }
                 }
             }
-
             updateTocVisibility();
-
             tocData.forEach(item => {
                 const basePad = parseInt(item.a.dataset.basePadding);
-                
                 item.a.addEventListener('mouseenter', () => item.a.style.paddingLeft = (basePad + 6) + 'px');
-                item.a.addEventListener('mouseleave', () => {
-                    if (!item.a.classList.contains('active')) item.a.style.paddingLeft = basePad + 'px';
-                });
-
+                item.a.addEventListener('mouseleave', () => { if (!item.a.classList.contains('active')) item.a.style.paddingLeft = basePad + 'px'; });
                 item.a.addEventListener('click', function(e) {
                     e.preventDefault();
-                    if (e.target.classList.contains('geek-toc-arrow')) {
-                        item.isOpen = !item.isOpen;
-                        item.a.classList.toggle('is-open', item.isOpen);
-                        updateTocVisibility();
-                    } else {
-                        if (item.isParent && !item.isOpen) {
-                            item.isOpen = true;
-                            item.a.classList.add('is-open');
-                            updateTocVisibility();
-                        }
+                    if (e.target.classList.contains('geek-toc-arrow')) { item.isOpen = !item.isOpen; item.a.classList.toggle('is-open', item.isOpen); updateTocVisibility(); } else {
+                        if (item.isParent && !item.isOpen) { item.isOpen = true; item.a.classList.add('is-open'); updateTocVisibility(); }
                         const offsetPosition = item.heading.getBoundingClientRect().top + window.pageYOffset - 70;
                         window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
                     }
                 });
             });
-
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        tocData.forEach(item => {
-                            item.a.classList.remove('active');
-                            item.a.style.paddingLeft = item.a.dataset.basePadding + 'px';
-                        });
-                        
+                        tocData.forEach(item => { item.a.classList.remove('active'); item.a.style.paddingLeft = item.a.dataset.basePadding + 'px'; });
                         const activeIndex = tocData.findIndex(item => item.heading.id === entry.target.id);
                         if (activeIndex !== -1) {
-                            const activeItem = tocData[activeIndex];
-                            activeItem.a.classList.add('active');
-                            activeItem.a.style.paddingLeft = (parseInt(activeItem.a.dataset.basePadding) + 6) + 'px';
-                            
-                            let currentLevel = activeItem.level;
-                            let needsUpdate = false;
-                            for (let i = activeIndex - 1; i >= 0; i--) {
-                                if (tocData[i].level < currentLevel) {
-                                    if (tocData[i].isParent && !tocData[i].isOpen) {
-                                        tocData[i].isOpen = true;
-                                        tocData[i].a.classList.add('is-open');
-                                        needsUpdate = true;
-                                    }
-                                    currentLevel = tocData[i].level;
-                                }
-                            }
+                            const activeItem = tocData[activeIndex]; activeItem.a.classList.add('active'); activeItem.a.style.paddingLeft = (parseInt(activeItem.a.dataset.basePadding) + 6) + 'px';
+                            let currentLevel = activeItem.level; let needsUpdate = false;
+                            for (let i = activeIndex - 1; i >= 0; i--) { if (tocData[i].level < currentLevel) { if (tocData[i].isParent && !tocData[i].isOpen) { tocData[i].isOpen = true; tocData[i].a.classList.add('is-open'); needsUpdate = true; } currentLevel = tocData[i].level; } }
                             if (needsUpdate) updateTocVisibility();
                         }
                     }
                 });
             }, { rootMargin: '-80px 0px -70% 0px', threshold: 0 });
-
             headings.forEach(h => observer.observe(h));
         }
 
-        const postImages = document.querySelectorAll('.markdown-content img');
-        if (postImages.length > 0) {
-            const viewerHTML = `
-                <div id="geek-image-viewer" class="image-viewer">
-                    <button class="close-btn" id="viewer-close-btn" title="关闭 (ESC)">&times;</button>
-                    <div class="image-viewer-content">
-                        <img id="viewer-image" src="" alt="Full View">
-                    </div>
-                </div>
-            `;
-            document.body.insertAdjacentHTML('beforeend', viewerHTML);
+        // --- 6. 🌟 GitHub 级：标题锚点悬浮链接 ---
+        headings.forEach(heading => {
+            // 前提条件：TOC 生成器已经为所有标题打上了 id 标签
+            if (!heading.id) return; 
 
-            const viewer = document.getElementById('geek-image-viewer');
-            const viewerImg = document.getElementById('viewer-image');
-            const closeBtn = document.getElementById('viewer-close-btn');
-
-            postImages.forEach(img => {
-                img.style.cursor = 'zoom-in'; 
-                img.addEventListener('click', () => {
-                    viewerImg.src = img.src; 
-                    viewer.classList.add('show'); 
-                    document.body.style.overflow = 'hidden'; 
+            // 创建锚点链接元素
+            const anchor = document.createElement('a');
+            anchor.className = 'heading-anchor';
+            anchor.setAttribute('title', '复制该小节链接');
+            
+            // 原生精简版 Link 图标 (不用依赖 Feather 渲染，性能更高)
+            const linkIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>`;
+            // 成功状态的 Check 图标
+            const checkIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+            
+            anchor.innerHTML = linkIcon;
+            
+            // 核心点击交互逻辑
+            anchor.addEventListener('click', (e) => {
+                e.preventDefault(); // 阻止页面瞬间闪烁跳动的默认行为
+                
+                // 拼接并复制完整的专属直达 URL
+                const targetUrl = window.location.origin + window.location.pathname + '#' + heading.id;
+                navigator.clipboard.writeText(targetUrl).then(() => {
+                    // 1. 图标秒切打勾状态，给予物理质感反馈
+                    anchor.innerHTML = checkIcon;
+                    anchor.classList.add('copied');
+                    
+                    // 2. 无缝更新浏览器地址栏（页面不会刷新，也不会发生跳动）
+                    history.pushState(null, null, '#' + heading.id);
+                    
+                    // 3. 2秒后恢复原状
+                    setTimeout(() => {
+                        anchor.innerHTML = linkIcon;
+                        anchor.classList.remove('copied');
+                    }, 2000);
                 });
             });
+            
+            // 将小图标安静地插入到每个标题的最前面
+            heading.insertBefore(anchor, heading.firstChild);
+        });
 
-            const closeViewer = () => {
-                viewer.classList.remove('show');
-                setTimeout(() => { document.body.style.overflow = ''; }, 300);
-            };
-
+        // 3. 图片放大查看器
+        const postImages = document.querySelectorAll('.markdown-content img');
+        if (postImages.length > 0) {
+            const viewerHTML = `<div id=\"geek-image-viewer\" class=\"image-viewer\"><button class=\"close-btn\" id=\"viewer-close-btn\" title=\"关闭 (ESC)\">&times;</button><div class=\"image-viewer-content\"><img id=\"viewer-image\" src=\"\" alt=\"Full View\"></div></div>`;
+            document.body.insertAdjacentHTML('beforeend', viewerHTML);
+            const viewer = document.getElementById('geek-image-viewer'); const viewerImg = document.getElementById('viewer-image'); const closeBtn = document.getElementById('viewer-close-btn');
+            postImages.forEach(img => { img.style.cursor = 'zoom-in'; img.addEventListener('click', () => { viewerImg.src = img.src; viewer.classList.add('show'); document.body.style.overflow = 'hidden'; }); });
+            const closeViewer = () => { viewer.classList.remove('show'); setTimeout(() => { document.body.style.overflow = ''; }, 300); };
             closeBtn.addEventListener('click', closeViewer);
-            viewer.addEventListener('click', (e) => {
-                if (e.target === viewer || e.target.classList.contains('image-viewer-content')) {
-                    closeViewer();
-                }
-            });
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && viewer.classList.contains('show')) closeViewer();
-            });
+            viewer.addEventListener('click', (e) => { if (e.target === viewer || e.target.classList.contains('image-viewer-content')) { closeViewer(); } });
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && viewer.classList.contains('show')) closeViewer(); });
         }
-    });
+
+// --- 4. 极客版：代码块一键复制 & 智能语言水印 ---
+        const codeBlocks = document.querySelectorAll('.markdown-content pre');
+        codeBlocks.forEach(pre => {
+            const wrapper = document.createElement('div'); 
+            wrapper.className = 'code-wrapper'; 
+            pre.parentNode.insertBefore(wrapper, pre); 
+            wrapper.appendChild(pre); 
+            pre.style.margin = '0'; 
+            
+            // 🌟 穿透式语言嗅探：向上寻找 Jekyll 生成的父级 language- 标签
+            let langText = '';
+            const codeNode = pre.querySelector('code');
+            const langContainer = pre.closest('[class*="language-"]') || codeNode;
+            
+            if (langContainer && langContainer.className) {
+                const match = langContainer.className.match(/language-([a-zA-Z0-9\-\+]+)/);
+                if (match) {
+                    langText = match[1].toUpperCase(); // 转为大写
+                    if (langText === 'JAVASCRIPT') langText = 'JS';
+                    if (langText === 'MARKDOWN') langText = 'MD';
+                    if (langText === 'PYTHON') langText = 'PY';
+                }
+            }
+            
+            // 注入水印
+            if (langText) {
+                const langBadge = document.createElement('div');
+                langBadge.className = 'code-lang-badge';
+                langBadge.textContent = langText;
+                wrapper.appendChild(langBadge);
+            }
+
+            // 注入复制按钮
+            const copyBtn = document.createElement('button'); 
+            copyBtn.className = 'code-copy-btn'; 
+            copyBtn.setAttribute('aria-label', 'Copy code'); 
+            copyBtn.innerHTML = '<i data-feather="copy"></i> <span>Copy</span>'; 
+            wrapper.appendChild(copyBtn);
+
+            copyBtn.addEventListener('click', () => {
+                const codeContent = codeNode ? codeNode.textContent : pre.textContent;
+                navigator.clipboard.writeText(codeContent).then(() => {
+                    const originalHtml = copyBtn.innerHTML; 
+                    copyBtn.innerHTML = '<i data-feather="check"></i> <span>Copied!</span>'; 
+                    copyBtn.classList.add('copied'); 
+                    if(typeof feather !== 'undefined') { feather.replace(); }
+                    setTimeout(() => { 
+                        copyBtn.innerHTML = originalHtml; 
+                        copyBtn.classList.remove('copied'); 
+                        if(typeof feather !== 'undefined') { feather.replace(); } 
+                    }, 2000);
+                });
+            });
+        });
+
+        // --- 5. 🌟 沉浸式禅定模式 (Zen Mode) ---
+        const zenBtn = document.createElement('button');
+        zenBtn.className = 'zen-mode-toggle';
+        zenBtn.setAttribute('title', '进入禅定阅读模式 (快捷键: Z)');
+        zenBtn.innerHTML = '<i data-feather="wind"></i>';
+        
+        // 🌟 核心：将禅定按钮插入到全局控制中心容器的最前面！
+        const controlsContainer = document.getElementById('global-controls');
+        if (controlsContainer) {
+            controlsContainer.insertBefore(zenBtn, controlsContainer.firstChild);
+        } else {
+            document.body.appendChild(zenBtn);
+        }
+
+        const toggleZenMode = () => {
+            const isZen = document.body.classList.toggle('zen-mode');
+            // ... (下方原有的代码保持不变)
+            if (isZen) {
+                zenBtn.innerHTML = '<i data-feather=\"minimize-2\"></i>';
+                zenBtn.style.color = 'var(--primary-color)';
+                zenBtn.style.borderColor = 'var(--primary-color)';
+            } else {
+                zenBtn.innerHTML = '<i data-feather=\"wind\"></i>';
+                zenBtn.style.color = '';
+                zenBtn.style.borderColor = '';
+            }
+            if(typeof feather !== 'undefined') { feather.replace(); }
+        };
+
+        zenBtn.addEventListener('click', toggleZenMode);
+        document.addEventListener('keydown', (e) => {
+            const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+            if (activeTag === 'input' || activeTag === 'textarea') return;
+            if (e.key.toLowerCase() === 'z') { e.preventDefault(); toggleZenMode(); }
+            if (e.key === 'Escape' && document.body.classList.contains('zen-mode')) { e.preventDefault(); toggleZenMode(); }
+        });
+
+        if(typeof feather !== 'undefined') { feather.replace(); }
+    }); 
+    
+    
 
     window.shareToPlatform = function(e, platform) {
         e.preventDefault();
-        const url = encodeURIComponent(window.location.href);
-        const title = encodeURIComponent(document.title);
-        let shareUrl = '';
-
+        const url = encodeURIComponent(window.location.href); const title = encodeURIComponent(document.title); let shareUrl = '';
         switch(platform) {
-            case 'twitter':
-                shareUrl = `https://twitter.com/intent/tweet?text=${title}&url=${url}`;
-                break;
-            case 'linkedin':
-                shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
-                break;
-            case 'facebook':
-                shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
-                break;
-            case 'weibo':
-                shareUrl = `http://service.weibo.com/share/share.php?url=${url}&title=${title}`;
-                break;
+            case 'twitter': shareUrl = `https://twitter.com/intent/tweet?text=${title}&url=${url}`; break;
+            case 'linkedin': shareUrl = `https://www.linkedin.com/sharing/share-offsite/?url=${url}`; break;
+            case 'facebook': shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}`; break;
+            case 'weibo': shareUrl = `http://service.weibo.com/share/share.php?url=${url}&title=${title}`; break;
         }
         window.open(shareUrl, '_blank', 'width=600,height=500,left=200,top=200');
     };
 
     window.copyPageUrl = function(btn) {
         navigator.clipboard.writeText(window.location.href).then(() => {
-            const originalHtml = btn.innerHTML;
-            btn.innerHTML = '<i data-feather="check"></i>';
-            if(typeof feather !== 'undefined') { feather.replace(); }
-            
-            btn.style.color = '#10B981';
-            btn.style.borderColor = '#10B981';
-            btn.style.background = 'rgba(16, 185, 129, 0.1)';
-            
-            setTimeout(() => {
-                btn.innerHTML = originalHtml;
-                if(typeof feather !== 'undefined') { feather.replace(); }
-                btn.style.color = '';
-                btn.style.borderColor = '';
-                btn.style.background = '';
-            }, 2000);
+            const originalHtml = btn.innerHTML; btn.innerHTML = '<i data-feather=\"check\"></i>'; if(typeof feather !== 'undefined') { feather.replace(); }
+            btn.style.color = '#10B981'; btn.style.borderColor = '#10B981'; btn.style.background = 'rgba(16, 185, 129, 0.1)';
+            setTimeout(() => { btn.innerHTML = originalHtml; if(typeof feather !== 'undefined') { feather.replace(); } btn.style.color = ''; btn.style.borderColor = ''; btn.style.background = ''; }, 2000);
         });
     };
+
+    
 </script>

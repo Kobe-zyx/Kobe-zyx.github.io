@@ -9,3 +9,30 @@
                 loading="lazy">
             </iframe>
         </div>
+
+// 页面淡出跳转
+    // 只处理"阅读更多"和"查看更多博文"按钮
+    // 只处理指向.html或blog/的链接
+    document.querySelectorAll('.button.secondary, .button.primary').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            const href = btn.getAttribute('href');
+            if (href && (href.endsWith('.html') || href.startsWith('blog/'))) {
+                e.preventDefault();
+                document.body.classList.add('fade-out');
+                setTimeout(() => {
+                    window.location.href = href;
+                }, 500);
+            }
+        });
+    });
+
+    // 时间轴导航淡出跳转
+    document.querySelectorAll('a[href="/timeline/"]').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.body.classList.add('fade-out');
+            setTimeout(() => {
+                window.location.href = '/timeline/';
+            }, 500);
+        });
+    });

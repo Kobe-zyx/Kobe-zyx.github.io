@@ -10,19 +10,51 @@
     
     <script src="https://unpkg.com/feather-icons"></script>
 
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            // 检查本地记忆，如果没有记忆则跟随操作系统偏好
+            if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+            }
+        })();
+    </script>
+
     {% seo %}
 </head>
 
 <body class="fade-in">
+    <div id="mouse-spotlight" class="mouse-spotlight"></div>
+    <div id="geek-terminal" class="geek-terminal">
+        <canvas id="matrix-canvas" class="matrix-canvas"></canvas>
+        <div class="terminal-header">
+            <span class="terminal-title">bash - geek@blog:~</span>
+            <button id="terminal-close" class="terminal-close">&times;</button>
+        </div>
+        <div class="terminal-body" id="terminal-body">
+            <div class="terminal-output" id="terminal-output">
+                <div>Welcome to Geek Blog Terminal v1.0.0</div>
+                <div>Type '<span class="terminal-text-blue">help</span>' to see available commands.</div>
+            </div>
+            <div class="terminal-input-line">
+                <span class="terminal-prompt">geek@blog:~$</span>
+                <input type="text" id="terminal-input" autocomplete="off" spellcheck="false">
+            </div>
+        </div>
+    </div>
     <header class="navbar">
         <div class="container">
             <a href="/index.html" class="logo">
                 <img src="https://cdn.jsdelivr.net/gh/Kobe-zyx/PicGo@main/light.svg" alt="切换到浅色模式" class="light-icon">
                 <img src="https://cdn.jsdelivr.net/gh/Kobe-zyx/PicGo@main/dark.svg" alt="切换到深色模式" class="dark-icon">
             </a>
+            
             <button class="mobile-menu-btn" aria-label="展开菜单">
                 <i data-feather="menu"></i>
             </button>
+            
             <div class="nav-links-container">
                 <nav>
                     <ul>
@@ -31,7 +63,6 @@
                         <li><a href="/timeline/" {% if page.url contains '/timeline' %}class="active"{% endif %}>Timeline</a></li>
                         <li><a href="/projects/" {% if page.url contains '/projects' %}class="active"{% endif %}>Projects</a></li>
                         <li><a href="/archive/" {% if page.url contains '/archive' %}class="active"{% endif %}>Archive</a></li>
-                        
                     </ul>
                 </nav>
             </div>
@@ -41,19 +72,19 @@
     {{ content }}
 
     <nav class="bottom-nav">
-    <div class="container">
-        <ul>
-            <li><a href="/">Readme</a></li>
-            <li><a href="/blog/">Geek</a></li>
-            <li><a href="/timeline/">Timeline</a></li>
-            <li><a href="/projects">Projects</a></li>
-            <li><a href="/archive/" >Archive</a></li>
-            <li><a href="/hall/">Hall</a></li>
-            <li><a href="/changelog/">Changelog</a></li>
-            <li><a href="/stack/">Stack</a></li>
-        </ul>
-    </div>
-</nav>
+        <div class="container">
+            <ul>
+                <li><a href="/">Readme</a></li>
+                <li><a href="/blog/">Geek</a></li>
+                <li><a href="/timeline/">Timeline</a></li>
+                <li><a href="/projects">Projects</a></li>
+                <li><a href="/archive/" >Archive</a></li>
+                <li><a href="/hall/">Hall</a></li>
+                <li><a href="/changelog/">Changelog</a></li>
+                <li><a href="/stack/">Stack</a></li>
+            </ul>
+        </div>
+    </nav>
 
     <footer>
         <div class="container">
@@ -66,16 +97,18 @@
     </button>
 
     <script>
-        feather.replace();
-        
-        // 🌟 新增：手机端导航栏折叠/展开逻辑
         document.addEventListener('DOMContentLoaded', function() {
+            // 1. 初始化所有 Feather 图标
+            if(typeof feather !== 'undefined') { 
+                feather.replace(); 
+            }
+            
+            // 2. 手机端导航栏折叠逻辑
             const menuBtn = document.querySelector('.mobile-menu-btn');
             const navLinks = document.querySelector('.nav-links-container');
             if(menuBtn && navLinks) {
                 menuBtn.addEventListener('click', function() {
                     navLinks.classList.toggle('active');
-                    // 点击后，无缝切换 汉堡图标(menu) 与 关闭图标(x)
                     const icon = this.querySelector('i');
                     if(navLinks.classList.contains('active')) {
                         icon.setAttribute('data-feather', 'x');
@@ -85,13 +118,161 @@
                     feather.replace();
                 });
             }
+
+            // 3. 深色模式持久化记忆逻辑
+            const themeToggle = document.querySelector('.theme-toggle');
+            if (themeToggle) {
+                themeToggle.addEventListener('click', () => {
+                    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+                    
+                    if (isDark) {
+                        // 切换到浅色，并存入本地便签
+                        document.documentElement.removeAttribute('data-theme');
+                        localStorage.setItem('theme', 'light');
+                    } else {
+                        // 切换到深色，并存入本地便签
+                        document.documentElement.setAttribute('data-theme', 'dark');
+                        localStorage.setItem('theme', 'dark');
+                    }
+                });
+            }
         });
     </script>
+    
     <script src="/script.js"></script>
     
-    <button class="theme-toggle" aria-label="切换深浅模式">
-        <img src="/svg/ld/light.svg" alt="切换到浅色模式" class="light-icon">
-        <img src="/svg/ld/dark.svg" alt="切换到深色模式" class="dark-icon">
-    </button>
+
+    <div id="spotlight-modal" class="spotlight-modal">
+        <div class="spotlight-content">
+            <div class="spotlight-input-group">
+                <i data-feather="search"></i>
+                <input type="text" id="spotlight-input" placeholder="全局检索：输入关键词，秒出结果..." autocomplete="off">
+                <div class="spotlight-shortcuts"><kbd>ESC</kbd></div>
+            </div>
+            <div id="spotlight-results" class="spotlight-results">
+                <div class="spotlight-empty">键入关键词以探索全站内容...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('spotlight-modal');
+            const input = document.getElementById('spotlight-input');
+            const resultsBox = document.getElementById('spotlight-results');
+            const trigger = document.getElementById('spotlight-trigger');
+            
+            let searchData = [];
+            let isDataLoaded = false;
+
+            // 打开魔法
+            const openSpotlight = () => {
+                modal.classList.add('show');
+                setTimeout(() => input.focus(), 100); // 延迟聚焦，保证动画顺滑
+                document.body.style.overflow = 'hidden'; // 锁定背景滚动
+                
+                // 仅在首次打开时去拉取 json，极致节省服务器流量
+                if (!isDataLoaded) {
+                    fetch('/search.json')
+                        .then(res => res.json())
+                        .then(data => {
+                            searchData = data;
+                            isDataLoaded = true;
+                        });
+                }
+            };
+
+            const closeSpotlight = () => {
+                modal.classList.remove('show');
+                document.body.style.overflow = '';
+                input.blur();
+            };
+
+            // 🌟 监听原生键盘事件
+            document.addEventListener('keydown', (e) => {
+                // 拦截 Cmd+K (Mac) 或 Ctrl+K (Windows)
+                if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+                    e.preventDefault(); // 阻止浏览器默认的光标定位行为
+                    if (modal.classList.contains('show')) closeSpotlight();
+                    else openSpotlight();
+                }
+                // 拦截 ESC 退出
+                if (e.key === 'Escape' && modal.classList.contains('show')) {
+                    closeSpotlight();
+                }
+            });
+
+            // 绑定点击事件
+            if (trigger) trigger.addEventListener('click', openSpotlight);
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeSpotlight(); // 点击毛玻璃背景关闭
+            });
+
+            // 🌟 实时检索引擎
+            if (input) {
+                input.addEventListener('input', (e) => {
+                    const query = e.target.value.toLowerCase().trim();
+                    resultsBox.innerHTML = '';
+                    
+                    if (!query) {
+                        resultsBox.innerHTML = '<div class="spotlight-empty">键入关键词以探索全站内容...</div>';
+                        return;
+                    }
+                    if (!isDataLoaded) return;
+
+                    // 检索标题和正文，最多只显示前 10 条结果保证性能
+                    const results = searchData.filter(post => 
+                        post.title.toLowerCase().includes(query) || 
+                        post.content.toLowerCase().includes(query)
+                    ).slice(0, 10); 
+
+                    if (results.length === 0) {
+                        resultsBox.innerHTML = '<div class="spotlight-empty">未找到相关内容，换个词试试？</div>';
+                        return;
+                    }
+
+                    results.forEach(post => {
+                        let contentExcerpt = '';
+                        const matchIndex = post.content.toLowerCase().indexOf(query);
+                        // 智能截取匹配位置前后的文本
+                        if (matchIndex !== -1) {
+                            const start = Math.max(0, matchIndex - 15);
+                            const end = Math.min(post.content.length, matchIndex + query.length + 35);
+                            contentExcerpt = (start > 0 ? '... ' : '') + post.content.substring(start, end) + ' ...';
+                        } else {
+                            contentExcerpt = post.content.substring(0, 50) + '...';
+                        }
+
+                        // 注入高亮标签
+                        const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')})`, 'gi');
+                        const hlTitle = post.title.replace(regex, '<mark class="spotlight-highlight">$1</mark>');
+                        const hlContent = contentExcerpt.replace(regex, '<mark class="spotlight-highlight">$1</mark>');
+
+                        const a = document.createElement('a');
+                        a.href = post.url;
+                        a.className = 'spotlight-result-item';
+                        a.innerHTML = `<h4>${hlTitle}</h4><p>${hlContent}</p>`;
+                        resultsBox.appendChild(a);
+                    });
+                });
+            }
+        });
+    </script>
+    <div class="page-bottom-shadow"></div>
+    <script>feather.replace();</script>
+    
+    <div class="global-controls" id="global-controls">
+        <button id="spotlight-trigger" class="spotlight-trigger" aria-label="全局搜索">
+            <i data-feather="search"></i>
+            <kbd>⌘ K</kbd>
+        </button>
+        <button class="theme-toggle" aria-label="切换深浅模式">
+            <img src="/svg/ld/light.svg" alt="切换到浅色模式" class="light-icon">
+            <img src="/svg/ld/dark.svg" alt="切换到深色模式" class="dark-icon">
+        </button>
+    </div>
+    
+    <script src="/script.js"></script>
+
 </body>
 </html>

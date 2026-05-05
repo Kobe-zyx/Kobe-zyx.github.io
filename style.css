@@ -2117,3 +2117,537 @@ footer .container {
     from { opacity: 0; transform: translateY(-10px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+
+/* ==========================================================
+   阅读进度条 (Reading Progress Bar)
+   ========================================================== */
+
+/* 进度条容器 */
+.reading-progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background-color: transparent;
+    z-index: 1001; /* 确保在导航栏之上 */
+    pointer-events: none; /* 不阻挡用户交互 */
+}
+
+/* 进度填充 */
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--primary-color), var(--link-hover-color));
+    box-shadow: 0 0 10px rgba(0, 122, 255, 0.3);
+    transition: width 0.2s ease-out, background-color 0.3s ease;
+    will-change: width;
+    transform: translateZ(0); /* 启用 GPU 加速 */
+}
+
+/* 深色模式适配 */
+[data-theme="dark"] .progress-fill {
+    box-shadow: 0 0 10px rgba(0, 122, 255, 0.5);
+}
+
+/* ==========================================================
+   Cmd + K 唤醒 Spotlight 全局检索
+   ========================================================== */
+/* 触发按钮 (悬浮在右上角) */
+.spotlight-trigger {
+    position: absolute;
+    top: 25px;
+    right: 100px; /* 放在深色模式切换的左边 */
+    z-index: 1000;
+    background: rgba(var(--background-dark-rgb), 0.5);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    color: var(--secondary-text-color);
+    transition: all 0.3s ease;
+}
+.spotlight-trigger:hover {
+    color: var(--text-color);
+    border-color: var(--secondary-text-color);
+}
+.spotlight-trigger svg { width: 16px; height: 16px; }
+.spotlight-trigger kbd {
+    font-family: var(--font-code);
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 2px 6px;
+    color: var(--text-color);
+}
+
+/* 高斯模糊模态框 */
+.spotlight-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 15vh;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.spotlight-modal.show {
+    opacity: 1;
+    visibility: visible;
+}
+.spotlight-content {
+    width: 90%;
+    max-width: 650px;
+    background: var(--background-light);
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    border: 1px solid var(--border-color);
+    overflow: hidden;
+    transform: scale(0.95) translateY(-20px);
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.spotlight-modal.show .spotlight-content {
+    transform: scale(1) translateY(0);
+}
+[data-theme="dark"] .spotlight-content { box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+
+/* 输入框区域 */
+.spotlight-input-group {
+    display: flex;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-color);
+}
+.spotlight-input-group svg {
+    color: var(--secondary-text-color);
+    margin-right: 15px;
+    width: 22px;
+    height: 22px;
+}
+.spotlight-input-group input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 18px;
+    color: var(--text-color);
+    outline: none;
+    font-family: var(--font-main);
+}
+.spotlight-shortcuts kbd {
+    font-family: var(--font-code);
+    font-size: 11px;
+    color: var(--secondary-text-color);
+    background: var(--background-dark);
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+}
+
+/* 检索结果区域 */
+.spotlight-results {
+    max-height: 50vh;
+    overflow-y: auto;
+    padding: 10px 0;
+}
+/* 隐藏滚动条让它更像 Mac 原生 */
+.spotlight-results::-webkit-scrollbar { width: 6px; }
+.spotlight-results::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 10px; }
+
+.spotlight-result-item {
+    display: block;
+    padding: 14px 24px;
+    text-decoration: none;
+    color: var(--text-color);
+    border-left: 3px solid transparent;
+    transition: background 0.2s, border-color 0.2s;
+}
+.spotlight-result-item:hover {
+    background: var(--background-dark);
+    border-left-color: var(--primary-color);
+}
+.spotlight-result-item h4 {
+    margin: 0 0 5px 0;
+    font-size: 15px;
+    font-weight: 600;
+}
+.spotlight-result-item p {
+    margin: 0;
+    font-size: 13px;
+    color: var(--secondary-text-color);
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+mark.spotlight-highlight {
+    background: rgba(0, 122, 255, 0.15);
+    color: var(--primary-color);
+    font-weight: 600;
+    padding: 0 2px;
+    border-radius: 3px;
+}
+[data-theme="dark"] mark.spotlight-highlight { background: rgba(0, 122, 255, 0.3); color: #fff; }
+.spotlight-empty {
+    padding: 40px;
+    text-align: center;
+    color: var(--secondary-text-color);
+    font-size: 14px;
+}
+
+/* 手机端响应式避让 */
+@media (max-width: 768px) {
+    .spotlight-trigger { top: 15px; right: 65px; padding: 6px; }
+    .spotlight-trigger kbd { display: none; /* 手机端空间小，隐藏键盘提示 */ }
+}
+
+/* ==========================================================
+   代码块“一键复制”按钮样式 (Mac 沉浸风)
+   ========================================================== */
+.code-copy-btn {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #abb2bf;
+    border-radius: 6px;
+    padding: 4px 8px;
+    font-size: 12px;
+    font-family: var(--font-code);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    z-index: 10;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+/* 当鼠标悬停在代码保护壳时，按钮丝滑浮现 */
+.code-wrapper:hover .code-copy-btn {
+    opacity: 1;
+}
+
+.code-copy-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+.code-copy-btn svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* 复制成功后的绿色打勾状态 */
+.code-copy-btn.copied {
+    background: rgba(39, 201, 63, 0.15);
+    border-color: rgba(39, 201, 63, 0.4);
+    color: #27c93f;
+}
+
+/* ==========================================================
+   🌟 极客控制中心：右上角统一工具栏 (Zen, Spotlight, Theme)
+   ========================================================== */
+/* 统一 Flex 弹性容器，自动分配间距，永远不穿模！ */
+.global-controls {
+    position: absolute;
+    top: 25px;
+    right: 40px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 1000;
+}
+
+/* 统一的按钮基底样式（毛玻璃 + 圆角矩形 + 相同高度） */
+.theme-toggle, 
+.spotlight-trigger, 
+.zen-mode-toggle {
+    position: static !important; /* 覆盖之前可能存在的绝对定位 */
+    height: 38px;
+    box-sizing: border-box;
+    border-radius: 8px;
+    background: rgba(var(--background-dark-rgb), 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--border-color);
+    color: var(--secondary-text-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    padding: 0;
+    margin: 0;
+}
+
+/* 统一的悬浮动效 */
+.theme-toggle:hover, 
+.spotlight-trigger:hover, 
+.zen-mode-toggle:hover {
+    transform: translateY(-2px);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+/* 1. 深浅切换按钮专属微调 */
+.theme-toggle { width: 38px; }
+.theme-toggle img { width: 18px; height: 18px; transition: transform 0.3s ease; }
+.theme-toggle .light-icon { display: block; filter: brightness(0); }
+.theme-toggle .dark-icon { display: none; }
+[data-theme="dark"] .theme-toggle .light-icon { display: none; }
+[data-theme="dark"] .theme-toggle .dark-icon { display: block; filter: brightness(0) invert(1) drop-shadow(0 0 1px white); }
+
+/* 2. Cmd+K 搜索按钮专属微调 (宽度自适应内容) */
+.spotlight-trigger { padding: 0 10px; gap: 6px; width: auto; }
+.spotlight-trigger svg { width: 16px; height: 16px; }
+.spotlight-trigger kbd {
+    font-family: var(--font-code); font-size: 11px; font-weight: 600;
+    background: var(--background-light); border: 1px solid var(--border-color);
+    border-radius: 4px; padding: 2px 6px; color: var(--text-color);
+}
+
+/* 3. 禅定模式按钮专属微调 */
+.zen-mode-toggle { width: 38px; }
+.zen-mode-toggle svg { width: 18px; height: 18px; }
+
+/* 手机端响应式避让 */
+@media (max-width: 768px) {
+    .global-controls { top: 15px; right: 20px; gap: 8px; }
+    .spotlight-trigger kbd { display: none; } /* 手机端隐藏键盘提示，节省空间 */
+}
+
+/* ==========================================================
+   🌟 极客彩蛋：隐藏终端 (Terminal) 样式
+   ========================================================== */
+.geek-terminal {
+    position: fixed;
+    /* 🌟 核心修改 1：把 top 改为 bottom，驻扎在页面底部 */
+    bottom: 0; left: 0; width: 100%; height: 45vh;
+    background-color: rgba(30, 30, 30, 0.95);
+    backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+    /* 🌟 核心修改 2：边框换到顶端 */
+    border-top: 1px solid #444;
+    z-index: 10000;
+    font-family: 'Fira Code', Consolas, Monaco, monospace;
+    color: #d4d4d4;
+    /* 🌟 核心修改 3：藏在屏幕正下方 100% 的位置 */
+    transform: translateY(100%);
+    /* 🌟 核心修复 4：把 box-shadow 也加入过渡动画，平时值为 none，彻底消灭漏光 */
+    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s ease;
+    display: flex; flex-direction: column;
+    box-shadow: none; 
+    overflow: hidden;
+}
+
+.geek-terminal.show { 
+    transform: translateY(0); 
+    /* 🌟 核心修改 5：终端弹出时，阴影改为向上投射 (-10px) */
+    box-shadow: 0 -10px 40px rgba(0,0,0,0.5); 
+}
+.terminal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    background: #1e1e1e; padding: 6px 15px; font-size: 12px;
+    color: #888; user-select: none; z-index: 2; border-bottom: 1px solid #333;
+}
+.terminal-close {
+    background: transparent; border: none; color: #888;
+    cursor: pointer; font-size: 18px; line-height: 1; transition: color 0.2s;
+}
+.terminal-close:hover { color: #ff5f56; }
+
+.terminal-body {
+    padding: 15px; flex-grow: 1; overflow-y: auto;
+    position: relative; z-index: 2;
+}
+.terminal-body::-webkit-scrollbar { width: 6px; }
+.terminal-body::-webkit-scrollbar-thumb { background-color: #555; border-radius: 3px; }
+
+.terminal-output { margin-bottom: 10px; line-height: 1.6; font-size: 14px; }
+.terminal-output div { word-break: break-all; }
+
+.terminal-input-line { display: flex; align-items: center; }
+.terminal-prompt { color: #4af626; margin-right: 8px; font-weight: bold; font-size: 14px; white-space: nowrap; }
+#terminal-input {
+    flex-grow: 1; background: transparent; border: none; color: #d4d4d4;
+    font-family: 'Fira Code', Consolas, Monaco, monospace; font-size: 14px; outline: none;
+}
+
+/* 终端颜色集 */
+.terminal-text-green { color: #4af626; }
+.terminal-text-blue { color: #56b6c2; }
+.terminal-text-yellow { color: #d7ba7d; }
+
+/* 🌟 代码雨画布 */
+.matrix-canvas {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 1; pointer-events: none; opacity: 0; transition: opacity 0.5s ease;
+}
+.matrix-canvas.active { opacity: 1; }
+
+/* ==========================================================
+   🌟 极客级：全局鼠标探照灯 (Mouse Spotlight Glow)
+   ========================================================== */
+.mouse-spotlight {
+    position: fixed;
+    top: 0; left: 0; width: 600px; height: 600px;
+    background: radial-gradient(circle at center, rgba(0, 122, 255, 0.06) 0%, rgba(0, 122, 255, 0.03) 30%, transparent 70%);
+    border-radius: 50%; pointer-events: none; z-index: -1;
+    transform: translate(-50%, -50%);
+    transition: opacity 1.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+    will-change: transform;
+    
+    /* 🌟 核心防污染：浅色模式下直接把它从渲染树抹除！ */
+    display: none; 
+    opacity: 0;
+}
+
+/* 深色模式下才赋予生命 */
+[data-theme="dark"] .mouse-spotlight {
+    display: block; 
+    opacity: 1;
+}
+
+/* 配合 JS 控制鼠标移出屏幕时的优雅隐藏（使用 class 防污染） */
+[data-theme="dark"] .mouse-spotlight.is-hidden {
+    opacity: 0 !important;
+}
+
+@media (max-width: 768px) {
+    .mouse-spotlight { display: none !important; }
+}
+
+/* ==========================================================
+   🌟 极客设计：页面底部环境光阴影 (完美还原终端漏光版)
+   ========================================================== */
+.page-bottom-shadow {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    /* 🌟 核心：给它 1px 的高度，强制浏览器必须把它画出来 */
+    height: 1px; 
+    background: transparent;
+    
+    /* 🌟 原汁原味：完全采用之前终端顶部漏光时的 50% 高强度阴影！ */
+    box-shadow: 0 -10px 40px 10px rgba(0, 0, 0, 0.5);
+    
+    pointer-events: none; /* 绝对不能阻挡点击 */
+    z-index: 9999;
+}
+
+/* 深色模式下的适配方案 */
+[data-theme="dark"] .page-bottom-shadow {
+    box-shadow: 0 -10px 40px 10px rgba(0, 0, 0, 0.8);
+}
+
+/* 手机端适当收敛扩散范围 */
+@media (max-width: 768px) {
+    .page-bottom-shadow {
+        box-shadow: 0 -5px 25px 5px rgba(0, 0, 0, 0.4);
+    }
+}
+
+/* ==========================================================
+   🌟 极客设计：Medium 级沉浸式划词菜单 (Text Selection Tooltip)
+   ========================================================== */
+
+/* 1. 升级全局原生划词高亮色 (极其克制的 Apple 蓝) */
+::selection {
+    background: rgba(0, 122, 255, 0.2);
+    color: inherit;
+}
+[data-theme="dark"] ::selection {
+    background: rgba(0, 122, 255, 0.35);
+}
+
+/* 2. 划词菜单毛玻璃本体 */
+.geek-selection-tooltip {
+    position: absolute;
+    z-index: 10000;
+    display: none; /* 默认不占据空间 */
+    align-items: center;
+    background: rgba(30, 30, 30, 0.85);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 8px;
+    padding: 4px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.1);
+    
+    /* 动画初始状态：微缩且向下偏移 */
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+    transition: opacity 0.2s cubic-bezier(0.25, 0.8, 0.25, 1), transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* 菜单展现时的状态 */
+.geek-selection-tooltip.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+/* 指向文字的极简小倒三角 */
+.geek-selection-tooltip::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 6px 6px 0;
+    border-style: solid;
+    border-color: rgba(30, 30, 30, 0.85) transparent transparent transparent;
+}
+
+/* 当菜单因为屏幕顶部空间不足而翻转到文字下方时，小三角朝上 */
+.geek-selection-tooltip.flip::after {
+    bottom: auto;
+    top: -6px;
+    border-width: 0 6px 6px;
+    border-color: transparent transparent rgba(30, 30, 30, 0.85) transparent;
+}
+
+/* 菜单按钮样式 */
+.geek-selection-tooltip button {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: var(--font-main);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+
+.geek-selection-tooltip button svg { width: 14px; height: 14px; opacity: 0.8; }
+.geek-selection-tooltip button:hover { background: rgba(255,255,255,0.15); }
+
+/* 按钮之间的分割线 */
+.st-divider {
+    width: 1px;
+    height: 18px;
+    background: rgba(255,255,255,0.2);
+    margin: 0 2px;
+}

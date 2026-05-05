@@ -11,7 +11,15 @@ permalink: /blog/
         <p class="blog-intro-text" style="margin-bottom: 30px;">你可以查看我的所有博文列表。</p>
         
         <style>
-            /* 1. 搜索框样式 */
+            /* ==========================================================
+               🌟 核心：强行隐藏来自全局的 Spotlight 图标和模态框
+               这样只会在 blog 页面隐藏，其他页面不受影响
+               ========================================================== */
+            #spotlight-trigger, #spotlight-modal {
+                display: none !important; 
+            }
+
+            /* 1. 长搜索框样式 */
             .blog-search-box {
                 position: relative;
                 width: 100%;
@@ -36,116 +44,86 @@ permalink: /blog/
                 box-shadow: 0 4px 15px rgba(0,0,0,0.05);
             }
             .blog-search-box .search-icon {
-                position: absolute;
-                left: 16px;
-                top: 50%;
-                transform: translateY(-50%);
-                color: var(--secondary-text-color);
-                width: 18px;
-                height: 18px;
-                pointer-events: none;
+                position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+                color: var(--secondary-text-color); width: 18px; height: 18px; pointer-events: none;
             }
 
-            /* ==========================================================
-                🌟 博客分类系统样式 (Categories Cloud 内嵌防脱轨)
-               ========================================================== */
+            /* 2. 分类系统样式 */
             .categories-cloud {
-                display: flex;
-                flex-wrap: wrap;
-                gap: 12px;
-                margin-bottom: 40px;
-                padding-bottom: 30px;
-                border-bottom: 1px solid var(--border-color);
+                display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 40px;
+                padding-bottom: 30px; border-bottom: 1px solid var(--border-color);
             }
-            
             .category-pill {
-                padding: 6px 16px;
+                padding: 6px 16px; border: 1px solid var(--border-color); border-radius: 30px; 
+                font-size: 13px; font-weight: 500; color: var(--secondary-text-color);
+                cursor: pointer; transition: all 0.3s ease; user-select: none; font-family: var(--font-main);
+            }
+            .category-pill sup { font-size: 10px; opacity: 0.6; margin-left: 2px; }
+            .category-pill:hover { border-color: var(--text-color); color: var(--text-color); }
+            .category-pill.active { background-color: var(--text-color); color: var(--background-light); border-color: var(--text-color); }
+            [data-theme="dark"] .category-pill.active { color: #000000; }
+            
+            .post-inline-category { font-size: 13px; color: var(--secondary-text-color); margin-right: 8px; transition: color 0.2s ease; font-weight: 400; }
+            .post-item-hux:hover .post-inline-category { color: var(--text-color); }
+            .post-item-hux { transition: opacity 0.3s ease; }
+
+            /* ==========================================================
+               🌟 页面内嵌版：检索结果容器样式 (完美还原 Spotlight 体验)
+               ========================================================== */
+            #blog-search-results {
+                background: var(--card-background);
                 border: 1px solid var(--border-color);
-                border-radius: 30px; 
-                font-size: 13px;
-                font-weight: 500;
-                color: var(--secondary-text-color);
-                cursor: pointer;
-                transition: all 0.3s ease;
-                user-select: none;
-                font-family: var(--font-main);
+                border-radius: 16px;
+                padding: 10px 0;
+                margin-bottom: 40px;
+                box-shadow: 0 12px 30px rgba(0,0,0,0.05);
+                display: none; /* 默认隐藏 */
+                animation: slideDown 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
             }
+            [data-theme="dark"] #blog-search-results { box-shadow: 0 12px 30px rgba(0,0,0,0.2); }
             
-            .category-pill sup {
-                font-size: 10px;
-                opacity: 0.6;
-                margin-left: 2px;
+            @keyframes slideDown {
+                from { opacity: 0; transform: translateY(-10px); }
+                to { opacity: 1; transform: translateY(0); }
             }
+
+            .spotlight-result-item { display: block; padding: 14px 24px; text-decoration: none; color: var(--text-color); border-left: 3px solid transparent; transition: background 0.2s, border-color 0.2s; }
+            .spotlight-result-item:hover { background: var(--background-dark); border-left-color: var(--primary-color); }
+            .spotlight-result-item h4 { margin: 0 0 5px 0; font-size: 15px; font-weight: 600; }
+            .spotlight-result-item p { margin: 0; font-size: 13px; color: var(--secondary-text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
             
-            .category-pill:hover {
-                border-color: var(--text-color);
-                color: var(--text-color);
-            }
-            
-            .category-pill.active {
-                background-color: var(--text-color);
-                color: var(--background-light);
-                border-color: var(--text-color);
-            }
-            
-            [data-theme="dark"] .category-pill.active {
-                color: #000000; 
-            }
-            
-            /* 🌟 修改后的分类标签：正常不加粗，悬停变深 */
-            .post-inline-category {
-                font-size: 13px;
-                color: var(--secondary-text-color); /* 默认呈现低调的灰色 */
-                margin-right: 8px;
-                transition: color 0.2s ease;
-                font-weight: 400; /* 🌟 核心修改：取消原来的 600 加粗，恢复正常字重 */
-            }
-            
-            /* 当鼠标悬停在文章卡片上时，颜色变深 */
-            .post-item-hux:hover .post-inline-category {
-                color: var(--text-color); /* 🌟 核心修改：原来是变成蓝色，现在改为深黑色/主文字色 */
-            }
-            
-            .post-item-hux {
-                transition: opacity 0.3s ease;
-            }
+            mark.spotlight-highlight { background: rgba(0, 122, 255, 0.15); color: var(--primary-color); font-weight: 600; padding: 0 2px; border-radius: 3px; }
+            [data-theme="dark"] mark.spotlight-highlight { background: rgba(0, 122, 255, 0.3); color: #fff; }
+            .spotlight-empty { padding: 40px; text-align: center; color: var(--secondary-text-color); font-size: 14px; }
         </style>
 
         <div class="blog-search-box">
             <i data-feather="search" class="search-icon"></i>
-            <input type="text" id="blog-search-input" placeholder="搜索博文标题、副标题或分类...">
+            <input type="text" id="blog-search-input" placeholder="输入关键词，全站秒搜..." autocomplete="off">
         </div>
 
-        <div class="categories-cloud">
+        <div id="blog-search-results">
+            <div class="spotlight-empty">键入关键词以唤醒检索引擎...</div>
+        </div>
+
+        <div class="categories-cloud" id="blog-categories">
             <span class="category-pill active" data-category="all">全部 All</span>
-            
             {% for category in site.categories %}
             <span class="category-pill" data-category="{{ category[0] }}">
                 {{ category[0] }} <sup>{{ category[1].size }}</sup>
             </span>
             {% endfor %}
-
-            
         </div>
         
         <div class="post-list-hux" id="post-list">                
             {% for post in site.posts %}
             <div class="post-item-hux" data-categories="{{ post.categories | join: ',' }}">
                 <a href="{{ post.url | relative_url }}">
-                    <h2 class="post-title-hux">
-                        {{ post.title }}
-                    </h2>
-                    
-                    {% if post.subtitle %}
-                    <h3 class="post-subtitle-hux">
-                        {{ post.subtitle }}
-                    </h3>
-                    {% endif %}
+                    <h2 class="post-title-hux">{{ post.title }}</h2>
+                    {% if post.subtitle %}<h3 class="post-subtitle-hux">{{ post.subtitle }}</h3>{% endif %}
                 </a>
-                
                 <p class="post-meta-hux">
                     Posted by {{ post.author | default: site.author | default: "Kobe_zyx" }} on {{ post.date | date: "%Y年%m月%d日" }}
-                    
                     {% if post.categories.size > 0 %}
                         &nbsp;·&nbsp; 
                         {% for category in post.categories %}
@@ -161,39 +139,145 @@ permalink: /blog/
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        if(typeof feather !== 'undefined') {
-            feather.replace();
-        }
+        if(typeof feather !== 'undefined') { feather.replace(); }
 
+        const localSearchInput = document.getElementById('blog-search-input');
+        const localSearchResults = document.getElementById('blog-search-results');
+        const blogCategories = document.getElementById('blog-categories');
+        const blogPostList = document.getElementById('post-list');
         const categoryPills = document.querySelectorAll('.category-pill[data-category]');
-        const posts = document.querySelectorAll('.post-item-hux');
-        const searchInput = document.getElementById('blog-search-input'); 
+
+        let searchData = [];
+        let isDataLoaded = false;
+
+        // 异步请求全局搜索数据
+        const loadSearchData = async () => {
+            if (isDataLoaded) return;
+            try {
+                const res = await fetch('/search.json');
+                const data = await res.json();
+                searchData = data.map((item, index) => ({
+                    elementIndex: index,
+                    url: item.url,
+                    rawTitle: item.title || "",
+                    title: (item.title || "").toLowerCase(),
+                    subtitle: (item.subtitle || "").toLowerCase(),
+                    categories: (item.categories || "").toLowerCase(),
+                    rawContent: item.content || "",
+                    content: (item.content || "").toLowerCase()
+                }));
+                isDataLoaded = true;
+            } catch (error) {
+                console.error("Failed to load search.json:", error);
+            }
+        };
+
+        loadSearchData();
 
         // ==========================================
-        // 1. 分类点击过滤逻辑
+        // 🌟 核心修改：拦截全局 Cmd+K 快捷键
+        // ==========================================
+        window.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+                // 1. 阻止默认行为（阻止浏览器搜索框）
+                e.preventDefault(); 
+                // 2. 阻止事件冒泡（切断全局 Spotlight 的弹窗唤醒逻辑）
+                e.stopPropagation(); 
+                
+                // 3. 丝滑滚动并直接聚焦本页的长搜索框
+                if (localSearchInput) {
+                    window.scrollTo({ top: localSearchInput.offsetTop - 120, behavior: 'smooth' });
+                    localSearchInput.focus();
+                }
+            }
+        }, true); // 注意这里的 true，使用捕获阶段，确保比全局脚本更早拦截！
+
+        // ==========================================
+        // 🌟 长搜索框的极致体验逻辑
+        // ==========================================
+        if (localSearchInput) {
+            localSearchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase().trim();
+
+                if (!query) {
+                    // 当搜索框为空时：隐藏搜索结果，恢复显示分类和博客列表
+                    localSearchResults.style.display = 'none';
+                    blogCategories.style.display = 'flex';
+                    blogPostList.style.display = 'block';
+                    return;
+                }
+
+                // 当正在搜索时：隐藏分类和博客列表，展示 Spotlight 搜索结果
+                blogCategories.style.display = 'none';
+                blogPostList.style.display = 'none';
+                localSearchResults.style.display = 'block';
+
+                if (!isDataLoaded) return;
+
+                const results = searchData.filter(item => 
+                    item.title.includes(query) || item.content.includes(query)
+                ).slice(0, 15); // 最多展示15条
+
+                if (results.length === 0) {
+                    localSearchResults.innerHTML = '<div class="spotlight-empty">未找到相关内容，换个词试试？</div>';
+                    return;
+                }
+
+                localSearchResults.innerHTML = '';
+                results.forEach(item => {
+                    let contentExcerpt = '';
+                    const matchIndex = item.content.indexOf(query);
+                    
+                    if (matchIndex !== -1) {
+                        const start = Math.max(0, matchIndex - 15);
+                        const end = Math.min(item.rawContent.length, matchIndex + query.length + 35);
+                        contentExcerpt = (start > 0 ? '... ' : '') + item.rawContent.substring(start, end) + ' ...';
+                    } else {
+                        contentExcerpt = item.rawContent.substring(0, 50) + '...';
+                    }
+
+                    const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    const regex = new RegExp(`(${escapedQuery})`, 'gi');
+                    const hlTitle = item.rawTitle.replace(regex, '<mark class="spotlight-highlight">$1</mark>');
+                    const hlContent = contentExcerpt.replace(regex, '<mark class="spotlight-highlight">$1</mark>');
+
+                    const a = document.createElement('a');
+                    a.href = item.url;
+                    a.className = 'spotlight-result-item';
+                    a.innerHTML = `<h4>${hlTitle}</h4><p>${hlContent}</p>`;
+                    localSearchResults.appendChild(a);
+                });
+            });
+        }
+
+        // ==========================================
+        // 分类过滤逻辑 (点分类时清空搜索框)
         // ==========================================
         categoryPills.forEach(pill => {
             pill.addEventListener('click', function(e) {
-                // 如果点的是带有 href 的链接(比如归档时光机)，就不执行过滤动画，让它正常跳转
                 if (this.getAttribute('href')) return;
 
-                if (searchInput) searchInput.value = '';
+                // 如果正在搜索，点击分类会清空搜索状态并恢复列表
+                if (localSearchInput && localSearchInput.value !== '') {
+                    localSearchInput.value = '';
+                    localSearchInput.dispatchEvent(new Event('input'));
+                }
 
                 categoryPills.forEach(p => p.classList.remove('active'));
                 this.classList.add('active');
 
                 const selectedCategory = this.getAttribute('data-category');
+                const postsDOMArray = document.querySelectorAll('.post-item-hux');
 
-                posts.forEach(post => {
+                postsDOMArray.forEach(post => {
                     post.style.opacity = '0'; 
-                    
                     setTimeout(() => {
                         if (selectedCategory === 'all') {
                             post.style.display = 'block';
                             setTimeout(() => post.style.opacity = '1', 50);
                         } else {
-                            const postCategories = post.getAttribute('data-categories').split(',');
-                            if (postCategories.includes(selectedCategory)) {
+                            const postCategories = post.getAttribute('data-categories');
+                            if (postCategories && postCategories.split(',').includes(selectedCategory)) {
                                 post.style.display = 'block';
                                 setTimeout(() => post.style.opacity = '1', 50);
                             } else {
@@ -204,31 +288,5 @@ permalink: /blog/
                 });
             });
         });
-
-        // ==========================================
-        // 2. 搜索框实时匹配逻辑 (完美支持 Categories)
-        // ==========================================
-        if (searchInput) {
-            searchInput.addEventListener('input', function(e) {
-                const query = e.target.value.toLowerCase().trim();
-
-                categoryPills.forEach(p => p.classList.remove('active'));
-                document.querySelector('.category-pill[data-category="all"]')?.classList.add('active');
-
-                posts.forEach(post => {
-                    const title = post.querySelector('.post-title-hux')?.textContent.toLowerCase() || '';
-                    const subtitle = post.querySelector('.post-subtitle-hux')?.textContent.toLowerCase() || '';
-                    const categories = post.getAttribute('data-categories').toLowerCase();
-
-                    if (title.includes(query) || subtitle.includes(query) || categories.includes(query)) {
-                        post.style.display = 'block';
-                        setTimeout(() => post.style.opacity = '1', 50); 
-                    } else {
-                        post.style.opacity = '0';
-                        setTimeout(() => post.style.display = 'none', 300); 
-                    }
-                });
-            });
-        }
     });
 </script>

@@ -99,6 +99,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    
+
     // 头像滚动效果
     const profilePhoto = document.querySelector('.profile-photo');
     let ticking = false;
@@ -201,47 +203,7 @@ document.addEventListener('DOMContentLoaded', function() {
     highlightNavLink();
 });
 
-// 深浅模式切换逻辑
-document.addEventListener('DOMContentLoaded', function() {
-    const themeToggle = document.querySelector('.theme-toggle');
 
-    // 获取当前主题
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    if (savedTheme === 'dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
-    }
-
-    // 🌟 核心魔法：向 Giscus 的 iframe 发送跨域换色指令
-    function syncGiscusTheme(theme) {
-        const iframe = document.querySelector('iframe.giscus-frame');
-        if (!iframe) return;
-        // 向评论区内部传递当前主题状态
-        iframe.contentWindow.postMessage(
-            { giscus: { setConfig: { theme: theme } } },
-            'https://giscus.app'
-        );
-    }
-
-    // 监听右上角按钮的点击切换
-    themeToggle.addEventListener('click', () => {
-        const currentTheme = document.documentElement.getAttribute('data-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        
-        // 切换网页本地主题
-        document.documentElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
-
-        // ⚡️ 同时让评论区瞬间变色
-        syncGiscusTheme(newTheme);
-    });
-
-    // 🌟 核心防御：当 Giscus 刚刚加载完毕时，自动校准一次颜色
-    window.addEventListener('message', (event) => {
-        if (event.origin === 'https://giscus.app') {
-            syncGiscusTheme(document.documentElement.getAttribute('data-theme') || 'light');
-        }
-    });
-});
 
 
 
@@ -403,3 +365,441 @@ const restoreScrollPos = () => {
 // 3. 挂载到两大核心生命周期上
 document.addEventListener('DOMContentLoaded', restoreScrollPos);
 window.addEventListener('pageshow', restoreScrollPos);
+
+
+// ==========================================
+// 阅读进度条引擎 (Reading Progress Bar)
+// ==========================================
+class ReadingProgressBar {
+    constructor() {
+        this.progressBar = null;
+        this.progressFill = null;
+        this.ticking = false;
+        this.init();
+    }
+
+    /**
+     * 初始化进度条
+     * 检测页面类型，仅在博客文章页创建进度条
+     */
+    init() {
+        if (!this.isBlogPostPage()) {
+            return;
+        }
+        this.createProgressBar();
+        this.bindEvents();
+    }
+
+    /**
+     * 检测是否为博客文章页
+     * @returns {boolean}
+     */
+    isBlogPostPage() {
+        try {
+            const path = window.location.pathname;
+            // 检测是否为博客文章页：
+            // 1. 路径以 .html 结尾（文章页面）
+            // 2. 排除首页、博客列表页、时间轴、项目页等
+            // 3. 排除 /blog/index.html 和 /blog/
+            const isHtmlPage = path.endsWith('.html');
+            const isExcludedPage = path === '/' || 
+                                   path === '/index.html' ||
+                                   path === '/blog/' ||
+                                   path === '/blog/index.html' ||
+                                   path === '/timeline/' ||
+                                   path === '/timeline/index.html' ||
+                                   path === '/projects/' ||
+                                   path === '/projects/index.html' ||
+                                   path === '/archive/' ||
+                                   path === '/archive/index.html' ||
+                                   path === '/hall/' ||
+                                   path === '/hall/index.html' ||
+                                   path === '/stack/' ||
+                                   path === '/stack/index.html' ||
+                                   path === '/changelog/' ||
+                                   path === '/changelog/index.html';
+            
+            return isHtmlPage && !isExcludedPage;
+        } catch (error) {
+            console.warn('Reading Progress Bar: Failed to detect page type', error);
+            return false; // 默认不显示进度条
+        }
+    }
+
+    /**
+     * 创建进度条 DOM 元素
+     */
+    createProgressBar() {
+        try {
+            this.progressBar = document.createElement('div');
+            this.progressBar.id = 'reading-progress-bar';
+            this.progressBar.className = 'reading-progress-bar';
+            
+            this.progressFill = document.createElement('div');
+            this.progressFill.className = 'progress-fill';
+            
+            this.progressBar.appendChild(this.progressFill);
+            document.body.appendChild(this.progressBar);
+        } catch (error) {
+            console.error('Reading Progress Bar: Failed to create DOM elements', error);
+            this.progressBar = null;
+            this.progressFill = null;
+        }
+    }
+
+    /**
+     * 绑定滚动事件监听器
+     */
+    bindEvents() {
+        window.addEventListener('scroll', () => this.onScroll(), { passive: true });
+        // 初始化时计算一次进度
+        this.updateProgress();
+    }
+
+    /**
+     * 滚动事件处理器（使用 requestAnimationFrame 节流）
+     */
+    onScroll() {
+        if (!this.ticking) {
+            window.requestAnimationFrame(() => {
+                this.updateProgress();
+                this.ticking = false;
+            });
+            this.ticking = true;
+        }
+    }
+
+    /**
+     * 计算并更新进度条宽度
+     */
+    updateProgress() {
+        try {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const docHeight = document.documentElement.scrollHeight;
+            const winHeight = window.innerHeight;
+            
+            // 防御性检查
+            if (!this.progressFill || docHeight <= winHeight) {
+                return;
+            }
+            
+            const scrollPercent = scrollTop / (docHeight - winHeight);
+            const scrollPercentRounded = Math.max(0, Math.min(100, Math.round(scrollPercent * 100)));
+            
+            this.progressFill.style.width = `${scrollPercentRounded}%`;
+        } catch (error) {
+            console.error('Reading Progress Bar: Failed to update progress', error);
+        }
+    }
+
+    /**
+     * 清理资源（页面卸载时调用）
+     */
+    destroy() {
+        if (this.progressBar && this.progressBar.parentNode) {
+            this.progressBar.parentNode.removeChild(this.progressBar);
+        }
+    }
+}
+
+// 在 DOMContentLoaded 事件中初始化阅读进度条
+document.addEventListener('DOMContentLoaded', function() {
+    const readingProgressBar = new ReadingProgressBar();
+    
+    // 页面卸载时清理资源
+    window.addEventListener('beforeunload', () => {
+        readingProgressBar.destroy();
+    });
+});
+
+// ==========================================
+// 🌟 极客彩蛋：隐藏终端 (Terminal) 引擎
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    const terminal = document.getElementById('geek-terminal');
+    if (!terminal) return;
+
+    const termInput = document.getElementById('terminal-input');
+    const termOutput = document.getElementById('terminal-output');
+    const termClose = document.getElementById('terminal-close');
+    const matrixCanvas = document.getElementById('matrix-canvas');
+    let isTerminalOpen = false;
+
+    // 打开/关闭逻辑
+    const openTerminal = () => {
+        terminal.classList.add('show');
+        isTerminalOpen = true;
+        setTimeout(() => termInput.focus(), 200);
+    };
+    const closeTerminal = () => {
+        terminal.classList.remove('show');
+        isTerminalOpen = false;
+        termInput.blur();
+        stopMatrix(); // 关闭时停止代码雨节省性能
+    };
+
+    // 监听 Ctrl+~ 或 Cmd+~
+    document.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && (e.key === '`' || e.code === 'Backquote')) {
+            e.preventDefault();
+            if (isTerminalOpen) closeTerminal();
+            else openTerminal();
+        }
+        if (e.key === 'Escape' && isTerminalOpen) {
+            closeTerminal();
+        }
+    });
+
+    termClose.addEventListener('click', closeTerminal);
+    terminal.querySelector('.terminal-body').addEventListener('click', () => {
+        if (window.getSelection().toString() === '') termInput.focus();
+    });
+
+    // 打印输出函数
+    const printLine = (text, type = '') => {
+        const line = document.createElement('div');
+        if (type) line.className = `terminal-text-${type}`;
+        line.innerHTML = text; 
+        termOutput.appendChild(line);
+        termOutput.parentNode.scrollTop = termOutput.parentNode.scrollHeight;
+    };
+
+    // 🌟 极客专属指令集
+    const commands = {
+        help: () => {
+            printLine('Available commands:', 'yellow');
+            printLine('  <span class="terminal-text-blue">whoami</span>  - About the author');
+            printLine('  <span class="terminal-text-blue">date</span>    - Current system time');
+            printLine('  <span class="terminal-text-blue">clear</span>   - Clear terminal output');
+            printLine('  <span class="terminal-text-blue">matrix</span>  - Enter the matrix (Easter Egg)');
+            printLine('  <span class="terminal-text-blue">exit</span>    - Close terminal');
+        },
+        whoami: () => {
+            printLine('Name: Kobe_zyx', 'green');
+            printLine('Role: Geek, Developer, Blogger');
+            printLine('Status: Writing code and changing the world.');
+        },
+        date: () => { printLine(new Date().toString()); },
+        clear: () => { termOutput.innerHTML = ''; },
+        exit: () => { closeTerminal(); },
+        matrix: () => {
+            printLine('Initializing Matrix protocol...', 'green');
+            startMatrix();
+        }
+    };
+
+    // 监听输入回车
+    termInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            const cmd = termInput.value.trim().toLowerCase();
+            printLine(`geek@blog:~$ ${termInput.value}`);
+            termInput.value = '';
+            
+            if (cmd) {
+                if (commands[cmd]) commands[cmd]();
+                else printLine(`bash: ${cmd}: command not found. Type 'help'.`, 'yellow');
+            }
+        }
+    });
+
+    // 🌟 Matrix 代码雨引擎 (Canvas)
+    let matrixInterval;
+    const startMatrix = () => {
+        if (matrixCanvas.classList.contains('active')) return;
+        matrixCanvas.classList.add('active');
+        const ctx = matrixCanvas.getContext('2d');
+        matrixCanvas.width = terminal.offsetWidth;
+        matrixCanvas.height = terminal.offsetHeight;
+
+        const chars = '01'; // 纯粹的 01 矩阵
+        const fontSize = 14;
+        const columns = matrixCanvas.width / fontSize;
+        const drops = Array(Math.floor(columns)).fill(1);
+
+        clearInterval(matrixInterval);
+        matrixInterval = setInterval(() => {
+            ctx.fillStyle = 'rgba(30, 30, 30, 0.1)';
+            ctx.fillRect(0, 0, matrixCanvas.width, matrixCanvas.height);
+            
+            ctx.fillStyle = '#0F0';
+            ctx.font = fontSize + 'px monospace';
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = chars.charAt(Math.floor(Math.random() * chars.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > matrixCanvas.height && Math.random() > 0.95) drops[i] = 0;
+                drops[i]++;
+            }
+        }, 33);
+    };
+
+    const stopMatrix = () => {
+        matrixCanvas.classList.remove('active');
+        clearInterval(matrixInterval);
+    };
+    
+    window.addEventListener('resize', () => {
+        if(matrixCanvas.classList.contains('active')){
+            matrixCanvas.width = terminal.offsetWidth;
+            matrixCanvas.height = terminal.offsetHeight;
+        }
+    });
+});
+
+// ==========================================
+// 🌟 极客引擎：鼠标探照灯坐标实时同步 (性能优化版)
+// ==========================================
+document.addEventListener('mousemove', (e) => {
+    // 🌟 核心拦截：如果是浅色模式，直接 return，不计算坐标，不消耗一滴性能！
+    if (document.documentElement.getAttribute('data-theme') !== 'dark') return;
+    
+    const spotlight = document.getElementById('mouse-spotlight');
+    if (!spotlight) return;
+
+    window.requestAnimationFrame(() => {
+        spotlight.style.left = e.clientX + 'px';
+        spotlight.style.top = e.clientY + 'px';
+    });
+});
+
+// 当鼠标离开窗口时，优雅地淡出光晕 (改用 Class 控制，彻底告别内联样式污染)
+document.addEventListener('mouseleave', () => {
+    const spotlight = document.getElementById('mouse-spotlight');
+    if (spotlight) spotlight.classList.add('is-hidden');
+});
+
+// 鼠标重新进入时恢复
+document.addEventListener('mouseenter', () => {
+    const spotlight = document.getElementById('mouse-spotlight');
+    if (spotlight) spotlight.classList.remove('is-hidden');
+});
+
+// ==========================================
+// 🌟 极客引擎：沉浸式划词菜单 (Text Selection Tooltip)
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. 用 JS 凭空捏造一个菜单 DOM，绝对不污染 HTML
+    const tooltip = document.createElement('div');
+    tooltip.className = 'geek-selection-tooltip';
+    tooltip.innerHTML = `
+        <button id="st-copy"><i data-feather="copy"></i> 复制金句</button>
+        <div class="st-divider"></div>
+        <button id="st-share"><i data-feather="twitter"></i> 分享至 X</button>
+    `;
+    document.body.appendChild(tooltip);
+    if(typeof feather !== 'undefined') feather.replace();
+
+    let selectedText = '';
+
+    // 2. 🌟 核心升级：监听“鼠标右键”事件 (contextmenu)
+    document.addEventListener('contextmenu', (e) => {
+        // 🌟 终极交互逻辑：如果自定义菜单已经处于“打开”状态，说明这是用户的“第二次右键”！
+        // 此时我们隐藏自定义菜单，并且【绝对不拦截默认事件】，让浏览器原生菜单顺滑弹出！
+        if (tooltip.classList.contains('show')) {
+            tooltip.classList.remove('show');
+            setTimeout(() => { tooltip.style.display = 'none'; }, 200);
+            return; // 极其关键的 return，不再往下执行 e.preventDefault()
+        }
+
+        // 如果右键点击的是我们自己的菜单，直接拦截
+        if (tooltip.contains(e.target)) {
+            e.preventDefault();
+            return;
+        }
+
+        const selection = window.getSelection();
+        selectedText = selection.toString().trim();
+
+        // 区域探测：判断选中的文本是否在博文正文内 (.markdown-content)
+        let isInsidePost = false;
+        if (selection.rangeCount > 0) {
+            let container = selection.getRangeAt(0).commonAncestorContainer;
+            if (container.nodeType === 3) container = container.parentNode; 
+            if (container.closest('.markdown-content')) {
+                isInsidePost = true;
+            }
+        }
+
+        const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+        
+        // 触发条件：有选中文字 + 在博文区内 + 不在输入框里
+        if (selectedText.length > 0 && isInsidePost && activeTag !== 'input' && activeTag !== 'textarea') {
+            
+            e.preventDefault(); // 第一次右键：拦截原生菜单
+            
+            const range = selection.getRangeAt(0);
+            const rect = range.getBoundingClientRect(); 
+            
+            tooltip.style.display = 'flex';
+            void tooltip.offsetWidth; // 触发重绘，保证动画不跳闪
+
+            const tooltipWidth = tooltip.offsetWidth;
+            const tooltipHeight = tooltip.offsetHeight;
+            
+            // 计算坐标
+            let top = rect.top + window.scrollY - tooltipHeight - 12; 
+            let left = rect.left + window.scrollX + (rect.width / 2) - (tooltipWidth / 2);
+            
+            // 边缘检测与翻转：如果文字太靠顶部，小三角和菜单翻转到文字下方
+            if (top < window.scrollY) {
+                top = rect.bottom + window.scrollY + 12;
+                tooltip.style.transformOrigin = 'top center';
+                tooltip.classList.add('flip'); 
+            } else {
+                tooltip.style.transformOrigin = 'bottom center';
+                tooltip.classList.remove('flip');
+            }
+            
+            tooltip.style.top = `${top}px`;
+            tooltip.style.left = `${left}px`;
+            tooltip.classList.add('show');
+            
+        } else {
+            // 不符合条件时，隐藏我们自己的菜单，放行系统原生菜单
+            tooltip.classList.remove('show');
+            setTimeout(() => { 
+                if(!tooltip.classList.contains('show')) tooltip.style.display = 'none'; 
+            }, 200); 
+        }
+    });
+
+    // 3. 点击鼠标左键时，强制隐藏菜单
+    document.addEventListener('mousedown', (e) => {
+        // 如果是按右键(e.button === 2)，交由上面的 contextmenu 去处理，这里忽略
+        if (e.button === 2) return; 
+        
+        if (!tooltip.contains(e.target) && tooltip.classList.contains('show')) {
+            tooltip.classList.remove('show');
+            setTimeout(() => { tooltip.style.display = 'none'; }, 200);
+        }
+    });
+
+    // 4. 核心功能：优雅地复制
+    document.getElementById('st-copy').addEventListener('click', () => {
+        navigator.clipboard.writeText(selectedText).then(() => {
+            const btn = document.getElementById('st-copy');
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i data-feather="check"></i> 复制成功';
+            feather.replace();
+            btn.style.color = '#10B981'; // 绿字成功提示
+
+            setTimeout(() => {
+                btn.innerHTML = originalHtml;
+                btn.style.color = '';
+                feather.replace();
+                window.getSelection().removeAllRanges(); // 复制完毕取消高亮
+                tooltip.classList.remove('show');
+            }, 1500);
+        });
+    });
+
+    // 5. 核心功能：一键分享至 X (Twitter)
+    document.getElementById('st-share').addEventListener('click', () => {
+        const url = encodeURIComponent(window.location.href);
+        const text = encodeURIComponent(`「${selectedText}」`);
+        window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank', 'width=600,height=500,left=200,top=200');
+        
+        window.getSelection().removeAllRanges();
+        tooltip.classList.remove('show');
+    });
+});
