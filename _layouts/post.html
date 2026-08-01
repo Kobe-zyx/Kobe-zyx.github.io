@@ -37,7 +37,12 @@ layout: default
                 {% assign diff_seconds = current_date | minus: post_date %}
                 {% assign diff_days = diff_seconds | divided_by: 86400 %}
                 
-                {% if diff_days > 180 %}
+                {% assign is_target_category = false %}
+                {% if page.categories contains "教程操作" or page.categories contains "软件推荐" or page.category == "教程操作" or page.category == "软件推荐" %}
+                    {% assign is_target_category = true %}
+                {% endif %}
+
+                {% if diff_days > 180 and is_target_category %}
                 <div class="outdated-warning fade-in">
                     <i data-feather="alert-triangle"></i>
                     <div class="warning-text">
