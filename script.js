@@ -803,3 +803,136 @@ document.addEventListener('DOMContentLoaded', () => {
         tooltip.classList.remove('show');
     });
 });
+
+
+// ==========================================
+// 🌟 极客引擎：Apple TV 级 3D 空间卡片倾斜悬浮 (3D Tilt Engine)
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    // 自动搜寻全站所有的卡片元素
+    const cardSelectors = '.related-post-card, .career-item-card, .music-track, .portfolio-item';
+    const cards = document.querySelectorAll(cardSelectors);
+
+    cards.forEach(card => {
+        // 给卡片打上 3D 物理类名
+        card.classList.add('tilt-card');
+
+        // 如果内部还没有高光层，自动凭空注入高光 DOM
+        if (!card.querySelector('.tilt-card-glare')) {
+            const glare = document.createElement('div');
+            glare.className = 'tilt-card-glare';
+            card.appendChild(glare);
+        }
+
+        let ticking = false;
+
+        card.addEventListener('mousemove', (e) => {
+            // 鼠标移动时，移除平滑归位类名，保证贴合度
+            card.classList.remove('tilt-reset');
+
+            if (!ticking) {
+                window.requestAnimationFrame(() => {
+                    const rect = card.getBoundingClientRect();
+                    const width = rect.width;
+                    const height = rect.height;
+                    
+                    // 计算鼠标相对卡片中心点的百分比 (-0.5 ~ 0.5)
+                    const mouseX = e.clientX - rect.left;
+                    const mouseY = e.clientY - rect.top;
+                    
+                    const xPct = (mouseX / width) - 0.5;
+                    const yPct = (mouseY / height) - 0.5;
+
+                    // 倾斜角度设定：最大倾斜 10 度
+                    const maxTilt = 10;
+                    const rotateX = (-yPct * maxTilt).toFixed(2); // 沿 X 轴旋转 (上下倾斜)
+                    const rotateY = (xPct * maxTilt).toFixed(2);  // 沿 Y 轴旋转 (左右倾斜)
+
+                    // 🌟 物理变形：1000px 3D 视距 + 双轴旋转 + Z轴微微放大浮起
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+
+                    // 🌟 镜面高光坐标同步 (百分比)
+                    const glareX = ((mouseX / width) * 100).toFixed(1);
+                    const glareY = ((mouseY / height) * 100).toFixed(1);
+                    card.style.setProperty('--glare-x', `${glareX}%`);
+                    card.style.setProperty('--glare-y', `${glareY}%`);
+
+                    ticking = false;
+                });
+                ticking = true;
+            }
+        });
+
+        card.addEventListener('mouseleave', () => {
+            // 鼠标离开卡片时，触发平滑复位
+            card.classList.add('tilt-reset');
+            card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
+        });
+    });
+});
+
+// ==========================================
+// 🌟 极客引擎：视频链接自动解析与懒加载 (Auto Video Embed 终极防御版)
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    const links = document.querySelectorAll('.markdown-content a');
+
+    links.forEach(link => {
+        try {
+            // 安全获取超链接，防止对象报错
+            const url = link.getAttribute('href') || '';
+            if (!url) return;
+            
+            let wrapper = null;
+
+            // 1. YouTube 嗅探器
+            const ytMatch = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i);
+            if (ytMatch) {
+                const videoId = ytMatch[1];
+                // 🌟 修复：改用 hqdefault.jpg 替代 maxresdefault.jpg，彻底解决 404 破图报错！
+                const coverUrl = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+                
+                wrapper = document.createElement('div');
+                wrapper.className = 'geek-video-wrapper';
+                wrapper.innerHTML = `
+                    <div class="video-cover-container" title="点击播放视频">
+                        <img src="${coverUrl}" alt="YouTube Video Cover" loading="lazy">
+                        <div class="video-play-btn">
+                            <svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                        </div>
+                    </div>
+                `;
+                const coverContainer = wrapper.querySelector('.video-cover-container');
+                coverContainer.addEventListener('click', function() {
+                    wrapper.innerHTML = `<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
+                });
+            } 
+            // 2. Bilibili 嗅探器
+            else {
+                const biliMatch = url.match(/bilibili\.com\/video\/(BV[a-zA-Z0-9]+)/i);
+                if (biliMatch) {
+                    const bvid = biliMatch[1];
+                    wrapper = document.createElement('div');
+                    wrapper.className = 'geek-video-wrapper';
+                    wrapper.innerHTML = `<iframe src="//player.bilibili.com/player.html?bvid=${bvid}&page=1&high_quality=1&danmaku=0" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>`;
+                }
+            }
+
+            // 🌟 终极渲染替换逻辑，加入 DOM 容错处理
+            if (wrapper) {
+                const parent = link.parentNode;
+                if (!parent) return; 
+
+                if (parent.tagName === 'P' && parent.textContent.trim() === link.textContent.trim()) {
+                    if (parent.parentNode) {
+                        parent.parentNode.replaceChild(wrapper, parent);
+                    }
+                } else {
+                    parent.replaceChild(wrapper, link);
+                }
+            }
+        } catch (e) {
+            console.warn('视频解析异常，安全跳过:', e);
+        }
+    });
+});    

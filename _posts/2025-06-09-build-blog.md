@@ -8,6 +8,7 @@ tags:
 - website
 categories:
 - 教程操作
+updated: Aug 2, 2026 13:22 PM
 ---
 
 ## 1. 局限性说明
@@ -20,16 +21,14 @@ categories:
 
 ### 2.1 原生开发
 
-我的个人博客即采用原生开发，可以通过以下链接访问本网页：
-
-* **演示地址**：[https://kobezyx.com/](https://kobezyx.com/) 或 [https://kobezyx.xx.kg/](https://www.google.com/search?q=https://kobezyx.xx.kg/)
+我**从前**的博客采用过原生开发。
 * **开源代码**：[点击这里访问 GitHub](https://github.com/Kobe-zyx/blog-demo)
 
 ### 2.2 Hexo 框架
 
-我之前的个人博客是基于 Hexo 框架开发的（现已弃用，但仍可访问），此网站目前已经闭源。在此特别感谢 **【安知鱼】** 大佬的开源精神！
+我之前的个人博客（早于上面的原生开发）是基于 Hexo 框架开发的（现已弃用），此网站目前已经闭源。在此特别感谢 **【安知鱼】** 大佬的开源精神！
 
-* **历史演示地址**：[点击这里访问](https://kobeblog.dpdns.org/)
+
 * **相关资源**：
 * [Hexo 官方网站](https://hexo.io/zh-cn/)
 * [Hexo 官方主题库](https://hexo.io/themes/)
@@ -50,10 +49,11 @@ categories:
 
 | 工具类型 | 推荐工具与链接 | 适用模型示例 | 效果评价 |
 | --- | --- | --- | --- |
-| **网页端 AI** | [Gemini](https://gemini.google.com/app) | Gemini 2.5 Flash / Pro | 响应迅速 |
-| **网页端 AI** | [Claude](https://claude.ai/onboarding) | Claude 3.7 / 4 Sonnet | **Claude 4 Sonnet 效果最佳** |
-| **AI 代码编辑器** | [Cursor](https://www.cursor.com/cn) | 聚合多种大模型 | **效果最佳** |
+| **网页端 AI** | [Gemini](https://gemini.google.com/app) | Gemini 3.1  Pro | 效果极佳 |
+| **网页端 AI** | [Claude](https://claude.ai/onboarding) | Claude Opus 5.0 | 体验不佳 |
+| **AI 代码编辑器** | [Cursor](https://www.cursor.com/cn) | 聚合多种大模型 | **之前的顶流** |
 | **AI 代码编辑器** | [Trae](https://www.trae.ai/) | 聚合多种大模型 | 值得一试 |
+| **CLI** | [Claude Code](https://claude.com/product/claude-code) | 外部接入 | 网传能打 |
 
 **第二步：本地预览代码**
 将 AI 生成的代码保存在本地文件夹中，并在代码编辑器中点击 HTML 文件进行本地预览。建议的命名规范如下：

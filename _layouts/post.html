@@ -12,17 +12,24 @@ layout: default
             <div class="blog-main-content">
                 <h1 style="margin-top: 0; font-size: 2.5em; line-height: 1.2; letter-spacing: -0.02em;">{{ page.title }}</h1>
                 
-                <div class="post-meta" style="color: var(--secondary-text-color); font-size: 0.9em; margin-bottom: 40px; display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
+<div class="post-meta" style="color: var(--secondary-text-color); font-size: 0.9em; margin-bottom: 40px; display: flex; align-items: center; flex-wrap: wrap; gap: 6px;">
                     <span>{{ page.author | default: site.author | default: "Kobe_zyx" }}</span>
                     <span>·</span>
-                    <span>{{ page.date | date: "%Y年%m月%d日" }}</span>
+                    <span>发布于 {{ page.date | date: "%Y年%m月%d日" }}</span>
+
+                    {% if page.updated %}
+                    <span>·</span>
+                    <span style="color: var(--primary-color);" title="本文曾重新迭代与补充">
+                        更新于 {{ page.updated | date: "%Y年%m月%d日" }}
+                    </span>
+                    {% endif %}
                     
                     {% if page.categories.size > 0 %} 
                         <span>·</span>
                         <span style="background: var(--border-color); padding: 2px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 600;">{{ page.categories.first }}</span>
                     {% endif %}
                     
-                    {% assign clean_content = content | strip_html | strip_newlines | remove: " " | remove: "　" %}
+                    {% assign clean_content = content | strip_html | strip_newlines | remove: " " | remove: " " %}
                     {% assign char_count = clean_content | size %}
                     {% assign read_time = char_count | divided_by: 350 | plus: 1 %}
                     <span>·</span>
@@ -33,7 +40,13 @@ layout: default
                 </div>
                 
                 {% assign current_date = 'now' | date: '%s' %}
-                {% assign post_date = page.date | date: '%s' %}
+                
+                {% if page.updated %}
+                    {% assign post_date = page.updated | date: '%s' %}
+                {% else %}
+                    {% assign post_date = page.date | date: '%s' %}
+                {% endif %}
+                
                 {% assign diff_seconds = current_date | minus: post_date %}
                 {% assign diff_days = diff_seconds | divided_by: 86400 %}
                 
@@ -50,8 +63,7 @@ layout: default
                         随着时间的推移，文中的部分技术细节、API 或操作界面可能已发生变化，请在实战中注意甄别。
                     </div>
                 </div>
-                {% endif %}
-                          
+                {% endif %}        
                 <div class="markdown-content" id="markdown-content">
                     {{ content }}
                 </div>

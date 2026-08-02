@@ -2288,7 +2288,7 @@ footer .container {
     font-size: 13px;
     color: var(--secondary-text-color);
     display: -webkit-box;
-    -webkit-line-clamp: 1;
+    /* -webkit-line-clamp: 1; */
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -2650,4 +2650,139 @@ mark.spotlight-highlight {
     height: 18px;
     background: rgba(255,255,255,0.2);
     margin: 0 2px;
+}
+
+
+/* ==========================================================
+   🌟 极客设计：Apple TV 级 3D 空间卡片倾斜悬浮 (3D Hover Tilt)
+   ========================================================== */
+.tilt-card {
+    position: relative;
+    transform-style: preserve-3d;
+    will-change: transform;
+    /* 鼠标在内部移动时极其贴合 */
+    transition: transform 0.1s ease-out, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+/* 🌟 核心：鼠标离开时，开启 0.5s 贝塞尔曲线平滑归位 */
+.tilt-card.tilt-reset {
+    transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease, border-color 0.3s ease !important;
+}
+
+/* 🌟 动态镜面高光遮罩 (Mirror Glare) */
+.tilt-card-glare {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none; /* 绝对不能阻挡卡片内部的点击！ */
+    z-index: 5;
+    /* 浅色模式：柔和白光 */
+    background: radial-gradient(
+        circle at var(--glare-x, 50%) var(--glare-y, 50%),
+        rgba(255, 255, 255, 0.35) 0%,
+        rgba(255, 255, 255, 0.08) 40%,
+        transparent 75%
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+/* 深色模式：更富科技感的微光 */
+[data-theme="dark"] .tilt-card-glare {
+    background: radial-gradient(
+        circle at var(--glare-x, 50%) var(--glare-y, 50%),
+        rgba(255, 255, 255, 0.18) 0%,
+        rgba(255, 255, 255, 0.04) 40%,
+        transparent 75%
+    );
+}
+
+.tilt-card:hover .tilt-card-glare {
+    opacity: 1;
+}
+
+
+/* ==========================================================
+   🌟 极客设计：视频链接自动解析卡片 (Auto Video Embed)
+   ========================================================== */
+.geek-video-wrapper {
+    position: relative;
+    width: 100%;
+    /* 强制保持 16:9 的黄金视频比例 */
+    aspect-ratio: 16 / 9; 
+    margin: 2em 0;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: var(--background-dark);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--border-color);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+[data-theme="dark"] .geek-video-wrapper {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.geek-video-wrapper:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 15px 40px rgba(0, 122, 255, 0.15);
+}
+
+/* 封面图片层 */
+.video-cover-container {
+    position: absolute;
+    inset: 0;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-size: cover;
+    background-position: center;
+    transition: opacity 0.3s ease;
+}
+
+.video-cover-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    margin: 0 !important; /* 覆盖 markdown img 的默认边距 */
+}
+
+/* 悬浮的毛玻璃播放按钮 */
+.video-play-btn {
+    position: absolute;
+    width: 64px;
+    height: 64px;
+    background: rgba(30, 30, 30, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.video-play-btn svg {
+    width: 28px;
+    height: 28px;
+    fill: #fff;
+    margin-left: 4px; /* 播放三角视觉居中修正 */
+}
+
+.video-cover-container:hover .video-play-btn {
+    transform: scale(1.1);
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* 内嵌的真实播放器 */
+.geek-video-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
 }
