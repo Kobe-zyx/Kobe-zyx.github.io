@@ -4,6 +4,8 @@ title: Archive |
 permalink: /archive/
 ---
 
+
+
 <section class="timeline-section" style="margin-top: 100px;">
     <div class="container">
         <h1 style="margin-bottom: 10px;">Archive</h1>
@@ -69,6 +71,7 @@ permalink: /archive/
         </div>
 
         <div class="archive-container">
+         
             {% for post in site.posts %}
                 {% capture current_year %}{{ post.date | date: "%Y" }}{% endcapture %}
                 

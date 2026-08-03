@@ -2786,3 +2786,493 @@ mark.spotlight-highlight {
     height: 100%;
     border: none;
 }
+
+/* ==========================================================
+   🌟 首页 Hero 双栏排版升级
+   ========================================================== */
+.hero-content-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+    flex-wrap: wrap-reverse; /* 手机端自动将头像折叠到顶部 */
+}
+
+.hero-text {
+    flex: 1;
+    min-width: 300px; /* 保证文字区不被过度挤压 */
+}
+
+.hero-avatar {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+}
+
+/* 覆盖旧的头像样式，放大并增加呼吸质感 */
+.hero-section .profile-photo {
+    width: 220px !important;
+    height: 220px !important;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    border: 4px solid var(--background-light); 
+    margin-bottom: 0 !important; 
+}
+
+[data-theme="dark"] .hero-section .profile-photo {
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    border-color: var(--background-dark);
+}
+
+@media (max-width: 768px) {
+    .hero-content-wrapper {
+        flex-direction: column-reverse; /* 手机端头像在上，文字在下 */
+        text-align: center;
+    }
+    .hero-section .social-links { justify-content: center; }
+    .hero-section p { text-align: left; } /* 手机段落保持左对齐易读 */
+}
+
+/* ==========================================================
+   🌟 热力图容器：拆除卡片外壳，融入页面，向左对齐！
+   ========================================================== */
+#geek-heatmap-container {
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0 0 40px 0; /* 核心：取消 auto 居中，彻底向左看齐 */
+    padding: 10px 0; /* 核心：移除左右内边距，与正文完美对齐 */
+    background: transparent; /* 移除白底卡片 */
+    border: none; /* 移除边框 */
+    box-shadow: none; /* 移除阴影 */
+}
+
+/* 热力图标题对齐修正 */
+.heatmap-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-color);
+    margin-bottom: 20px;
+    padding-left: 2px;
+}
+
+.heatmap-scroll-wrapper {
+    overflow-x: auto;
+    padding-bottom: 10px;
+}
+.heatmap-scroll-wrapper::-webkit-scrollbar { height: 6px; }
+.heatmap-scroll-wrapper::-webkit-scrollbar-thumb { background-color: var(--border-color); border-radius: 3px; }
+
+/* 内部网格绝对左对齐 */
+.heatmap-grid {
+    display: grid;
+    grid-template-rows: repeat(7, 12px);
+    grid-auto-flow: column;
+    gap: 4px;
+    width: max-content;
+    margin: 0; /* 核心：干掉居中！ */
+    padding-left: 2px;
+}
+
+/* 单元格方块 */
+.heatmap-cell {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    background-color: #ebedf0;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+.heatmap-cell:hover {
+    transform: scale(1.3);
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    z-index: 2;
+}
+
+/* 🌟 颜色层级（浅色模式 - 纯正 GitHub 绿） */
+.heatmap-cell[data-level="1"] { background-color: #9be9a8; }
+.heatmap-cell[data-level="2"] { background-color: #40c463; }
+.heatmap-cell[data-level="3"] { background-color: #30a14e; }
+.heatmap-cell[data-level="4"] { background-color: #216e39; }
+
+/* 🌟 深色模式适配 */
+[data-theme="dark"] .heatmap-cell[data-level="0"] { background-color: #161b22; }
+[data-theme="dark"] .heatmap-cell[data-level="1"] { background-color: #0e4429; }
+[data-theme="dark"] .heatmap-cell[data-level="2"] { background-color: #006d32; }
+[data-theme="dark"] .heatmap-cell[data-level="3"] { background-color: #26a641; }
+[data-theme="dark"] .heatmap-cell[data-level="4"] { background-color: #39d353; }
+
+/* 悬浮提示框 Tooltip */
+.heatmap-tooltip {
+    position: absolute;
+    background: rgba(0,0,0,0.85);
+    color: #fff;
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 6px;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(5px) scale(0.95);
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    z-index: 10000;
+    white-space: nowrap;
+    font-family: var(--font-code);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+.heatmap-tooltip.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+/* 小倒三角 */
+.heatmap-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: rgba(0,0,0,0.85) transparent transparent transparent;
+}
+
+/* ==========================================================
+   🌟 极客设计：Obsidian 级知识星图 (主题自适应版)
+   ========================================================== */
+.knowledge-graph-wrapper {
+    margin: 0 0 40px 0;
+    padding: 24px;
+    background: var(--card-background); /* 🌟 核心：跟随网站主题自动切换深浅底色 */
+    border: 1px solid var(--border-color); /* 统一的边框 */
+    border-radius: 16px; /* 统一的圆角 */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03); /* 统一的轻柔阴影 */
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.graph-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+    color: var(--text-color); /* 🌟 核心：跟随主题切换文字颜色 */
+}
+
+.graph-header svg {
+    color: var(--primary-color);
+}
+
+.graph-header h3 {
+    margin: 0;
+    font-size: 1.3em;
+    color: var(--text-color);
+}
+
+.graph-tip {
+    font-size: 12px;
+    color: var(--secondary-text-color);
+    margin-left: auto; 
+    font-family: var(--font-main);
+    background: var(--border-color); /* 柔和的提示框底色 */
+    padding: 4px 10px;
+    border-radius: 20px;
+}
+
+/* 物理引擎画布 */
+#geek-knowledge-graph {
+    width: 100%;
+    height: 450px;
+    border-radius: 8px;
+    background-color: transparent;
+    cursor: grab;
+}
+#geek-knowledge-graph:active {
+    cursor: grabbing;
+}
+
+@media (max-width: 768px) {
+    .graph-tip { display: none; }
+    #geek-knowledge-graph { height: 350px; }
+}
+
+/* ==========================================================
+   🌟 极客设计：知识星图微型控制塔 (Graph Controls)
+   ========================================================== */
+.graph-controls {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 10px;
+}
+
+.graph-controls button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background: var(--card-background);
+    color: var(--secondary-text-color);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+    outline: none;
+}
+
+.graph-controls button:hover {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+    background: rgba(0, 122, 255, 0.08);
+    transform: translateY(-1px);
+}
+
+.graph-controls button:active {
+    transform: translateY(0);
+}
+
+.graph-controls button svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* 手机端隐藏控件，保持界面极简 */
+@media (max-width: 768px) {
+    .graph-controls { display: none; }
+}
+
+/* ==========================================================
+   🌟 极客设计：分享海报生成引擎 (Poster Generator)
+   ========================================================== */
+.icon-poster:hover {
+    border-color: #a855f7 !important;
+    color: #a855f7 !important;
+    background: rgba(168, 85, 247, 0.1) !important;
+}
+
+@keyframes geek-spin { 100% { transform: rotate(360deg); } }
+.spin-anim { animation: geek-spin 1s linear infinite; }
+
+/* 海报暗箱 (深藏功与名) */
+.geek-poster-template {
+    position: fixed;
+    top: -9999px;
+    left: -9999px;
+    width: 780px;
+    background: #0d1117; /* GitHub Dark 深渊色 */
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: #c9d1d9;
+    z-index: -1;
+}
+
+.poster-inner {
+    padding: 60px;
+    background: radial-gradient(circle at 100% 0%, rgba(168, 85, 247, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 0% 100%, rgba(56, 189, 248, 0.1) 0%, transparent 50%);
+}
+
+.poster-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 40px;
+}
+
+.poster-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.1);
+    object-fit: cover;
+}
+
+.poster-author-name {
+    font-size: 22px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 2px;
+}
+
+.poster-domain {
+    font-size: 14px;
+    color: #8b949e;
+    font-family: var(--font-code);
+}
+
+.poster-title {
+    font-size: 42px;
+    font-weight: 800;
+    color: #ffffff;
+    line-height: 1.35;
+    margin: 0 0 24px 0;
+    letter-spacing: -0.5px;
+}
+
+.poster-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 14px;
+    color: #8b949e;
+    margin-bottom: 40px;
+    font-family: var(--font-code);
+}
+
+.poster-meta span {
+    padding: 4px 12px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+}
+
+.poster-excerpt {
+    font-size: 18px;
+    line-height: 1.7;
+    color: #a5b2c1;
+    margin-bottom: 60px;
+    display: -webkit-box;
+    /* -webkit-line-clamp: 4; */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.poster-footer {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    padding-top: 40px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.qr-code-box {
+    background: #ffffff;
+    padding: 10px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.qr-text strong {
+    display: block;
+    font-size: 18px;
+    color: #ffffff;
+    margin-bottom: 6px;
+    letter-spacing: 1px;
+}
+
+.qr-text span {
+    font-size: 14px;
+    color: #8b949e;
+}
+
+/* ==========================================================
+   🌟 极客设计：Colophon 版权与致谢页专属样式
+   ========================================================== */
+.colophon-section {
+    margin-top: 100px;
+    padding-bottom: 100px;
+}
+
+.colophon-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 40px;
+    margin-top: 40px;
+}
+
+.typeface-card {
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+    transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.typeface-card:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-2px);
+}
+
+.typeface-specimen {
+    font-size: 2.2em;
+    font-weight: 600;
+    margin: 15px 0;
+    color: var(--text-color);
+    line-height: 1.2;
+}
+
+.font-lexend { font-family: var(--font-main); }
+.font-fira { font-family: var(--font-code); }
+.font-serif { font-family: 'Lora', 'Noto Serif SC', serif; }
+
+.inspiration-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.inspiration-item {
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: 14px;
+    padding: 20px;
+    text-decoration: none !important;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.inspiration-item:hover {
+    border-color: var(--primary-color);
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0, 122, 255, 0.08);
+}
+
+.inspiration-item h3 {
+    margin: 0 0 8px 0;
+    font-size: 1.15em;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--text-color);
+}
+
+.inspiration-item p {
+    margin: 0;
+    font-size: 0.9em;
+    color: var(--secondary-text-color);
+    line-height: 1.5;
+}
+
+.inspiration-tag {
+    font-size: 0.75em;
+    font-family: var(--font-code);
+    color: var(--primary-color);
+    background: rgba(0, 122, 255, 0.08);
+    padding: 2px 8px;
+    border-radius: 4px;
+    align-self: flex-start;
+    margin-top: 12px;
+}
+
+.tech-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.tech-badge-pill {
+    padding: 6px 14px;
+    border-radius: 30px;
+    border: 1px solid var(--border-color);
+    font-size: 13px;
+    font-family: var(--font-code);
+    color: var(--secondary-text-color);
+    background: var(--card-background);
+}
