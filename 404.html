@@ -1,0 +1,191 @@
+---
+layout: default
+title: 404 Not Found |
+permalink: /404.html
+---
+
+<style>
+    /* 🌟 强行隐藏所有不必要的全局组件，打造绝对干净的画布 */
+    .navbar,
+    .bottom-nav,
+    .global-controls,
+    #global-controls,
+    .reading-progress-bar {
+        display: none !important;
+    }
+
+    .error-section {
+        min-height: 100vh; /* 撑满整个屏幕高度 */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        margin-top: -40px; /* 稍微向上偏移，抵消视觉下坠感 */
+    }
+
+    /* 进场丝滑浮现动效 */
+    .error-content-wrapper {
+        max-width: 600px;
+        padding: 0 20px;
+        animation: fadeUp 0.8s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+    }
+
+    @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* 🌟 404 大字：金属石墨高级渐变 */
+    .error-code {
+        font-family: 'Lexend', var(--font-main);
+        font-size: 10rem; /* 进一步放大，视觉冲击力拉满 */
+        font-weight: 800;
+        line-height: 1;
+        letter-spacing: -0.05em; /* 收紧字距，更显精致 */
+        margin-bottom: 10px;
+        background: linear-gradient(135deg, var(--text-color) 0%, var(--secondary-text-color) 100%);
+        /*-webkit-background-clip: text;*/
+        -webkit-text-fill-color: transparent;
+        user-select: none;
+    }
+
+    .error-title {
+        font-family: 'Lexend', var(--font-main);
+        font-size: 2.2rem;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        margin-bottom: 16px;
+        color: var(--text-color);
+    }
+
+    .error-desc {
+        font-family: 'Lexend', var(--font-main);
+        color: var(--secondary-text-color);
+        margin-bottom: 30px;
+        font-size: 1.15rem;
+        line-height: 1.6;
+    }
+
+    /* 🌟 极客终端重构：去掉生硬边框，加入发光红点 */
+    .error-terminal {
+        display: inline-flex;
+        align-items: center;
+        gap: 12px;
+        font-family: var(--font-code);
+        font-size: 0.95rem;
+        background: rgba(120, 120, 128, 0.08); /* 极度柔和的底色 */
+        padding: 12px 24px;
+        border-radius: 12px;
+        border: 1px solid rgba(120, 120, 128, 0.1);
+        color: var(--secondary-text-color);
+        margin-bottom: 40px;
+    }
+
+    /* 模拟系统故障灯 */
+    .error-terminal .red-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: #ff5f56;
+        box-shadow: 0 0 10px rgba(255, 95, 86, 0.8);
+    }
+
+    /* 🌟 Apple 级按钮重塑 */
+    .error-actions {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .error-btn {
+        font-family: 'Lexend', var(--font-main);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 14px 28px;
+        border-radius: 30px;
+        font-size: 1.05rem;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        border: none;
+        outline: none;
+    }
+
+    /* 主按钮：强烈的反色对比 (浅色模式下纯黑，深色模式下纯白) */
+    .error-btn.primary {
+        background-color: var(--text-color);
+        color: var(--background-light);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+    [data-theme="dark"] .error-btn.primary {
+        box-shadow: 0 8px 20px rgba(255, 255, 255, 0.1);
+    }
+    .error-btn.primary:hover {
+        transform: translateY(-2px) scale(1.02);
+        box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+    }
+    [data-theme="dark"] .error-btn.primary:hover {
+        box-shadow: 0 12px 25px rgba(255, 255, 255, 0.15);
+    }
+
+    /* 次按钮：克制的柔和底色 */
+    .error-btn.secondary {
+        background-color: rgba(120, 120, 128, 0.1);
+        color: var(--text-color);
+    }
+    .error-btn.secondary:hover {
+        background-color: rgba(120, 120, 128, 0.2);
+        transform: translateY(-2px);
+    }
+
+    /* 手机端按钮撑满 */
+    @media (max-width: 600px) {
+        .error-code { font-size: 7rem; }
+        .error-title { font-size: 1.8rem; }
+        .error-terminal { font-size: 0.85rem; padding: 10px 16px; }
+        .error-actions { flex-direction: column; width: 100%; }
+        .error-btn { justify-content: center; width: 100%; }
+    }
+</style>
+
+<section class="section error-section">
+    <div class="container error-content-wrapper">
+        
+        <div class="error-code">404</div>
+        <h1 class="error-title">页面迷失在虚空中</h1>
+        <p class="error-desc">你所寻找的页面可能已被移除、重命名，或者暂时不可用。</p>
+        
+        <div class="error-terminal">
+            <div class="red-dot"></div>
+            <span>ERR_CONNECTION_REFUSED : Target unreached.</span>
+        </div>
+
+        <div class="error-actions">
+            <a href="/" class="error-btn primary">
+                <i data-feather="home" style="width: 18px; height: 18px;"></i> 返回主页
+            </a>
+            <button class="error-btn secondary" id="trigger-search-404">
+                <i data-feather="search" style="width: 18px; height: 18px;"></i> 唤醒检索
+            </button>
+        </div>
+
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        if(typeof feather !== 'undefined') feather.replace();
+
+        const searchBtn404 = document.getElementById('trigger-search-404');
+        const spotlightTrigger = document.getElementById('spotlight-trigger');
+        
+        if (searchBtn404 && spotlightTrigger) {
+            searchBtn404.addEventListener('click', () => {
+                spotlightTrigger.click();
+            });
+        }
+    });
+</script>

@@ -166,20 +166,90 @@
             let searchData = [];
             let isDataLoaded = false;
 
-            // 打开魔法
+            // ==========================================
+            // 🌟 神经元核心 1：无感记录阅读足迹
+            // ==========================================
+            // 智能判定：只要页面里有 markdown-content (代表是具体文章页)，就记录到本地
+            if (document.querySelector('.markdown-content')) {
+                const title = document.title.split('|')[0].trim();
+                const url = window.location.pathname;
+                const time = new Date().getTime();
+                
+                let history = JSON.parse(localStorage.getItem('geek_spotlight_history') || '[]');
+                history = history.filter(item => item.url !== url); // 剔除重复的当前页
+                history.unshift({ title, url, time }); // 将最新阅读压入栈顶
+                if (history.length > 5) history.pop(); // 极其克制，只保留最近 5 条
+                
+                localStorage.setItem('geek_spotlight_history', JSON.stringify(history));
+            }
+
+            // 计算相对时间的极客函数
+            const getRelativeTime = (timestamp) => {
+                const diff = Math.floor((new Date().getTime() - timestamp) / 1000 / 60);
+                if (diff < 1) return '刚刚 (Just now)';
+                if (diff < 60) return `${diff} 分钟前 (mins ago)`;
+                if (diff < 1440) return `${Math.floor(diff / 60)} 小时前 (hours ago)`;
+                return `${Math.floor(diff / 1440)} 天前 (days ago)`;
+            };
+
+            // 渲染本地记忆库
+            const renderHistory = () => {
+                const history = JSON.parse(localStorage.getItem('geek_spotlight_history') || '[]');
+                if (history.length === 0) {
+                    resultsBox.innerHTML = '<div class="spotlight-empty">键入关键词以探索全站内容...</div>';
+                    return;
+                }
+
+                let html = `
+                    <div class="spotlight-history-header">
+                        <span>最近阅读 (Recently Viewed)</span>
+                        <button class="spotlight-history-clear" id="clear-history">清空 (Clear)</button>
+                    </div>
+                `;
+
+                history.forEach(item => {
+                    const timeStr = getRelativeTime(item.time);
+                    html += `
+                        <a href="${item.url}" class="spotlight-result-item">
+                            <h4>
+                                <svg class="history-icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                                ${item.title}
+                            </h4>
+                            <p class="history-item-meta">LAST VISITED: ${timeStr}</p>
+                        </a>
+                    `;
+                });
+
+                resultsBox.innerHTML = html;
+
+                // 绑定清空事件
+                document.getElementById('clear-history').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    localStorage.removeItem('geek_spotlight_history');
+                    renderHistory();
+                });
+            };
+
+            // ==========================================
+            // 🌟 神经元核心 2：重构 Spotlight 弹窗逻辑
+            // ==========================================
             const openSpotlight = () => {
                 modal.classList.add('show');
-                setTimeout(() => input.focus(), 100); // 延迟聚焦，保证动画顺滑
-                document.body.style.overflow = 'hidden'; // 锁定背景滚动
+                setTimeout(() => input.focus(), 100);
+                document.body.style.overflow = 'hidden';
                 
-                // 仅在首次打开时去拉取 json，极致节省服务器流量
                 if (!isDataLoaded) {
                     fetch('/search.json')
                         .then(res => res.json())
-                        .then(data => {
-                            searchData = data;
-                            isDataLoaded = true;
-                        });
+                        .then(data => { searchData = data; isDataLoaded = true; });
+                }
+
+                // 每次打开且没有输入文字时，展示本地记忆
+                if (input.value.trim() === '') {
+                    renderHistory();
                 }
             };
 
@@ -189,42 +259,36 @@
                 input.blur();
             };
 
-            // 🌟 监听原生键盘事件
             document.addEventListener('keydown', (e) => {
-                // 拦截 Cmd+K (Mac) 或 Ctrl+K (Windows)
                 if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-                    e.preventDefault(); // 阻止浏览器默认的光标定位行为
+                    e.preventDefault(); 
                     if (modal.classList.contains('show')) closeSpotlight();
                     else openSpotlight();
                 }
-                // 拦截 ESC 退出
                 if (e.key === 'Escape' && modal.classList.contains('show')) {
                     closeSpotlight();
                 }
             });
 
-            // 绑定点击事件
             if (trigger) trigger.addEventListener('click', openSpotlight);
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) closeSpotlight(); // 点击毛玻璃背景关闭
-            });
+            modal.addEventListener('click', (e) => { if (e.target === modal) closeSpotlight(); });
 
-            // 🌟 实时检索引擎
+            // 🌟 实时检索引擎与记忆库的平滑交接
             if (input) {
                 input.addEventListener('input', (e) => {
                     const query = e.target.value.toLowerCase().trim();
                     resultsBox.innerHTML = '';
                     
                     if (!query) {
-                        resultsBox.innerHTML = '<div class="spotlight-empty">键入关键词以探索全站内容...</div>';
+                        // 当搜索框被清空时，瞬间切回本地记忆！
+                        renderHistory();
                         return;
                     }
                     if (!isDataLoaded) return;
 
-                    // 检索标题和正文，最多只显示前 10 条结果保证性能
                     const results = searchData.filter(post => 
-                        post.title.toLowerCase().includes(query) || 
-                        post.content.toLowerCase().includes(query)
+                        (post.title && post.title.toLowerCase().includes(query)) || 
+                        (post.content && post.content.toLowerCase().includes(query))
                     ).slice(0, 10); 
 
                     if (results.length === 0) {
@@ -235,7 +299,6 @@
                     results.forEach(post => {
                         let contentExcerpt = '';
                         const matchIndex = post.content.toLowerCase().indexOf(query);
-                        // 智能截取匹配位置前后的文本
                         if (matchIndex !== -1) {
                             const start = Math.max(0, matchIndex - 15);
                             const end = Math.min(post.content.length, matchIndex + query.length + 35);
@@ -244,8 +307,7 @@
                             contentExcerpt = post.content.substring(0, 50) + '...';
                         }
 
-                        // 注入高亮标签
-                        const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\$&')})`, 'gi');
+                        const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
                         const hlTitle = post.title.replace(regex, '<mark class="spotlight-highlight">$1</mark>');
                         const hlContent = contentExcerpt.replace(regex, '<mark class="spotlight-highlight">$1</mark>');
 
@@ -267,6 +329,11 @@
             <i data-feather="search"></i>
             <kbd>⌘ K</kbd>
         </button>
+        
+        <button id="bionic-trigger" class="bionic-trigger" aria-label="启动仿生阅读" style="display: none;" title="开启仿生阅读模式 (Bionic Reading)">
+            <i data-feather="zap"></i>
+        </button>
+
         <button class="theme-toggle" aria-label="切换深浅模式">
             <img src="/svg/ld/light.svg" alt="切换到浅色模式" class="light-icon">
             <img src="/svg/ld/dark.svg" alt="切换到深色模式" class="dark-icon">

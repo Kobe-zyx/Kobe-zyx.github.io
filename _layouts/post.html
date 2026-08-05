@@ -30,15 +30,27 @@ layout: default
                         <span style="background: var(--border-color); padding: 2px 8px; border-radius: 4px; font-size: 0.85em; font-weight: 600;">{{ page.categories.first }}</span>
                     {% endif %}
                     
-                    {% assign clean_content = content | strip_html | strip_newlines | remove: " " | remove: " " %}
+                    {% assign clean_content = content | strip_html | strip_newlines | remove: " " | remove: " " | remove: "	" %}
                     {% assign char_count = clean_content | size %}
-                    {% assign read_time = char_count | divided_by: 350 | plus: 1 %}
+                    
+                    {% assign mod = char_count | modulo: 300 %}
+                    {% assign read_time = char_count | divided_by: 300 %}
+                    {% if mod > 0 %}
+                        {% assign read_time = read_time | plus: 1 %}
+                    {% endif %}
+                    {% if read_time == 0 %}
+                        {% assign read_time = 1 %}
+                    {% endif %}
+                    
                     <span>·</span>
                     <span style="display: inline-flex; align-items: center; gap: 4px;" title="全文字数：约 {{ char_count }} 字">
                         <i data-feather="clock" style="width: 14px; height: 14px;"></i> 
                         预计阅读 {{ read_time }} 分钟
                     </span>
-                </div>
+                    
+                </div> 
+                
+                {% assign current_date = 'now' | date: '%s' %}
                 
                 {% assign current_date = 'now' | date: '%s' %}
                 
