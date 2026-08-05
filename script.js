@@ -1318,9 +1318,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 极客状态库：你可以随时在这里修改你的日常状态！
     const statuses = [
+        { text: "Listening to Apple Music", colorClass: "music" },    // 迷幻紫
         { text: "System Online & Running", colorClass: "" },          // 默认绿色
         { text: "Coding in VS Code", colorClass: "coding" },          // 科技蓝
-        { text: "Listening to Apple Music", colorClass: "music" },    // 迷幻紫
         { text: "Reading technical passages", colorClass: "reading" },    // 专注橙
         { text: "Compiling thoughts...", colorClass: "coding" }       // 科技蓝
     ];
